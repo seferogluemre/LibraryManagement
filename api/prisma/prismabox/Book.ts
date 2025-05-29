@@ -7,12 +7,20 @@ import { __nullable__ } from "./__nullable__";
 export const BookPlain = t.Object({
   id: t.String(),
   title: t.String(),
+  isbn: __nullable__(t.String()),
+  publishedYear: __nullable__(t.Integer()),
+  totalCopies: t.Integer(),
+  availableCopies: t.Integer(),
   authorId: t.String(),
+  categoryId: __nullable__(t.String()),
+  publisherId: __nullable__(t.String()),
   addedById: __nullable__(t.String()),
 });
 
 export const BookRelations = t.Object({
   author: t.Object({ id: t.String(), name: t.String() }),
+  category: __nullable__(t.Object({ id: t.String(), name: t.String() })),
+  publisher: __nullable__(t.Object({ id: t.String(), name: t.String() })),
   addedBy: __nullable__(
     t.Object({
       id: t.String(),
@@ -31,14 +39,27 @@ export const BookRelations = t.Object({
       assignedAt: t.Date(),
       returnDue: t.Date(),
       returned: t.Boolean(),
+      returnedAt: __nullable__(t.Date()),
     }),
     { additionalProperties: true },
   ),
 });
 
-export const BookPlainInputCreate = t.Object({ title: t.String() });
+export const BookPlainInputCreate = t.Object({
+  title: t.String(),
+  isbn: t.Optional(__nullable__(t.String())),
+  publishedYear: t.Optional(__nullable__(t.Integer())),
+  totalCopies: t.Optional(t.Integer()),
+  availableCopies: t.Optional(t.Integer()),
+});
 
-export const BookPlainInputUpdate = t.Object({ title: t.Optional(t.String()) });
+export const BookPlainInputUpdate = t.Object({
+  title: t.Optional(t.String()),
+  isbn: t.Optional(__nullable__(t.String())),
+  publishedYear: t.Optional(__nullable__(t.Integer())),
+  totalCopies: t.Optional(t.Integer()),
+  availableCopies: t.Optional(t.Integer()),
+});
 
 export const BookRelationsInputCreate = t.Object({
   author: t.Object({
@@ -46,6 +67,20 @@ export const BookRelationsInputCreate = t.Object({
       id: t.String(),
     }),
   }),
+  category: t.Optional(
+    t.Object({
+      connect: t.Object({
+        id: t.String(),
+      }),
+    }),
+  ),
+  publisher: t.Optional(
+    t.Object({
+      connect: t.Object({
+        id: t.String(),
+      }),
+    }),
+  ),
   addedBy: t.Optional(
     t.Object({
       connect: t.Object({
@@ -72,6 +107,22 @@ export const BookRelationsInputUpdate = t.Partial(
         id: t.String(),
       }),
     }),
+    category: t.Partial(
+      t.Object({
+        connect: t.Object({
+          id: t.String(),
+        }),
+        disconnect: t.Boolean(),
+      }),
+    ),
+    publisher: t.Partial(
+      t.Object({
+        connect: t.Object({
+          id: t.String(),
+        }),
+        disconnect: t.Boolean(),
+      }),
+    ),
     addedBy: t.Partial(
       t.Object({
         connect: t.Object({
@@ -109,7 +160,13 @@ export const BookWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: true }),
           id: t.String(),
           title: t.String(),
+          isbn: t.String(),
+          publishedYear: t.Integer(),
+          totalCopies: t.Integer(),
+          availableCopies: t.Integer(),
           authorId: t.String(),
+          categoryId: t.String(),
+          publisherId: t.String(),
           addedById: t.String(),
         },
         { additionalProperties: true },
@@ -123,10 +180,16 @@ export const BookWhereUnique = t.Recursive(
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.String() }, { additionalProperties: true }),
+          t.Object(
+            { id: t.String(), isbn: t.String() },
+            { additionalProperties: true },
+          ),
           { additionalProperties: true },
         ),
-        t.Union([t.Object({ id: t.String() })], { additionalProperties: true }),
+        t.Union(
+          [t.Object({ id: t.String() }), t.Object({ isbn: t.String() })],
+          { additionalProperties: true },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([Self, t.Array(Self, { additionalProperties: true })]),
@@ -139,7 +202,13 @@ export const BookWhereUnique = t.Recursive(
           t.Object({
             id: t.String(),
             title: t.String(),
+            isbn: t.String(),
+            publishedYear: t.Integer(),
+            totalCopies: t.Integer(),
+            availableCopies: t.Integer(),
             authorId: t.String(),
+            categoryId: t.String(),
+            publisherId: t.String(),
             addedById: t.String(),
           }),
         ),
@@ -153,8 +222,16 @@ export const BookSelect = t.Partial(
   t.Object({
     id: t.Boolean(),
     title: t.Boolean(),
+    isbn: t.Boolean(),
+    publishedYear: t.Boolean(),
+    totalCopies: t.Boolean(),
+    availableCopies: t.Boolean(),
     author: t.Boolean(),
     authorId: t.Boolean(),
+    category: t.Boolean(),
+    categoryId: t.Boolean(),
+    publisher: t.Boolean(),
+    publisherId: t.Boolean(),
     addedBy: t.Boolean(),
     addedById: t.Boolean(),
     assignments: t.Boolean(),
@@ -165,6 +242,8 @@ export const BookSelect = t.Partial(
 export const BookInclude = t.Partial(
   t.Object({
     author: t.Boolean(),
+    category: t.Boolean(),
+    publisher: t.Boolean(),
     addedBy: t.Boolean(),
     assignments: t.Boolean(),
     _count: t.Boolean(),
@@ -179,7 +258,25 @@ export const BookOrderBy = t.Partial(
     title: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
+    isbn: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    publishedYear: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    totalCopies: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    availableCopies: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
     authorId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    categoryId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    publisherId: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
     addedById: t.Union([t.Literal("asc"), t.Literal("desc")], {

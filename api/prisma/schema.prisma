@@ -25,64 +25,105 @@ enum UserRole {
   TEACHER
   ADMIN
 
-  @@map("user_role")
+  @@map("user_roles")
 }
 
 model User {
-  id             String   @id @default(uuid())
-  name           String
-  email          String   @unique
-  hashedPassword String
-  role           UserRole
-  createdAt      DateTime @default(now())
+  id             String   @id @default(uuid()) @map("user_id")
+  name           String   @map("user_name")
+  email          String   @unique @map("user_email")
+  hashedPassword String   @map("hashed_password")
+  role           UserRole @map("user_role")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-  createdBooks Book[]
+  createdBooks Book[] @relation("BookCreatedBy")
+
+  @@map("users")
 }
 
 model Author {
-  id    String @id @default(uuid())
-  name  String
+  id    String @id @default(uuid()) @map("author_id")
+  name  String @map("author_name")
   books Book[]
+
+  @@map("authors")
+}
+
+model Category {
+  id    String @id @default(uuid()) @map("category_id")
+  name  String @unique @map("category_name")
+  books Book[]
+
+  @@map("categories")
+}
+
+model Publisher {
+  id    String @id @default(uuid()) @map("publisher_id")
+  name  String @map("publisher_name")
+  books Book[]
+
+  @@map("publishers")
 }
 
 model Student {
-  id        String    @id @default(uuid())
-  name      String
-  studentNo Int
+  id        String    @id @default(uuid()) @map("student_id")
+  name      String    @map("student_name")
+  email     String?   @map("student_email")
+  studentNo Int       @unique @map("student_number")
   class     Classroom @relation(fields: [classId], references: [id])
-  classId   String
+  classId   String    @map("class_id")
 
   assignments BookAssignment[]
+
+  @@map("students")
 }
 
 model Book {
-  id       String @id @default(uuid())
-  title    String
-  author   Author @relation(fields: [authorId], references: [id])
-  authorId String
+  id              String  @id @default(uuid()) @map("book_id")
+  title           String  @map("book_title")
+  isbn            String? @unique @map("book_isbn")
+  publishedYear   Int?    @map("published_year")
+  totalCopies     Int     @default(1) @map("total_copies")
+  availableCopies Int     @default(1) @map("available_copies")
 
-  addedBy   User?   @relation(fields: [addedById], references: [id])
-  addedById String?
+  author   Author @relation(fields: [authorId], references: [id])
+  authorId String @map("author_id")
+
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?   @map("category_id")
+
+  publisher   Publisher? @relation(fields: [publisherId], references: [id])
+  publisherId String?    @map("publisher_id")
+
+  addedBy   User?   @relation("BookCreatedBy", fields: [addedById], references: [id])
+  addedById String? @map("added_by_id")
 
   assignments BookAssignment[]
+
+  @@map("books")
 }
 
 model Classroom {
-  id   String @id @default(uuid())
-  name String
+  id   String @id @default(uuid()) @map("classroom_id")
+  name String @map("classroom_name")
 
   students Student[]
+
+  @@map("classrooms")
 }
 
 model BookAssignment {
-  id        String  @id @default(uuid())
+  id        String  @id @default(uuid()) @map("assignment_id")
   student   Student @relation(fields: [studentId], references: [id])
-  studentId String
+  studentId String  @map("student_id")
 
   book   Book   @relation(fields: [bookId], references: [id])
-  bookId String
+  bookId String @map("book_id")
 
-  assignedAt DateTime @default(now())
-  returnDue  DateTime
-  returned   Boolean  @default(false)
+  assignedAt DateTime  @default(now()) @map("assigned_at")
+  returnDue  DateTime  @map("return_due")
+  returned   Boolean   @default(false) @map("is_returned")
+  returnedAt DateTime? @map("returned_at")
+
+  @@map("book_assignments")
 }

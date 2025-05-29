@@ -18,7 +18,13 @@ export const UserRelations = t.Object({
     t.Object({
       id: t.String(),
       title: t.String(),
+      isbn: __nullable__(t.String()),
+      publishedYear: __nullable__(t.Integer()),
+      totalCopies: t.Integer(),
+      availableCopies: t.Integer(),
       authorId: t.String(),
+      categoryId: __nullable__(t.String()),
+      publisherId: __nullable__(t.String()),
       addedById: __nullable__(t.String()),
     }),
     { additionalProperties: true },

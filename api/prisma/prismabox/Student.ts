@@ -7,6 +7,7 @@ import { __nullable__ } from "./__nullable__";
 export const StudentPlain = t.Object({
   id: t.String(),
   name: t.String(),
+  email: __nullable__(t.String()),
   studentNo: t.Integer(),
   classId: t.String(),
 });
@@ -21,6 +22,7 @@ export const StudentRelations = t.Object({
       assignedAt: t.Date(),
       returnDue: t.Date(),
       returned: t.Boolean(),
+      returnedAt: __nullable__(t.Date()),
     }),
     { additionalProperties: true },
   ),
@@ -28,11 +30,13 @@ export const StudentRelations = t.Object({
 
 export const StudentPlainInputCreate = t.Object({
   name: t.String(),
+  email: t.Optional(__nullable__(t.String())),
   studentNo: t.Integer(),
 });
 
 export const StudentPlainInputUpdate = t.Object({
   name: t.Optional(t.String()),
+  email: t.Optional(__nullable__(t.String())),
   studentNo: t.Optional(t.Integer()),
 });
 
@@ -90,6 +94,7 @@ export const StudentWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: true }),
           id: t.String(),
           name: t.String(),
+          email: t.String(),
           studentNo: t.Integer(),
           classId: t.String(),
         },
@@ -104,10 +109,16 @@ export const StudentWhereUnique = t.Recursive(
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.String() }, { additionalProperties: true }),
+          t.Object(
+            { id: t.String(), studentNo: t.Integer() },
+            { additionalProperties: true },
+          ),
           { additionalProperties: true },
         ),
-        t.Union([t.Object({ id: t.String() })], { additionalProperties: true }),
+        t.Union(
+          [t.Object({ id: t.String() }), t.Object({ studentNo: t.Integer() })],
+          { additionalProperties: true },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([Self, t.Array(Self, { additionalProperties: true })]),
@@ -120,6 +131,7 @@ export const StudentWhereUnique = t.Recursive(
           t.Object({
             id: t.String(),
             name: t.String(),
+            email: t.String(),
             studentNo: t.Integer(),
             classId: t.String(),
           }),
@@ -134,6 +146,7 @@ export const StudentSelect = t.Partial(
   t.Object({
     id: t.Boolean(),
     name: t.Boolean(),
+    email: t.Boolean(),
     studentNo: t.Boolean(),
     class: t.Boolean(),
     classId: t.Boolean(),
@@ -156,6 +169,9 @@ export const StudentOrderBy = t.Partial(
       additionalProperties: true,
     }),
     name: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    email: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
     studentNo: t.Union([t.Literal("asc"), t.Literal("desc")], {

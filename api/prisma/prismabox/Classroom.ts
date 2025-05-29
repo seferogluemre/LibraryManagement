@@ -11,6 +11,7 @@ export const ClassroomRelations = t.Object({
     t.Object({
       id: t.String(),
       name: t.String(),
+      email: __nullable__(t.String()),
       studentNo: t.Integer(),
       classId: t.String(),
     }),

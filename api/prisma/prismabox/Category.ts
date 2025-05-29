@@ -4,9 +4,9 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const AuthorPlain = t.Object({ id: t.String(), name: t.String() });
+export const CategoryPlain = t.Object({ id: t.String(), name: t.String() });
 
-export const AuthorRelations = t.Object({
+export const CategoryRelations = t.Object({
   books: t.Array(
     t.Object({
       id: t.String(),
@@ -24,13 +24,13 @@ export const AuthorRelations = t.Object({
   ),
 });
 
-export const AuthorPlainInputCreate = t.Object({ name: t.String() });
+export const CategoryPlainInputCreate = t.Object({ name: t.String() });
 
-export const AuthorPlainInputUpdate = t.Object({
+export const CategoryPlainInputUpdate = t.Object({
   name: t.Optional(t.String()),
 });
 
-export const AuthorRelationsInputCreate = t.Object({
+export const CategoryRelationsInputCreate = t.Object({
   books: t.Optional(
     t.Object({
       connect: t.Array(
@@ -43,7 +43,7 @@ export const AuthorRelationsInputCreate = t.Object({
   ),
 });
 
-export const AuthorRelationsInputUpdate = t.Partial(
+export const CategoryRelationsInputUpdate = t.Partial(
   t.Object({
     books: t.Partial(
       t.Object({
@@ -64,7 +64,7 @@ export const AuthorRelationsInputUpdate = t.Partial(
   }),
 );
 
-export const AuthorWhere = t.Partial(
+export const CategoryWhere = t.Partial(
   t.Recursive(
     (Self) =>
       t.Object(
@@ -77,19 +77,25 @@ export const AuthorWhere = t.Partial(
         },
         { additionalProperties: true },
       ),
-    { $id: "Author" },
+    { $id: "Category" },
   ),
 );
 
-export const AuthorWhereUnique = t.Recursive(
+export const CategoryWhereUnique = t.Recursive(
   (Self) =>
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.String() }, { additionalProperties: true }),
+          t.Object(
+            { id: t.String(), name: t.String() },
+            { additionalProperties: true },
+          ),
           { additionalProperties: true },
         ),
-        t.Union([t.Object({ id: t.String() })], { additionalProperties: true }),
+        t.Union(
+          [t.Object({ id: t.String() }), t.Object({ name: t.String() })],
+          { additionalProperties: true },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([Self, t.Array(Self, { additionalProperties: true })]),
@@ -102,10 +108,10 @@ export const AuthorWhereUnique = t.Recursive(
       ],
       { additionalProperties: true },
     ),
-  { $id: "Author" },
+  { $id: "Category" },
 );
 
-export const AuthorSelect = t.Partial(
+export const CategorySelect = t.Partial(
   t.Object({
     id: t.Boolean(),
     name: t.Boolean(),
@@ -114,11 +120,11 @@ export const AuthorSelect = t.Partial(
   }),
 );
 
-export const AuthorInclude = t.Partial(
+export const CategoryInclude = t.Partial(
   t.Object({ books: t.Boolean(), _count: t.Boolean() }),
 );
 
-export const AuthorOrderBy = t.Partial(
+export const CategoryOrderBy = t.Partial(
   t.Object({
     id: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
@@ -129,14 +135,14 @@ export const AuthorOrderBy = t.Partial(
   }),
 );
 
-export const Author = t.Composite([AuthorPlain, AuthorRelations]);
+export const Category = t.Composite([CategoryPlain, CategoryRelations]);
 
-export const AuthorInputCreate = t.Composite([
-  AuthorPlainInputCreate,
-  AuthorRelationsInputCreate,
+export const CategoryInputCreate = t.Composite([
+  CategoryPlainInputCreate,
+  CategoryRelationsInputCreate,
 ]);
 
-export const AuthorInputUpdate = t.Composite([
-  AuthorPlainInputUpdate,
-  AuthorRelationsInputUpdate,
+export const CategoryInputUpdate = t.Composite([
+  CategoryPlainInputUpdate,
+  CategoryRelationsInputUpdate,
 ]);

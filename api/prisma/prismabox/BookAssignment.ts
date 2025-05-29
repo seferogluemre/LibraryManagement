@@ -11,19 +11,27 @@ export const BookAssignmentPlain = t.Object({
   assignedAt: t.Date(),
   returnDue: t.Date(),
   returned: t.Boolean(),
+  returnedAt: __nullable__(t.Date()),
 });
 
 export const BookAssignmentRelations = t.Object({
   student: t.Object({
     id: t.String(),
     name: t.String(),
+    email: __nullable__(t.String()),
     studentNo: t.Integer(),
     classId: t.String(),
   }),
   book: t.Object({
     id: t.String(),
     title: t.String(),
+    isbn: __nullable__(t.String()),
+    publishedYear: __nullable__(t.Integer()),
+    totalCopies: t.Integer(),
+    availableCopies: t.Integer(),
     authorId: t.String(),
+    categoryId: __nullable__(t.String()),
+    publisherId: __nullable__(t.String()),
     addedById: __nullable__(t.String()),
   }),
 });
@@ -32,12 +40,14 @@ export const BookAssignmentPlainInputCreate = t.Object({
   assignedAt: t.Optional(t.Date()),
   returnDue: t.Date(),
   returned: t.Optional(t.Boolean()),
+  returnedAt: t.Optional(__nullable__(t.Date())),
 });
 
 export const BookAssignmentPlainInputUpdate = t.Object({
   assignedAt: t.Optional(t.Date()),
   returnDue: t.Optional(t.Date()),
   returned: t.Optional(t.Boolean()),
+  returnedAt: t.Optional(__nullable__(t.Date())),
 });
 
 export const BookAssignmentRelationsInputCreate = t.Object({
@@ -82,6 +92,7 @@ export const BookAssignmentWhere = t.Partial(
           assignedAt: t.Date(),
           returnDue: t.Date(),
           returned: t.Boolean(),
+          returnedAt: t.Date(),
         },
         { additionalProperties: true },
       ),
@@ -114,6 +125,7 @@ export const BookAssignmentWhereUnique = t.Recursive(
             assignedAt: t.Date(),
             returnDue: t.Date(),
             returned: t.Boolean(),
+            returnedAt: t.Date(),
           }),
         ),
       ],
@@ -132,6 +144,7 @@ export const BookAssignmentSelect = t.Partial(
     assignedAt: t.Boolean(),
     returnDue: t.Boolean(),
     returned: t.Boolean(),
+    returnedAt: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -158,6 +171,9 @@ export const BookAssignmentOrderBy = t.Partial(
       additionalProperties: true,
     }),
     returned: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    returnedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
   }),
