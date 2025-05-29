@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator prismabox {
+  provider                    = "prismabox"
+  // you can optionally specify the output location. Defaults to ./prismabox
+  output                      = "./prismabox"
+  // if you want, you can customize the imported variable name that is used for the schemes. Defaults to "Type" which is what the standard typebox package offers
+  typeboxImportVariableName   = "t"
+  // you also can specify the dependency from which the above import should happen. This is useful if a package re-exports the typebox package and you would like to use that
+  typeboxImportDependencyName = "elysia"
+  // by default the generated schemes do not allow additional properties. You can allow them by setting this to true
+  additionalProperties        = true
+  // optionally enable the data model generation. See the data model section below for more info
+  inputModel                  = true
+}
+
+enum UserRole {
+  TEACHER
+  ADMIN
+
+  @@map("user_role")
+}
+
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  hashedPassword String
+  role           UserRole
+  createdAt      DateTime @default(now())
+
+  createdBooks Book[]
+}
+
+model Author {
+  id    String @id @default(uuid())
+  name  String
+  books Book[]
+}
+
+model Student {
+  id        String    @id @default(uuid())
+  name      String
+  studentNo Int
+  class     Classroom @relation(fields: [classId], references: [id])
+  classId   String
+
+  assignments BookAssignment[]
+}
+
+model Book {
+  id       String @id @default(uuid())
+  title    String
+  author   Author @relation(fields: [authorId], references: [id])
+  authorId String
+
+  addedBy   User?   @relation(fields: [addedById], references: [id])
+  addedById String?
+
+  assignments BookAssignment[]
+}
+
+model Classroom {
+  id   String @id @default(uuid())
+  name String
+
+  students Student[]
+}
+
+model BookAssignment {
+  id        String  @id @default(uuid())
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String
+
+  book   Book   @relation(fields: [bookId], references: [id])
+  bookId String
+
+  assignedAt DateTime @default(now())
+  returnDue  DateTime
+  returned   Boolean  @default(false)
+}
