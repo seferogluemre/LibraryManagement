@@ -1,0 +1,61 @@
+import { Elysia } from "elysia";
+import { AuthService } from "../modules/auth/service";
+import { UnauthorizedException } from "./http-errors";
+
+/**
+ * JWT Authentication Middleware
+ * Authorization header'dan token'ı alır ve doğrular
+ */
+export const authMiddleware = new Elysia({ name: "auth-middleware" }).derive(
+  async ({ headers }) => {
+    const authHeader = headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new UnauthorizedException("Authorization header gerekli");
+    }
+
+    const token = authHeader.substring(7);
+
+    try {
+      const user = await AuthService.validateToken(token);
+      return {
+        user,
+        isAuthenticated: true,
+      };
+    } catch (error) {
+      throw new UnauthorizedException("Geçersiz token");
+    }
+  }
+);
+
+/**
+ * Optional Auth Middleware
+ * Token varsa doğrular, yoksa null user döner
+ */
+export const optionalAuthMiddleware = new Elysia({
+  name: "optional-auth-middleware",
+}).derive(async ({ headers }) => {
+  const authHeader = headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return {
+      user: null,
+      isAuthenticated: false,
+    };
+  }
+
+  const token = authHeader.substring(7);
+
+  try {
+    const user = await AuthService.validateToken(token);
+    return {
+      user,
+      isAuthenticated: true,
+    };
+  } catch (error) {
+    return {
+      user: null,
+      isAuthenticated: false,
+    };
+  }
+});

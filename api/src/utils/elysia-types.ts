@@ -11,6 +11,10 @@ export const errorResponseDto = {
     message: t.String(),
     error: t.Optional(t.String()),
   }),
+  401: t.Object({
+    message: t.String(),
+    error: t.Optional(t.String()),
+  }),
   404: t.Object({
     message: t.String(),
     error: t.Optional(t.String()),
