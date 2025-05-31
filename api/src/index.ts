@@ -3,6 +3,7 @@ import swagger from "@elysiajs/swagger";
 import { authController } from "@modules/auth";
 import { classroomController } from "@modules/classroom";
 import { studentController } from "@modules/student";
+import { studentClassroomController } from "@modules/student-classroom";
 import { userController } from "@modules/users";
 import { Elysia } from "elysia";
 
@@ -21,6 +22,10 @@ const app = new Elysia()
           { name: "Users", description: "Kullanıcı yönetimi" },
           { name: "Students", description: "Öğrenci yönetimi" },
           { name: "Classrooms", description: "Sınıf yönetimi" },
+          {
+            name: "Student-Classroom",
+            description: "Öğrenci-Sınıf ilişki yönetimi",
+          },
         ],
         components: {
           securitySchemes: {
@@ -38,6 +43,7 @@ const app = new Elysia()
   .use(authController)
   .use(studentController)
   .use(classroomController)
+  .use(studentClassroomController)
   .listen(3000);
 
 console.log(
