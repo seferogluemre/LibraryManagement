@@ -13,7 +13,7 @@ export const StudentPlain = t.Object({
 });
 
 export const StudentRelations = t.Object({
-  class: t.Object({ id: t.String(), name: t.String() }),
+  class: t.Object({ id: t.String(), name: t.String(), createdAt: t.Date() }),
   assignments: t.Array(
     t.Object({
       id: t.String(),

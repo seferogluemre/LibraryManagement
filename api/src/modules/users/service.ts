@@ -1,17 +1,10 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import bcrypt from "bcryptjs";
 import prisma from "../../core/prisma";
 import { ConflictException, NotFoundException } from "../../utils/http-errors";
 import { getUserFilters } from "./dtos";
 import { UserCreatePayload, UserIndexQuery, UserUpdatePayload } from "./types";
-
-interface UserPayloadInternal {
-  name?: string;
-  email?: string;
-  hashedPassword?: string;
-  role?: UserRole;
-}
 
 export abstract class UsersService {
   private static async handlePrismaError(

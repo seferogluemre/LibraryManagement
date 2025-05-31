@@ -4,7 +4,11 @@ import { __transformDate__ } from "./__transformDate__";
 
 import { __nullable__ } from "./__nullable__";
 
-export const ClassroomPlain = t.Object({ id: t.String(), name: t.String() });
+export const ClassroomPlain = t.Object({
+  id: t.String(),
+  name: t.String(),
+  createdAt: t.Date(),
+});
 
 export const ClassroomRelations = t.Object({
   students: t.Array(
@@ -69,6 +73,7 @@ export const ClassroomWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: true }),
           id: t.String(),
           name: t.String(),
+          createdAt: t.Date(),
         },
         { additionalProperties: true },
       ),
@@ -93,7 +98,9 @@ export const ClassroomWhereUnique = t.Recursive(
           }),
           { additionalProperties: true },
         ),
-        t.Partial(t.Object({ id: t.String(), name: t.String() })),
+        t.Partial(
+          t.Object({ id: t.String(), name: t.String(), createdAt: t.Date() }),
+        ),
       ],
       { additionalProperties: true },
     ),
@@ -104,6 +111,7 @@ export const ClassroomSelect = t.Partial(
   t.Object({
     id: t.Boolean(),
     name: t.Boolean(),
+    createdAt: t.Boolean(),
     students: t.Boolean(),
     _count: t.Boolean(),
   }),
@@ -119,6 +127,9 @@ export const ClassroomOrderBy = t.Partial(
       additionalProperties: true,
     }),
     name: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
   }),

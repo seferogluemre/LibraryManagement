@@ -17,7 +17,7 @@ export const app = new Elysia({
   },
 })
   .post(
-    "", // Yeni kullanıcı oluşturma
+    "",
     async ({ body }) => {
       const user = await UsersService.store(body);
       return UserFormatter.response(user);

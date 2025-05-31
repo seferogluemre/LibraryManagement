@@ -108,7 +108,8 @@ model Classroom {
   id   String @id @default(uuid()) @map("classroom_id")
   name String @map("classroom_name")
 
-  students Student[]
+  createdAt DateTime  @default(now())
+  students  Student[]
 
   @@map("classrooms")
 }
