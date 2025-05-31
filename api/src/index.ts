@@ -4,6 +4,7 @@ import { authController } from "@modules/auth";
 import { classroomController } from "@modules/classroom";
 import { studentController } from "@modules/student";
 import { studentClassroomController } from "@modules/student-classroom";
+import { transferHistoryController } from "@modules/transfer-history";
 import { userController } from "@modules/users";
 import { Elysia } from "elysia";
 
@@ -26,6 +27,10 @@ const app = new Elysia()
             name: "Student-Classroom",
             description: "Öğrenci-Sınıf ilişki yönetimi",
           },
+          {
+            name: "Transfer History",
+            description: "Öğrenci transfer geçmişi yönetimi",
+          },
         ],
         components: {
           securitySchemes: {
@@ -44,6 +49,7 @@ const app = new Elysia()
   .use(studentController)
   .use(classroomController)
   .use(studentClassroomController)
+  .use(transferHistoryController)
   .listen(3000);
 
 console.log(

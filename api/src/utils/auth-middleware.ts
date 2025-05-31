@@ -27,7 +27,7 @@ export const authGuard = async (
 
 /**
  * JWT Authentication Middleware
- * Elysia instance olarak
+ * Elysia instance
  */
 export const authMiddleware = new Elysia({ name: "auth" }).macro(
   ({ onBeforeHandle }) => ({

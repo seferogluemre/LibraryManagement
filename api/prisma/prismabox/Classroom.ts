@@ -21,6 +21,30 @@ export const ClassroomRelations = t.Object({
     }),
     { additionalProperties: true },
   ),
+  oldTransfer: t.Array(
+    t.Object({
+      id: t.String(),
+      studentId: t.String(),
+      oldClassId: t.String(),
+      newClassId: t.String(),
+      notes: __nullable__(t.String()),
+      transferDate: t.Date(),
+      createdAt: t.Date(),
+    }),
+    { additionalProperties: true },
+  ),
+  newTransfer: t.Array(
+    t.Object({
+      id: t.String(),
+      studentId: t.String(),
+      oldClassId: t.String(),
+      newClassId: t.String(),
+      notes: __nullable__(t.String()),
+      transferDate: t.Date(),
+      createdAt: t.Date(),
+    }),
+    { additionalProperties: true },
+  ),
 });
 
 export const ClassroomPlainInputCreate = t.Object({ name: t.String() });
@@ -40,11 +64,63 @@ export const ClassroomRelationsInputCreate = t.Object({
       ),
     }),
   ),
+  oldTransfer: t.Optional(
+    t.Object({
+      connect: t.Array(
+        t.Object({
+          id: t.String(),
+        }),
+        { additionalProperties: true },
+      ),
+    }),
+  ),
+  newTransfer: t.Optional(
+    t.Object({
+      connect: t.Array(
+        t.Object({
+          id: t.String(),
+        }),
+        { additionalProperties: true },
+      ),
+    }),
+  ),
 });
 
 export const ClassroomRelationsInputUpdate = t.Partial(
   t.Object({
     students: t.Partial(
+      t.Object({
+        connect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+        disconnect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+      }),
+    ),
+    oldTransfer: t.Partial(
+      t.Object({
+        connect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+        disconnect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+      }),
+    ),
+    newTransfer: t.Partial(
       t.Object({
         connect: t.Array(
           t.Object({
@@ -113,12 +189,19 @@ export const ClassroomSelect = t.Partial(
     name: t.Boolean(),
     createdAt: t.Boolean(),
     students: t.Boolean(),
+    oldTransfer: t.Boolean(),
+    newTransfer: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
 
 export const ClassroomInclude = t.Partial(
-  t.Object({ students: t.Boolean(), _count: t.Boolean() }),
+  t.Object({
+    students: t.Boolean(),
+    oldTransfer: t.Boolean(),
+    newTransfer: t.Boolean(),
+    _count: t.Boolean(),
+  }),
 );
 
 export const ClassroomOrderBy = t.Partial(

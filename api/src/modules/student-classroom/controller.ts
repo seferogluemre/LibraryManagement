@@ -1,4 +1,5 @@
 import Elysia, { t } from "elysia";
+import { TransferHistoryFormatter } from "../transfer-history/formatters";
 import {
   studentClassroomRemoveDto,
   studentClassroomShowDto,
@@ -48,7 +49,7 @@ export const app = new Elysia({
     async ({ params: { studentId } }) => {
       const history =
         await StudentClassroomService.getStudentTransferHistory(studentId);
-      return StudentClassroomFormatter.transferHistoryResponse(history);
+      return TransferHistoryFormatter.listResponse(history);
     },
     {
       params: t.Object({
@@ -57,10 +58,26 @@ export const app = new Elysia({
       response: {
         200: t.Array(
           t.Object({
-            classId: t.String(),
-            className: t.String(),
+            id: t.String(),
+            studentId: t.String(),
+            oldClassId: t.String(),
+            newClassId: t.String(),
+            notes: t.Optional(t.String()),
             transferDate: t.Date(),
-            reason: t.Optional(t.String()),
+            createdAt: t.Date(),
+            student: t.Object({
+              id: t.String(),
+              name: t.String(),
+              studentNo: t.Number(),
+            }),
+            oldClass: t.Object({
+              id: t.String(),
+              name: t.String(),
+            }),
+            newClass: t.Object({
+              id: t.String(),
+              name: t.String(),
+            }),
           })
         ),
         404: studentClassroomShowDto.response[404],

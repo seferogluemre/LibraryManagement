@@ -74,7 +74,8 @@ model Student {
   class     Classroom @relation(fields: [classId], references: [id])
   classId   String    @map("class_id")
 
-  assignments BookAssignment[]
+  assignments     BookAssignment[]
+  TransferHistory TransferHistory[]
 
   @@map("students")
 }
@@ -108,8 +109,10 @@ model Classroom {
   id   String @id @default(uuid()) @map("classroom_id")
   name String @map("classroom_name")
 
-  createdAt DateTime  @default(now())
-  students  Student[]
+  createdAt   DateTime          @default(now())
+  students    Student[]
+  oldTransfer TransferHistory[] @relation("OldTransfer")
+  newTransfer TransferHistory[] @relation("NewTransfer")
 
   @@map("classrooms")
 }
@@ -142,4 +145,22 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+model TransferHistory {
+  id        String  @id @default(uuid()) @map("transfer_history_id")
+  studentId String  @map("student_id")
+  student   Student @relation(fields: [studentId], references: [id])
+
+  oldClassId String    @map("old_class_id")
+  oldClass   Classroom @relation("OldTransfer", fields: [oldClassId], references: [id])
+
+  newClassId String    @map("new_class_id")
+  newClass   Classroom @relation("NewTransfer", fields: [newClassId], references: [id])
+
+  notes        String?  @map("notes")
+  transferDate DateTime @default(now()) @map("transfer_date")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("transfer_histories")
 }

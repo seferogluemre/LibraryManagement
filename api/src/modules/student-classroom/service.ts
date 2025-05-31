@@ -1,6 +1,7 @@
 import prisma from "#core/prisma";
 import { ConflictException, NotFoundException } from "#utils/http-errors";
 import { StudentService } from "../student/service";
+import { TransferHistoryService } from "../transfer-history/service";
 import type { ClassroomTransferRequest, StudentWithClassroom } from "./types";
 
 export abstract class StudentClassroomService {
@@ -58,8 +59,13 @@ export abstract class StudentClassroomService {
         classId: newClassId,
       });
 
-      // TODO: Transfer geçmişini kaydet (gelecekte transfer history tablosu eklenebilir)
-      // await this.recordTransferHistory(studentId, currentStudent.classId, newClassId, reason);
+      // Transfer geçmişini kaydet
+      await TransferHistoryService.create({
+        studentId: studentId,
+        oldClassId: currentStudent.classId,
+        newClassId: newClassId,
+        notes: reason,
+      });
 
       return {
         id: updatedStudent.id,
@@ -106,6 +112,14 @@ export abstract class StudentClassroomService {
         classId: unassignedClass.id,
       });
 
+      // Transfer geçmişini kaydet
+      await TransferHistoryService.create({
+        studentId: studentId,
+        oldClassId: currentStudent.classId,
+        newClassId: unassignedClass.id,
+        notes: "Öğrenci sınıftan çıkarıldı",
+      });
+
       return {
         message: "Öğrenci sınıftan çıkarıldı",
         student: {
@@ -134,12 +148,16 @@ export abstract class StudentClassroomService {
   }
 
   /**
-   * Öğrencinin transfer geçmişini getir (gelecek için)
-   * TODO: Transfer history tablosu oluşturulduğunda aktif edilecek
+   * Öğrencinin transfer geçmişini getir
    */
   static async getStudentTransferHistory(studentId: string) {
-    // Placeholder for future implementation
-    return [];
+    try {
+      const history =
+        await TransferHistoryService.getStudentTransferHistory(studentId);
+      return history;
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**

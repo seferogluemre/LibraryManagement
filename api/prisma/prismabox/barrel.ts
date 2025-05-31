@@ -8,5 +8,6 @@ export * from "./Book";
 export * from "./Classroom";
 export * from "./BookAssignment";
 export * from "./Session";
+export * from "./TransferHistory";
 export * from "./__nullable__";
 export * from "./__transformDate__";
