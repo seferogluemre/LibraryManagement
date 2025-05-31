@@ -133,3 +133,73 @@ export const transferHistoryStudentDto = {
     description: "Belirtilen öğrencinin tüm transfer geçmişini gösterir",
   },
 } satisfies ControllerHook;
+
+// Additional DTOs for special endpoints
+export const transferHistoryFromClassDto = {
+  params: t.Object({
+    classId: t.String(),
+  }),
+  response: {
+    200: t.Array(transferHistoryResponseSchema),
+    404: errorResponseDto[404],
+  },
+  detail: {
+    summary: "Sınıftan Yapılan Transferler",
+    description:
+      "Belirtilen sınıftan başka sınıflara yapılan transferleri gösterir",
+  },
+} satisfies ControllerHook;
+
+export const transferHistoryToClassDto = {
+  params: t.Object({
+    classId: t.String(),
+  }),
+  response: {
+    200: t.Array(transferHistoryResponseSchema),
+    404: errorResponseDto[404],
+  },
+  detail: {
+    summary: "Sınıfa Yapılan Transferler",
+    description:
+      "Belirtilen sınıfa diğer sınıflardan yapılan transferleri gösterir",
+  },
+} satisfies ControllerHook;
+
+export const transferHistoryRecentDto = {
+  params: t.Object({
+    limit: t.Optional(t.String()),
+  }),
+  response: {
+    200: t.Array(
+      t.Object({
+        id: t.String(),
+        studentName: t.String(),
+        studentNo: t.Number(),
+        oldClassName: t.String(),
+        newClassName: t.String(),
+        transferDate: t.Date(),
+        notes: t.Optional(t.String()),
+      })
+    ),
+  },
+  detail: {
+    summary: "Son Transfer Kayıtları",
+    description: "En son yapılan N adet transferi özet olarak gösterir",
+  },
+} satisfies ControllerHook;
+
+export const transferHistoryDestroyDto = {
+  params: t.Object({
+    id: t.String(),
+  }),
+  response: {
+    200: t.Object({
+      message: t.String(),
+    }),
+    404: errorResponseDto[404],
+  },
+  detail: {
+    summary: "Transfer Kaydını Sil",
+    description: "Belirtilen transfer kaydını sistemden siler",
+  },
+} satisfies ControllerHook;

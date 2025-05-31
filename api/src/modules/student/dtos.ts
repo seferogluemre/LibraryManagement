@@ -142,3 +142,32 @@ export const studentCreateDto = {
 } satisfies ControllerHook;
 
 export const studentCreateResponseDto = studentCreateDto.response["200"];
+
+// Additional DTOs for special endpoints
+export const studentByClassDto = {
+  params: t.Object({
+    classId: t.String(),
+  }),
+  response: {
+    200: t.Array(studentWithClassResponseSchema),
+    404: errorResponseDto[404],
+  },
+  detail: {
+    summary: "Sınıfa Göre Öğrencileri Listele",
+    description: "Belirli bir sınıftaki tüm öğrencileri listeler",
+  },
+} satisfies ControllerHook;
+
+export const studentByStudentNoDto = {
+  params: t.Object({
+    studentNo: t.String(),
+  }),
+  response: {
+    200: studentWithClassResponseSchema,
+    404: errorResponseDto[404],
+  },
+  detail: {
+    summary: "Öğrenci Numarasına Göre Öğrenci Bul",
+    description: "Öğrenci numarası ile öğrenci arar",
+  },
+} satisfies ControllerHook;

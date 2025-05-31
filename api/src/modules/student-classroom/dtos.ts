@@ -84,16 +84,90 @@ export const studentClassroomHistoryDto = {
   response: {
     200: t.Array(
       t.Object({
-        classId: t.String(),
-        className: t.String(),
+        id: t.String(),
+        studentId: t.String(),
+        oldClassId: t.String(),
+        newClassId: t.String(),
+        notes: t.Optional(t.String()),
         transferDate: t.Date(),
-        reason: t.Optional(t.String()),
+        createdAt: t.Date(),
+        student: t.Object({
+          id: t.String(),
+          name: t.String(),
+          studentNo: t.Number(),
+        }),
+        oldClass: t.Object({
+          id: t.String(),
+          name: t.String(),
+        }),
+        newClass: t.Object({
+          id: t.String(),
+          name: t.String(),
+        }),
       })
     ),
     404: errorResponseDto[404],
   },
   detail: {
-    summary: "Öğrencinin Sınıf Geçmişini Getir",
-    description: "Öğrencinin hangi sınıflarda bulunduğu geçmişini gösterir",
+    summary: "Öğrencinin Transfer Geçmişi",
+    description: "Öğrencinin sınıf değişiklik geçmişini gösterir",
+  },
+} satisfies ControllerHook;
+
+// Additional DTOs for special endpoints
+export const studentClassroomBulkTransferDto = {
+  body: t.Object({
+    studentIds: t.Array(t.String(), {
+      description: "Transfer edilecek öğrenci ID'leri",
+    }),
+    newClassId: t.String({
+      description: "Yeni sınıf ID'si",
+    }),
+    reason: t.Optional(
+      t.String({
+        description: "Transfer sebebi",
+      })
+    ),
+  }),
+  response: {
+    200: t.Object({
+      summary: t.Object({
+        total: t.Number(),
+        successful: t.Number(),
+        failed: t.Number(),
+      }),
+      details: t.Object({
+        successful: t.Array(t.String()),
+        failed: t.Array(
+          t.Object({
+            studentId: t.String(),
+            error: t.String(),
+          })
+        ),
+      }),
+    }),
+    404: errorResponseDto[404],
+    422: errorResponseDto[422],
+  },
+  detail: {
+    summary: "Toplu Öğrenci Transferi",
+    description: "Birden fazla öğrenciyi aynı anda başka sınıfa transfer eder",
+  },
+} satisfies ControllerHook;
+
+export const studentClassroomClassCountDto = {
+  params: t.Object({
+    classId: t.String(),
+  }),
+  response: {
+    200: t.Object({
+      classId: t.String(),
+      studentCount: t.Number(),
+    }),
+    404: errorResponseDto[404],
+  },
+  detail: {
+    summary: "Sınıf Öğrenci Sayısı",
+    description: "Belirtilen sınıftaki öğrenci sayısını döner",
   },
 } satisfies ControllerHook;

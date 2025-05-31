@@ -1,6 +1,9 @@
-import Elysia, { t } from "elysia";
+import Elysia from "elysia";
 import { TransferHistoryFormatter } from "../transfer-history/formatters";
 import {
+  studentClassroomBulkTransferDto,
+  studentClassroomClassCountDto,
+  studentClassroomHistoryDto,
   studentClassroomRemoveDto,
   studentClassroomShowDto,
   studentClassroomTransferDto,
@@ -51,42 +54,7 @@ export const app = new Elysia({
         await StudentClassroomService.getStudentTransferHistory(studentId);
       return TransferHistoryFormatter.listResponse(history);
     },
-    {
-      params: t.Object({
-        studentId: t.String(),
-      }),
-      response: {
-        200: t.Array(
-          t.Object({
-            id: t.String(),
-            studentId: t.String(),
-            oldClassId: t.String(),
-            newClassId: t.String(),
-            notes: t.Optional(t.String()),
-            transferDate: t.Date(),
-            createdAt: t.Date(),
-            student: t.Object({
-              id: t.String(),
-              name: t.String(),
-              studentNo: t.Number(),
-            }),
-            oldClass: t.Object({
-              id: t.String(),
-              name: t.String(),
-            }),
-            newClass: t.Object({
-              id: t.String(),
-              name: t.String(),
-            }),
-          })
-        ),
-        404: studentClassroomShowDto.response[404],
-      },
-      detail: {
-        summary: "Öğrencinin Transfer Geçmişi",
-        description: "Öğrencinin sınıf değişiklik geçmişini gösterir",
-      },
-    }
+    studentClassroomHistoryDto
   )
   .post(
     "/bulk-transfer",
@@ -99,46 +67,7 @@ export const app = new Elysia({
       );
       return StudentClassroomFormatter.bulkTransferResponse(result);
     },
-    {
-      body: t.Object({
-        studentIds: t.Array(t.String(), {
-          description: "Transfer edilecek öğrenci ID'leri",
-        }),
-        newClassId: t.String({
-          description: "Yeni sınıf ID'si",
-        }),
-        reason: t.Optional(
-          t.String({
-            description: "Transfer sebebi",
-          })
-        ),
-      }),
-      response: {
-        200: t.Object({
-          summary: t.Object({
-            total: t.Number(),
-            successful: t.Number(),
-            failed: t.Number(),
-          }),
-          details: t.Object({
-            successful: t.Array(t.String()),
-            failed: t.Array(
-              t.Object({
-                studentId: t.String(),
-                error: t.String(),
-              })
-            ),
-          }),
-        }),
-        404: studentClassroomShowDto.response[404],
-        422: studentClassroomTransferDto.response[422],
-      },
-      detail: {
-        summary: "Toplu Öğrenci Transferi",
-        description:
-          "Birden fazla öğrenciyi aynı anda başka sınıfa transfer eder",
-      },
-    }
+    studentClassroomBulkTransferDto
   )
   .get(
     "/class/:classId/count",
@@ -150,20 +79,5 @@ export const app = new Elysia({
         studentCount: count,
       };
     },
-    {
-      params: t.Object({
-        classId: t.String(),
-      }),
-      response: {
-        200: t.Object({
-          classId: t.String(),
-          studentCount: t.Number(),
-        }),
-        404: studentClassroomShowDto.response[404],
-      },
-      detail: {
-        summary: "Sınıf Öğrenci Sayısı",
-        description: "Belirtilen sınıftaki öğrenci sayısını döner",
-      },
-    }
+    studentClassroomClassCountDto
   );

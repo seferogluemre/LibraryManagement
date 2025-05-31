@@ -1,12 +1,17 @@
-import Elysia, { t } from "elysia";
+import Elysia from "elysia";
 import {
   transferHistoryCreateDto,
+  transferHistoryDestroyDto,
+  transferHistoryFromClassDto,
   transferHistoryIndexDto,
+  transferHistoryRecentDto,
   transferHistoryShowDto,
   transferHistoryStudentDto,
+  transferHistoryToClassDto,
 } from "./dtos";
 import { TransferHistoryFormatter } from "./formatters";
 import { TransferHistoryService } from "./service";
+import { TransferHistoryRecord } from "./types";
 
 export const app = new Elysia({
   prefix: "/transfer-history",
@@ -19,7 +24,9 @@ export const app = new Elysia({
     "/",
     async ({ query }) => {
       const transfers = await TransferHistoryService.index(query);
-      return TransferHistoryFormatter.listResponse(transfers);
+      return TransferHistoryFormatter.listResponse(
+        transfers as unknown as TransferHistoryRecord[]
+      );
     },
     transferHistoryIndexDto
   )
@@ -44,7 +51,9 @@ export const app = new Elysia({
     async ({ params: { studentId } }) => {
       const transfers =
         await TransferHistoryService.getStudentTransferHistory(studentId);
-      return TransferHistoryFormatter.listResponse(transfers);
+      return TransferHistoryFormatter.listResponse(
+        transfers as unknown as TransferHistoryRecord[]
+      );
     },
     transferHistoryStudentDto
   )
@@ -53,44 +62,22 @@ export const app = new Elysia({
     async ({ params: { classId } }) => {
       const transfers =
         await TransferHistoryService.getTransfersFromClass(classId);
-      return TransferHistoryFormatter.listResponse(transfers);
+      return TransferHistoryFormatter.listResponse(
+        transfers as unknown as TransferHistoryRecord[]
+      );
     },
-    {
-      params: t.Object({
-        classId: t.String(),
-      }),
-      response: {
-        200: transferHistoryIndexDto.response[200],
-        404: transferHistoryShowDto.response[404],
-      },
-      detail: {
-        summary: "Sınıftan Yapılan Transferler",
-        description:
-          "Belirtilen sınıftan başka sınıflara yapılan transferleri gösterir",
-      },
-    }
+    transferHistoryFromClassDto
   )
   .get(
     "/class/:classId/to",
     async ({ params: { classId } }) => {
       const transfers =
         await TransferHistoryService.getTransfersToClass(classId);
-      return TransferHistoryFormatter.listResponse(transfers);
+      return TransferHistoryFormatter.listResponse(
+        transfers as unknown as TransferHistoryRecord[]
+      );
     },
-    {
-      params: t.Object({
-        classId: t.String(),
-      }),
-      response: {
-        200: transferHistoryIndexDto.response[200],
-        404: transferHistoryShowDto.response[404],
-      },
-      detail: {
-        summary: "Sınıfa Yapılan Transferler",
-        description:
-          "Belirtilen sınıfa diğer sınıflardan yapılan transferleri gösterir",
-      },
-    }
+    transferHistoryToClassDto
   )
   .get(
     "/recent/:limit?",
@@ -98,30 +85,11 @@ export const app = new Elysia({
       const transfers = await TransferHistoryService.getRecentTransfers(
         limit ? parseInt(limit) : 10
       );
-      return TransferHistoryFormatter.summaryListResponse(transfers);
+      return TransferHistoryFormatter.summaryListResponse(
+        transfers as unknown as TransferHistoryRecord[]
+      );
     },
-    {
-      params: t.Object({
-        limit: t.Optional(t.String()),
-      }),
-      response: {
-        200: t.Array(
-          t.Object({
-            id: t.String(),
-            studentName: t.String(),
-            studentNo: t.Number(),
-            oldClassName: t.String(),
-            newClassName: t.String(),
-            transferDate: t.Date(),
-            notes: t.Optional(t.String()),
-          })
-        ),
-      },
-      detail: {
-        summary: "Son Transfer Kayıtları",
-        description: "En son yapılan N adet transferi özet olarak gösterir",
-      },
-    }
+    transferHistoryRecentDto
   )
   .delete(
     "/:id",
@@ -129,19 +97,5 @@ export const app = new Elysia({
       await TransferHistoryService.destroy(id);
       return TransferHistoryFormatter.deleteResponse();
     },
-    {
-      params: t.Object({
-        id: t.String(),
-      }),
-      response: {
-        200: t.Object({
-          message: t.String(),
-        }),
-        404: transferHistoryShowDto.response[404],
-      },
-      detail: {
-        summary: "Transfer Kaydını Sil",
-        description: "Belirtilen transfer kaydını sistemden siler",
-      },
-    }
+    transferHistoryDestroyDto
   );

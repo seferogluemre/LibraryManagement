@@ -1,5 +1,7 @@
-import Elysia, { t } from "elysia";
+import Elysia from "elysia";
 import {
+  studentByClassDto,
+  studentByStudentNoDto,
   studentCreateDto,
   studentDestroyDto,
   studentIndexDto,
@@ -62,19 +64,7 @@ export const app = new Elysia({
       const students = await StudentService.getStudentsByClass(classId);
       return StudentFormatter.listResponse(students);
     },
-    {
-      params: t.Object({
-        classId: t.String(),
-      }),
-      response: {
-        200: studentIndexDto.response[200],
-        404: studentDestroyDto.response[404],
-      },
-      detail: {
-        summary: "Sınıfa Göre Öğrencileri Listele",
-        description: "Belirli bir sınıftaki tüm öğrencileri listeler",
-      },
-    }
+    studentByClassDto
   )
   .get(
     "/by-student-no/:studentNo",
@@ -85,17 +75,5 @@ export const app = new Elysia({
       }
       return StudentFormatter.response(student);
     },
-    {
-      params: t.Object({
-        studentNo: t.String(),
-      }),
-      response: {
-        200: studentShowDto.response[200],
-        404: studentDestroyDto.response[404],
-      },
-      detail: {
-        summary: "Öğrenci Numarasına Göre Öğrenci Bul",
-        description: "Öğrenci numarası ile öğrenci arar",
-      },
-    }
+    studentByStudentNoDto
   );
