@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../utils/auth-middleware";
+import { authGuard } from "../../utils/auth-middleware";
 import { loginDto, logoutDto, meDto, refreshTokenDto } from "./dtos";
 import { AuthFormatter } from "./formatters";
 import { AuthService } from "./service";
@@ -29,18 +29,18 @@ export const app = new Elysia({
   )
   .post(
     "/logout",
-    async () => {
-      const result = await AuthService.logout();
+    async ({ headers }) => {
+      const user = await authGuard(headers);
+      await AuthService.logout(user.id);
       return AuthFormatter.logoutResponse();
     },
     logoutDto
   )
-  .use(authMiddleware)
   .get(
-    "/me", // Kullanıcı profili
+    "/me",
     async ({ headers }) => {
-      const userProfile = await AuthService.me(headers.authorization);
-      return userProfile;
+      const user = await authGuard(headers);
+      return AuthFormatter.userProfile(user);
     },
     meDto
   );

@@ -7,5 +7,6 @@ export * from "./Student";
 export * from "./Book";
 export * from "./Classroom";
 export * from "./BookAssignment";
+export * from "./Session";
 export * from "./__nullable__";
 export * from "./__transformDate__";

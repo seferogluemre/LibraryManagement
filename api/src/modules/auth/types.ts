@@ -1,4 +1,4 @@
-import type { User } from "@prisma/client";
+import type { User, UserRole } from "@prisma/client";
 
 export interface LoginRequest {
   email: string;
@@ -24,7 +24,7 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
   createdAt: Date;
 }
 

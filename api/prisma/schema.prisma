@@ -36,7 +36,8 @@ model User {
   role           UserRole @map("user_role")
   createdAt      DateTime @default(now()) @map("created_at")
 
-  createdBooks Book[] @relation("BookCreatedBy")
+  createdBooks Book[]   @relation("BookCreatedBy")
+  session      Session?
 
   @@map("users")
 }
@@ -126,4 +127,18 @@ model BookAssignment {
   returnedAt DateTime? @map("returned_at")
 
   @@map("book_assignments")
+}
+
+model Session {
+  id           String   @id @default(uuid()) @map("session_id")
+  userId       String   @unique @map("user_id")
+  accessToken  String   @map("access_token") @db.Text
+  refreshToken String   @map("refresh_token") @db.Text
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }

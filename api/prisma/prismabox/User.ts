@@ -29,6 +29,17 @@ export const UserRelations = t.Object({
     }),
     { additionalProperties: true },
   ),
+  session: __nullable__(
+    t.Object({
+      id: t.String(),
+      userId: t.String(),
+      accessToken: t.String(),
+      refreshToken: t.String(),
+      expiresAt: t.Date(),
+      createdAt: t.Date(),
+      updatedAt: t.Date(),
+    }),
+  ),
 });
 
 export const UserPlainInputCreate = t.Object({
@@ -56,6 +67,13 @@ export const UserRelationsInputCreate = t.Object({
       ),
     }),
   ),
+  session: t.Optional(
+    t.Object({
+      connect: t.Object({
+        id: t.String(),
+      }),
+    }),
+  ),
 });
 
 export const UserRelationsInputUpdate = t.Partial(
@@ -74,6 +92,14 @@ export const UserRelationsInputUpdate = t.Partial(
           }),
           { additionalProperties: true },
         ),
+      }),
+    ),
+    session: t.Partial(
+      t.Object({
+        connect: t.Object({
+          id: t.String(),
+        }),
+        disconnect: t.Boolean(),
       }),
     ),
   }),
@@ -148,6 +174,7 @@ export const UserSelect = t.Partial(
     role: t.Boolean(),
     createdAt: t.Boolean(),
     createdBooks: t.Boolean(),
+    session: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -156,6 +183,7 @@ export const UserInclude = t.Partial(
   t.Object({
     role: t.Boolean(),
     createdBooks: t.Boolean(),
+    session: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
