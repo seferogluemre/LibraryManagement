@@ -28,14 +28,29 @@ export const classroomResponseSchema = t.Object({
   name: ClassroomPlain.properties.name,
 });
 
+export const classroomWithStudentsResponseSchema = t.Object({
+  id: ClassroomPlain.properties.id,
+  name: ClassroomPlain.properties.name,
+  createdAt: ClassroomPlain.properties.createdAt,
+  students: t.Array(
+    t.Object({
+      id: t.String(),
+      name: t.String(),
+      email: t.Optional(t.String()),
+      studentNo: t.Number(),
+    })
+  ),
+});
+
 export const classroomIndexDto = {
   query: t.Object({
     id: t.Optional(ClassroomPlain.properties.id),
     name: t.Optional(t.String()),
   }),
-  response: { 200: t.Array(classroomResponseSchema) },
+  response: { 200: t.Array(classroomWithStudentsResponseSchema) },
   detail: {
     summary: "Sınıfları Listele",
+    description: "Tüm sınıfları ve her sınıfa ait öğrencileri listeler",
   },
 } satisfies ControllerHook;
 
@@ -44,11 +59,12 @@ export const classroomShowDto = {
     id: ClassroomPlain.properties.id,
   }),
   response: {
-    200: classroomResponseSchema,
+    200: classroomWithStudentsResponseSchema,
     404: errorResponseDto[404],
   },
   detail: {
     summary: "Tek Sınıfı Göster",
+    description: "Belirtilen sınıfı ve sınıfa ait öğrencileri gösterir",
   },
 } satisfies ControllerHook;
 

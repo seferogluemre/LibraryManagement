@@ -52,9 +52,18 @@ export abstract class ClassroomService {
 
       const classrooms = await prisma.classroom.findMany({
         where,
-        select: {
-          id: true,
-          name: true,
+        include: {
+          students: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              studentNo: true,
+            },
+            orderBy: {
+              studentNo: "asc",
+            },
+          },
         },
         orderBy: { name: "asc" },
       });
@@ -70,6 +79,19 @@ export abstract class ClassroomService {
     try {
       const classroom = await prisma.classroom.findUnique({
         where,
+        include: {
+          students: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              studentNo: true,
+            },
+            orderBy: {
+              studentNo: "asc",
+            },
+          },
+        },
       });
 
       if (!classroom) {
@@ -78,6 +100,7 @@ export abstract class ClassroomService {
       return classroom;
     } catch (error) {
       this.handlePrismaError(error, "find");
+      throw error;
     }
   }
 

@@ -11,7 +11,7 @@ import { ClassroomFormatter } from "./formatters";
 import { ClassroomService } from "./service";
 
 export const app = new Elysia({
-  prefix: "classrooms",
+  prefix: "/classrooms",
   name: "Classroom",
   detail: {
     tags: ["Classrooms"],
@@ -29,7 +29,7 @@ export const app = new Elysia({
     "",
     async ({ query }) => {
       const classrooms = await ClassroomService.index(query);
-      return classrooms;
+      return ClassroomFormatter.listResponseWithStudents(classrooms);
     },
     classroomIndexDto
   )
@@ -37,9 +37,7 @@ export const app = new Elysia({
     "/:id",
     async ({ params: { id } }) => {
       const targetClassroom = await ClassroomService.show({ id });
-      return ClassroomFormatter.response(
-        targetClassroom as unknown as Classroom
-      );
+      return ClassroomFormatter.responseWithStudents(targetClassroom);
     },
     classroomShowDto
   )
