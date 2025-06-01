@@ -1,4 +1,4 @@
-export { app as classroomController } from "./controller";
+export { app as authorController } from "./controller";
 export * from "./dtos";
 export * from "./formatters";
 export * from "./service";
