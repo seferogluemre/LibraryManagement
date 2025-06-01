@@ -13,7 +13,7 @@ export const app = new Elysia({
   prefix: "/authors",
   name: "Author",
   detail: {
-    tags: ["authors"],
+    tags: ["Authors"],
   },
 })
   .post(

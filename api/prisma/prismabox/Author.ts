@@ -1,7 +1,5 @@
 import { t } from "elysia";
 
-import { __transformDate__ } from "./__transformDate__";
-
 import { __nullable__ } from "./__nullable__";
 
 export const AuthorPlain = t.Object({ id: t.String(), name: t.String() });
@@ -20,7 +18,7 @@ export const AuthorRelations = t.Object({
       publisherId: __nullable__(t.String()),
       addedById: __nullable__(t.String()),
     }),
-    { additionalProperties: true },
+    { additionalProperties: true }
   ),
 });
 
@@ -37,9 +35,9 @@ export const AuthorRelationsInputCreate = t.Object({
         t.Object({
           id: t.String(),
         }),
-        { additionalProperties: true },
+        { additionalProperties: true }
       ),
-    }),
+    })
   ),
 });
 
@@ -51,17 +49,17 @@ export const AuthorRelationsInputUpdate = t.Partial(
           t.Object({
             id: t.String(),
           }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
         disconnect: t.Array(
           t.Object({
             id: t.String(),
           }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
-      }),
+      })
     ),
-  }),
+  })
 );
 
 export const AuthorWhere = t.Partial(
@@ -75,10 +73,10 @@ export const AuthorWhere = t.Partial(
           id: t.String(),
           name: t.String(),
         },
-        { additionalProperties: true },
+        { additionalProperties: true }
       ),
-    { $id: "Author" },
-  ),
+    { $id: "Author" }
+  )
 );
 
 export const AuthorWhereUnique = t.Recursive(
@@ -87,7 +85,7 @@ export const AuthorWhereUnique = t.Recursive(
       [
         t.Partial(
           t.Object({ id: t.String() }, { additionalProperties: true }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
         t.Union([t.Object({ id: t.String() })], { additionalProperties: true }),
         t.Partial(
@@ -96,13 +94,13 @@ export const AuthorWhereUnique = t.Recursive(
             NOT: t.Union([Self, t.Array(Self, { additionalProperties: true })]),
             OR: t.Array(Self, { additionalProperties: true }),
           }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
         t.Partial(t.Object({ id: t.String(), name: t.String() })),
       ],
-      { additionalProperties: true },
+      { additionalProperties: true }
     ),
-  { $id: "Author" },
+  { $id: "Author" }
 );
 
 export const AuthorSelect = t.Partial(
@@ -111,11 +109,11 @@ export const AuthorSelect = t.Partial(
     name: t.Boolean(),
     books: t.Boolean(),
     _count: t.Boolean(),
-  }),
+  })
 );
 
 export const AuthorInclude = t.Partial(
-  t.Object({ books: t.Boolean(), _count: t.Boolean() }),
+  t.Object({ books: t.Boolean(), _count: t.Boolean() })
 );
 
 export const AuthorOrderBy = t.Partial(
@@ -126,7 +124,7 @@ export const AuthorOrderBy = t.Partial(
     name: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
-  }),
+  })
 );
 
 export const Author = t.Composite([AuthorPlain, AuthorRelations]);

@@ -1,22 +1,17 @@
 import { Prisma } from "@prisma/client";
 import { AuthorPlain } from "@prismabox/Author";
 import { BookPlain } from "@prismabox/Book";
+import { CategoryPlain } from "@prismabox/Category";
 import { t } from "elysia";
 import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
 
-export function getAuthorFilters(query?: {
-  id?: string;
-  name?: string;
-  email?: string;
-  studentNo?: number;
-  classId?: string;
-}) {
+export function getCategoryFilters(query?: { id?: string; name?: string }) {
   if (!query) {
     return [false, [], undefined] as const;
   }
 
-  const filters: Prisma.AuthorWhereInput[] = [];
-  const { id, name, email, studentNo, classId } = query;
+  const filters: Prisma.CategoryWhereInput[] = [];
+  const { id, name } = query;
 
   if (id) {
     filters.push({ id });
@@ -29,62 +24,62 @@ export function getAuthorFilters(query?: {
   return [filters.length > 0, filters, undefined] as const;
 }
 
-export const authorResponseSchema = t.Object({
-  id: AuthorPlain.properties.id,
-  name: AuthorPlain.properties.name,
+export const categoryResponseSchema = t.Object({
+  id: CategoryPlain.properties.id,
+  name: CategoryPlain.properties.name,
 });
 
-export const authorWithBooksResponseSchema = t.Object({
-  id: AuthorPlain.properties.id,
-  name: AuthorPlain.properties.name,
+export const categoryWithBooksResponseSchema = t.Object({
+  id: CategoryPlain.properties.id,
+  name: CategoryPlain.properties.name,
   books: t.Array(BookPlain.properties.id),
 });
 
-export const authorIndexDto = {
+export const categoryIndexDto = {
   query: t.Object({
-    id: t.Optional(AuthorPlain.properties.id),
+    id: t.Optional(CategoryPlain.properties.id),
     name: t.Optional(t.String()),
   }),
-  response: { 200: t.Array(authorResponseSchema) },
+  response: { 200: t.Array(categoryResponseSchema) },
   detail: {
-    summary: "Yazarları Listele",
+    summary: "Kategorileri Listele",
   },
 } satisfies ControllerHook;
 
-export const authorShowDto = {
+export const categoryShowDto = {
   params: t.Object({
-    id: AuthorPlain.properties.id,
+    id: CategoryPlain.properties.id,
   }),
   response: {
-    200: authorResponseSchema,
+    200: categoryResponseSchema,
     404: errorResponseDto[404],
   },
   detail: {
-    summary: "Tek Yazarı Göster",
+    summary: "Tek Kategori Göster",
   },
 } satisfies ControllerHook;
 
-export const authorUpdateDto = {
+export const categoryUpdateDto = {
   params: t.Object({
-    id: AuthorPlain.properties.id,
+    id: CategoryPlain.properties.id,
   }),
   body: t.Object({
     name: t.Optional(AuthorPlain.properties.name),
   }),
   response: {
-    200: authorResponseSchema,
+    200: categoryResponseSchema,
     404: errorResponseDto[404],
     409: errorResponseDto[409],
     422: errorResponseDto[422],
   },
   detail: {
-    summary: "Yazarı Güncelle",
+    summary: "Kategoriyi Güncelle",
   },
 } satisfies ControllerHook;
 
-export const authorDestroyDto = {
+export const categoryDestroyDto = {
   params: t.Object({
-    id: AuthorPlain.properties.id,
+    id: CategoryPlain.properties.id,
   }),
   response: {
     200: t.Object({
@@ -93,22 +88,22 @@ export const authorDestroyDto = {
     404: errorResponseDto[404],
   },
   detail: {
-    summary: "Yazarı Sil",
+    summary: "Kategoriyi Sil",
   },
 } satisfies ControllerHook;
 
-export const authorCreateDto = {
+export const categoryCreateDto = {
   body: t.Object({
-    name: AuthorPlain.properties.name,
+    name: CategoryPlain.properties.name,
   }),
   response: {
-    200: authorResponseSchema,
+    200: categoryResponseSchema,
     409: errorResponseDto[409],
     422: errorResponseDto[422],
   },
   detail: {
-    summary: "Yeni Yazar Oluştur",
+    summary: "Yeni Kategori Oluştur",
   },
 } satisfies ControllerHook;
 
-export const authorCreateResponseDto = authorCreateDto.response["200"];
+export const categoryCreateResponseDto = categoryCreateDto.response["200"];
