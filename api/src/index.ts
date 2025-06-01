@@ -8,6 +8,7 @@ import { studentController } from "@modules/student";
 import { studentClassroomController } from "@modules/student-classroom";
 import { transferHistoryController } from "@modules/transfer-history";
 import { userController } from "@modules/users";
+import { publisherController } from "@modules/publisher";
 import { Elysia } from "elysia";
 
 const app = new Elysia()
@@ -54,6 +55,7 @@ const app = new Elysia()
   .use(transferHistoryController)
   .use(authorController)
   .use(categoryController)
+  .use(publisherController)
   .listen(3000);
 
 console.log(

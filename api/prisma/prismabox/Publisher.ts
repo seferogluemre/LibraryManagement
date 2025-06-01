@@ -1,7 +1,5 @@
 import { t } from "elysia";
 
-import { __transformDate__ } from "./__transformDate__";
-
 import { __nullable__ } from "./__nullable__";
 
 export const PublisherPlain = t.Object({ id: t.String(), name: t.String() });
@@ -20,7 +18,7 @@ export const PublisherRelations = t.Object({
       publisherId: __nullable__(t.String()),
       addedById: __nullable__(t.String()),
     }),
-    { additionalProperties: true },
+    { additionalProperties: true }
   ),
 });
 
@@ -37,9 +35,9 @@ export const PublisherRelationsInputCreate = t.Object({
         t.Object({
           id: t.String(),
         }),
-        { additionalProperties: true },
+        { additionalProperties: true }
       ),
-    }),
+    })
   ),
 });
 
@@ -51,17 +49,17 @@ export const PublisherRelationsInputUpdate = t.Partial(
           t.Object({
             id: t.String(),
           }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
         disconnect: t.Array(
           t.Object({
             id: t.String(),
           }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
-      }),
+      })
     ),
-  }),
+  })
 );
 
 export const PublisherWhere = t.Partial(
@@ -75,10 +73,10 @@ export const PublisherWhere = t.Partial(
           id: t.String(),
           name: t.String(),
         },
-        { additionalProperties: true },
+        { additionalProperties: true }
       ),
-    { $id: "Publisher" },
-  ),
+    { $id: "Publisher" }
+  )
 );
 
 export const PublisherWhereUnique = t.Recursive(
@@ -87,7 +85,7 @@ export const PublisherWhereUnique = t.Recursive(
       [
         t.Partial(
           t.Object({ id: t.String() }, { additionalProperties: true }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
         t.Union([t.Object({ id: t.String() })], { additionalProperties: true }),
         t.Partial(
@@ -96,13 +94,13 @@ export const PublisherWhereUnique = t.Recursive(
             NOT: t.Union([Self, t.Array(Self, { additionalProperties: true })]),
             OR: t.Array(Self, { additionalProperties: true }),
           }),
-          { additionalProperties: true },
+          { additionalProperties: true }
         ),
         t.Partial(t.Object({ id: t.String(), name: t.String() })),
       ],
-      { additionalProperties: true },
+      { additionalProperties: true }
     ),
-  { $id: "Publisher" },
+  { $id: "Publisher" }
 );
 
 export const PublisherSelect = t.Partial(
@@ -111,11 +109,11 @@ export const PublisherSelect = t.Partial(
     name: t.Boolean(),
     books: t.Boolean(),
     _count: t.Boolean(),
-  }),
+  })
 );
 
 export const PublisherInclude = t.Partial(
-  t.Object({ books: t.Boolean(), _count: t.Boolean() }),
+  t.Object({ books: t.Boolean(), _count: t.Boolean() })
 );
 
 export const PublisherOrderBy = t.Partial(
@@ -126,7 +124,7 @@ export const PublisherOrderBy = t.Partial(
     name: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
-  }),
+  })
 );
 
 export const Publisher = t.Composite([PublisherPlain, PublisherRelations]);
