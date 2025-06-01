@@ -1,14 +1,14 @@
-import { authorController } from "#modules/author";
-import { categoryController } from "#modules/category";
+import { authorController } from "#modules/authors";
+import { categoryController } from "#modules/categories";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import { authController } from "@modules/auth";
-import { classroomController } from "@modules/classroom";
-import { studentController } from "@modules/student";
-import { studentClassroomController } from "@modules/student-classroom";
-import { transferHistoryController } from "@modules/transfer-history";
+import { classroomController } from "@modules/classrooms";
+import { publisherController } from "@modules/publishers";
+import { studentClassroomController } from "@modules/student-classrooms";
+import { studentController } from "@modules/students";
+import { transferHistoryController } from "@modules/transfer-histories";
 import { userController } from "@modules/users";
-import { publisherController } from "@modules/publisher";
 import { Elysia } from "elysia";
 
 const app = new Elysia()

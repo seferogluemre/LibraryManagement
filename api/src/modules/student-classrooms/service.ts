@@ -1,7 +1,7 @@
 import prisma from "#core/prisma";
 import { ConflictException, NotFoundException } from "#utils/http-errors";
-import { StudentService } from "../student/service";
-import { TransferHistoryService } from "../transfer-history/service";
+import { StudentService } from "../students/service";
+import { TransferHistoryService } from "../transfer-histories/service";
 import type { ClassroomTransferRequest, StudentWithClassroom } from "./types";
 
 export abstract class StudentClassroomService {
