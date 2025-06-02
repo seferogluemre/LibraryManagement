@@ -1,4 +1,5 @@
 import { authorController } from "#modules/authors";
+import { bookController } from "#modules/books";
 import { categoryController } from "#modules/categories";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
@@ -55,6 +56,7 @@ const app = new Elysia()
   .use(transferHistoryController)
   .use(authorController)
   .use(categoryController)
+  .use(bookController)
   .use(publisherController)
   .listen(3000);
 
