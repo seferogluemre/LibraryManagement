@@ -145,7 +145,11 @@ export const bookAssignmentCreateDto = {
   body: t.Object({
     student_id: BookAssignmentPlain.properties.studentId,
     book_id: BookAssignmentPlain.properties.bookId,
-    return_due: BookAssignmentPlain.properties.returnDue,
+    return_due: t.String({
+      format: "date-time",
+      description: "ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ",
+      examples: ["2025-06-18T15:30:00.000Z"],
+    }),
   }),
   headers: t.Object({
     authorization: t.String({

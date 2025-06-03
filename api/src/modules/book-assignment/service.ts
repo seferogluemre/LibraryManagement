@@ -227,7 +227,7 @@ export abstract class BookAssignmentService {
             studentId: payload.student_id,
             bookId: payload.book_id,
             assignedById,
-            returnDue: payload.return_due,
+            returnDue: new Date(payload.return_due),
           },
           include: {
             student: {
