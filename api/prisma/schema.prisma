@@ -40,6 +40,8 @@ model User {
   assignments  BookAssignment[] @relation("AssignedBy")
   session      Session?
 
+  @@index([role])
+  @@index([name])
   @@map("users")
 }
 
@@ -48,6 +50,7 @@ model Author {
   name  String @map("author_name")
   books Book[]
 
+  @@index([name])
   @@map("authors")
 }
 
@@ -64,6 +67,7 @@ model Publisher {
   name  String @map("publisher_name")
   books Book[]
 
+  @@index([name])
   @@map("publishers")
 }
 
@@ -78,6 +82,8 @@ model Student {
   assignments     BookAssignment[]
   TransferHistory TransferHistory[]
 
+  @@index([classId])
+  @@index([name])
   @@map("students")
 }
 
@@ -103,6 +109,12 @@ model Book {
 
   assignments BookAssignment[]
 
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([publisherId])
+  @@index([title])
+  @@index([availableCopies])
+  @@index([publishedYear])
   @@map("books")
 }
 
@@ -115,6 +127,7 @@ model Classroom {
   oldTransfer TransferHistory[] @relation("OldTransfer")
   newTransfer TransferHistory[] @relation("NewTransfer")
 
+  @@index([name])
   @@map("classrooms")
 }
 
@@ -134,6 +147,14 @@ model BookAssignment {
   returned   Boolean   @default(false) @map("is_returned")
   returnedAt DateTime? @map("returned_at")
 
+  @@index([studentId])
+  @@index([bookId])
+  @@index([assignedById])
+  @@index([returned])
+  @@index([returnDue])
+  @@index([assignedAt])
+  @@index([studentId, returned])
+  @@index([returned, returnDue])
   @@map("book_assignments")
 }
 
@@ -148,6 +169,7 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([expiresAt])
   @@map("sessions")
 }
 
@@ -166,5 +188,9 @@ model TransferHistory {
   transferDate DateTime @default(now()) @map("transfer_date")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  @@index([studentId])
+  @@index([transferDate])
+  @@index([oldClassId])
+  @@index([newClassId])
   @@map("transfer_histories")
 }
