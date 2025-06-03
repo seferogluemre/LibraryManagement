@@ -4,7 +4,6 @@ import { BookWithRelationsResponse } from "./types";
 
 export abstract class BookFormatter {
   static response(data: any): BookWithRelationsResponse {
-    // Null olan category ve publisher'ları düzelt
     const formattedData = {
       ...data,
       category:

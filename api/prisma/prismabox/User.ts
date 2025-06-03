@@ -29,6 +29,19 @@ export const UserRelations = t.Object({
     }),
     { additionalProperties: true },
   ),
+  assignments: t.Array(
+    t.Object({
+      id: t.String(),
+      studentId: t.String(),
+      bookId: t.String(),
+      assignedById: t.String(),
+      assignedAt: t.Date(),
+      returnDue: t.Date(),
+      returned: t.Boolean(),
+      returnedAt: __nullable__(t.Date()),
+    }),
+    { additionalProperties: true },
+  ),
   session: __nullable__(
     t.Object({
       id: t.String(),
@@ -67,6 +80,16 @@ export const UserRelationsInputCreate = t.Object({
       ),
     }),
   ),
+  assignments: t.Optional(
+    t.Object({
+      connect: t.Array(
+        t.Object({
+          id: t.String(),
+        }),
+        { additionalProperties: true },
+      ),
+    }),
+  ),
   session: t.Optional(
     t.Object({
       connect: t.Object({
@@ -79,6 +102,22 @@ export const UserRelationsInputCreate = t.Object({
 export const UserRelationsInputUpdate = t.Partial(
   t.Object({
     createdBooks: t.Partial(
+      t.Object({
+        connect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+        disconnect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+      }),
+    ),
+    assignments: t.Partial(
       t.Object({
         connect: t.Array(
           t.Object({
@@ -174,6 +213,7 @@ export const UserSelect = t.Partial(
     role: t.Boolean(),
     createdAt: t.Boolean(),
     createdBooks: t.Boolean(),
+    assignments: t.Boolean(),
     session: t.Boolean(),
     _count: t.Boolean(),
   }),
@@ -183,6 +223,7 @@ export const UserInclude = t.Partial(
   t.Object({
     role: t.Boolean(),
     createdBooks: t.Boolean(),
+    assignments: t.Boolean(),
     session: t.Boolean(),
     _count: t.Boolean(),
   }),

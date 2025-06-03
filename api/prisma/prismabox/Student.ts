@@ -19,6 +19,7 @@ export const StudentRelations = t.Object({
       id: t.String(),
       studentId: t.String(),
       bookId: t.String(),
+      assignedById: t.String(),
       assignedAt: t.Date(),
       returnDue: t.Date(),
       returned: t.Boolean(),

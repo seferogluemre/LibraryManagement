@@ -36,7 +36,8 @@ model User {
   role           UserRole @map("user_role")
   createdAt      DateTime @default(now()) @map("created_at")
 
-  createdBooks Book[]   @relation("BookCreatedBy")
+  createdBooks Book[]           @relation("BookCreatedBy")
+  assignments  BookAssignment[] @relation("AssignedBy")
   session      Session?
 
   @@map("users")
@@ -124,6 +125,9 @@ model BookAssignment {
 
   book   Book   @relation(fields: [bookId], references: [id])
   bookId String @map("book_id")
+
+  assignedBy   User   @relation("AssignedBy", fields: [assignedById], references: [id])
+  assignedById String @map("assigned_by_id")
 
   assignedAt DateTime  @default(now()) @map("assigned_at")
   returnDue  DateTime  @map("return_due")
