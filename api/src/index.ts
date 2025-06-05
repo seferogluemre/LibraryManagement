@@ -1,3 +1,5 @@
+import { handleElysiaError } from "#config/error-handler";
+import { prepareSwaggerConfig } from "#config/swagger-config";
 import { authorController } from "#modules/authors";
 import { bookAssignmentController } from "#modules/book-assignment";
 import { bookController } from "#modules/books";
@@ -14,10 +16,13 @@ import { transferHistoryController } from "@modules/transfer-histories";
 import { userController } from "@modules/users";
 import { Elysia } from "elysia";
 
+let tags;
+
 const app = new Elysia()
   .use(cors())
   .use(
     swagger({
+      path: "/swagger",
       documentation: {
         info: {
           title: "Kütüphane Takip API",
@@ -25,31 +30,28 @@ const app = new Elysia()
           description: "Kütüphane yönetim sistemi API dokümantasyonu",
         },
         tags: [
-          { name: "Authentication", description: "Kimlik doğrulama işlemleri" },
-          { name: "Users", description: "Kullanıcı yönetimi" },
+          { name: "Auth", description: "Kimlik doğrulama işlemleri" },
+          { name: "Books", description: "Kitap yönetimi" },
           { name: "Students", description: "Öğrenci yönetimi" },
-          { name: "Classrooms", description: "Sınıf yönetimi" },
+          { name: "Book Assignments", description: "Kitap ödünç işlemleri" },
+          { name: "Reports", description: "Raporlar ve istatistikler" },
+        ],
+        servers: [
           {
-            name: "Student-Classroom",
-            description: "Öğrenci-Sınıf ilişki yönetimi",
-          },
-          {
-            name: "Transfer History",
-            description: "Öğrenci transfer geçmişi yönetimi",
+            url: "http://localhost:3001",
+            description: "Development server",
           },
         ],
-        components: {
-          securitySchemes: {
-            bearerAuth: {
-              type: "http",
-              scheme: "bearer",
-              bearerFormat: "JWT",
-            },
-          },
-        },
+      },
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayOperationId: false,
+        filter: true,
+        tagsSorter: "alpha",
       },
     })
   )
+  .onError(handleElysiaError)
   .use(userController)
   .use(authController)
   .use(studentController)
@@ -62,12 +64,37 @@ const app = new Elysia()
   .use(publisherController)
   .use(bookAssignmentController)
   .use(reportController)
-  .listen(3000);
+  .get("/health", () => ({ status: "ok" }), {
+    detail: {
+      tags: ["System"],
+      description: "API sağlık kontrolü",
+    },
+  })
+  .listen(process.env.PORT || 3000);
+
+if (process.env.NODE_ENV === "development") {
+  const tags = [
+    { name: "User", description: "User endpoints" },
+    { name: "Auth", description: "Auth endpoints" },
+    { name: "Student", description: "Student endpoints" },
+    { name: "Classroom", description: "Classroom endpoints" },
+    { name: "Student-Classroom", description: "Student-Classroom endpoints" },
+    { name: "Transfer History", description: "Transfer History endpoints" },
+    { name: "Author", description: "Author endpoints" },
+    { name: "Category", description: "Category endpoints" },
+    { name: "Book", description: "Book endpoints" },
+    { name: "Publisher", description: "Publisher endpoints" },
+    { name: "Book Assignment", description: "Book Assignment endpoints" },
+    { name: "Report", description: "Report endpoints" },
+  ];
+
+  const swaggerConfig = await prepareSwaggerConfig({ tags });
+
+  app.use(swagger(swaggerConfig));
+}
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
 );
 
-console.log(
-  `📚 Swagger UI: http://${app.server?.hostname}:${app.server?.port}/swagger`
-);
+export type App = typeof app;
