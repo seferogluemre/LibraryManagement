@@ -1,7 +1,7 @@
 import prisma from "#core/prisma";
+import { HandleError } from "#shared/error/handle-error";
 import { NotFoundException } from "#utils/http-errors";
 import { Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getTransferHistoryFilters } from "./dtos";
 import type {
   CreateTransferHistoryRequest,
@@ -10,18 +10,6 @@ import type {
 } from "./types";
 
 export abstract class TransferHistoryService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "delete"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Transfer kaydı bulunamadı");
-      }
-    }
-    throw error;
-  }
-
   /**
    * Transfer geçmişini listele
    */
@@ -65,7 +53,7 @@ export abstract class TransferHistoryService {
 
       return transferHistory;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
     }
   }
@@ -104,9 +92,12 @@ export abstract class TransferHistoryService {
         throw new NotFoundException("Transfer kaydı bulunamadı");
       }
 
-      return transferRecord;
+      return {
+        ...transferRecord,
+        notes: transferRecord.notes ?? undefined,
+      };
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
     }
   }
@@ -150,9 +141,12 @@ export abstract class TransferHistoryService {
         },
       });
 
-      return transferRecord;
+      return {
+        ...transferRecord,
+        notes: transferRecord.notes ?? undefined,
+      };
     } catch (error) {
-      this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "transfer-history", "create");
       throw error;
     }
   }
@@ -192,9 +186,12 @@ export abstract class TransferHistoryService {
         },
       });
 
-      return transferHistory;
+      return transferHistory.map((record) => ({
+        ...record,
+        notes: record.notes ?? undefined,
+      }));
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
     }
   }
@@ -234,7 +231,7 @@ export abstract class TransferHistoryService {
 
       return transfers;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
     }
   }
@@ -274,7 +271,7 @@ export abstract class TransferHistoryService {
 
       return transfers;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
     }
   }
@@ -289,7 +286,7 @@ export abstract class TransferHistoryService {
       });
       return deletedRecord;
     } catch (error) {
-      this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "transfer-history", "delete");
       throw error;
     }
   }
@@ -329,7 +326,7 @@ export abstract class TransferHistoryService {
 
       return transfers;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
     }
   }

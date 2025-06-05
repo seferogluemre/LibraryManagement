@@ -1,7 +1,7 @@
 import prisma from "#core/prisma";
-import { ConflictException, NotFoundException } from "#utils/http-errors";
+import { HandleError } from "#shared/error/handle-error";
+import { NotFoundException } from "#utils/http-errors";
 import { Prisma, Publisher } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getPublisherFilters } from "./dtos";
 import {
   PublisherCreatePayload,
@@ -14,31 +14,6 @@ type PublisherWithBooks = Publisher & {
 };
 
 export abstract class PublisherService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "update" | "delete"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Yayıncı bulunamadı");
-      }
-      if (
-        error.code === "P2002" &&
-        (context === "create" || context === "update")
-      ) {
-        const target = (error.meta?.target as string[])?.join(", ");
-        if (target?.includes("publisher_name")) {
-          throw new ConflictException("Bu yayıncı adı zaten kullanılıyor");
-        }
-        throw new ConflictException(`${target} zaten kullanılıyor`);
-      }
-      if (error.code === "P2003" && context === "create") {
-        throw new NotFoundException("Belirtilen yayıncı bulunamadı");
-      }
-    }
-    throw error;
-  }
-
   private static async preparePublisherPayloadForCreate(
     payloadRaw: PublisherCreatePayload
   ): Promise<Omit<Prisma.PublisherCreateInput, "id">> {
@@ -84,7 +59,7 @@ export abstract class PublisherService {
 
       return publishers;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "publisher", "find");
       throw error;
     }
   }
@@ -105,7 +80,7 @@ export abstract class PublisherService {
       }
       return publisher;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "publisher", "find");
       throw error;
     }
   }
@@ -119,7 +94,7 @@ export abstract class PublisherService {
       });
       return publisher;
     } catch (error) {
-      await this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "publisher", "create");
       throw error;
     }
   }
@@ -146,7 +121,7 @@ export abstract class PublisherService {
 
       return updatedPublisher;
     } catch (error) {
-      await this.handlePrismaError(error, "update");
+      await HandleError.handlePrismaError(error, "publisher", "update");
       throw error;
     }
   }
@@ -158,7 +133,7 @@ export abstract class PublisherService {
       });
       return deletedPublisher;
     } catch (error) {
-      await this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "publisher", "delete");
       throw error;
     }
   }

@@ -1,7 +1,7 @@
 import prisma from "#core/prisma";
-import { ConflictException, NotFoundException } from "#utils/http-errors";
+import { HandleError } from "#shared/error/handle-error";
+import { NotFoundException } from "#utils/http-errors";
 import { Prisma, Student } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getStudentFilters } from "./dtos";
 import {
   StudentCreatePayload,
@@ -10,31 +10,6 @@ import {
 } from "./types";
 
 export abstract class StudentService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "update" | "delete"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Öğrenci bulunamadı");
-      }
-      if (
-        error.code === "P2002" &&
-        (context === "create" || context === "update")
-      ) {
-        const target = (error.meta?.target as string[])?.join(", ");
-        if (target?.includes("student_number")) {
-          throw new ConflictException("Bu öğrenci numarası zaten kullanılıyor");
-        }
-        throw new ConflictException(`${target} zaten kullanılıyor`);
-      }
-      if (error.code === "P2003" && context === "create") {
-        throw new NotFoundException("Belirtilen sınıf bulunamadı");
-      }
-    }
-    throw error;
-  }
-
   private static async prepareStudentPayloadForCreate(
     payloadRaw: StudentCreatePayload
   ): Promise<Omit<Prisma.StudentCreateInput, "id">> {
@@ -114,7 +89,7 @@ export abstract class StudentService {
 
       return students;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "student", "find");
       throw error;
     }
   }
@@ -138,7 +113,7 @@ export abstract class StudentService {
       }
       return student;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "student", "find");
       throw error;
     }
   }
@@ -161,7 +136,7 @@ export abstract class StudentService {
       });
       return student;
     } catch (error) {
-      await this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "student", "create");
       throw error;
     }
   }
@@ -192,7 +167,7 @@ export abstract class StudentService {
       });
       return updatedStudent;
     } catch (error) {
-      await this.handlePrismaError(error, "update");
+      await HandleError.handlePrismaError(error, "student", "update");
       throw error;
     }
   }
@@ -204,7 +179,7 @@ export abstract class StudentService {
       });
       return deletedStudent;
     } catch (error) {
-      await this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "student", "delete");
       throw error;
     }
   }
@@ -230,7 +205,7 @@ export abstract class StudentService {
       });
       return students;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "student", "find");
       throw error;
     }
   }
@@ -253,7 +228,7 @@ export abstract class StudentService {
       });
       return student;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "student", "find");
       throw error;
     }
   }

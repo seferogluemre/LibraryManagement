@@ -1,31 +1,12 @@
+import { HandleError } from "#shared/error/handle-error";
 import { Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import bcrypt from "bcryptjs";
 import prisma from "../../core/prisma";
-import { ConflictException, NotFoundException } from "../../utils/http-errors";
+import { NotFoundException } from "../../utils/http-errors";
 import { getUserFilters } from "./dtos";
 import { UserCreatePayload, UserIndexQuery, UserUpdatePayload } from "./types";
 
 export abstract class UsersService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "update" | "delete"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Kullanıcı bulunamadı");
-      }
-      if (
-        error.code === "P2002" &&
-        (context === "create" || context === "update")
-      ) {
-        const target = (error.meta?.target as string[])?.join(", ");
-        throw new ConflictException(`${target} zaten kullanılıyor.`);
-      }
-    }
-    throw error;
-  }
-
   private static async prepareUserPayloadForCreate(
     payloadRaw: UserCreatePayload
   ): Promise<Omit<Prisma.UserCreateInput, "id" | "createdAt">> {
@@ -80,7 +61,7 @@ export abstract class UsersService {
       });
       return user;
     } catch (error) {
-      await this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "user", "create");
       throw error;
     }
   }
@@ -104,7 +85,7 @@ export abstract class UsersService {
       });
       return updatedUser;
     } catch (error) {
-      await this.handlePrismaError(error, "update");
+      await HandleError.handlePrismaError(error, "user", "update");
       throw error;
     }
   }
@@ -116,7 +97,7 @@ export abstract class UsersService {
       });
       return deletedUser;
     } catch (error) {
-      await this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "user", "delete");
       throw error;
     }
   }

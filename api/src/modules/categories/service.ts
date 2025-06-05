@@ -1,7 +1,7 @@
 import prisma from "#core/prisma";
-import { ConflictException, NotFoundException } from "#utils/http-errors";
+import { HandleError } from "#shared/error/handle-error";
+import { NotFoundException } from "#utils/http-errors";
 import { Category, Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getCategoryFilters } from "./dtos";
 import {
   CategoryCreatePayload,
@@ -10,20 +10,6 @@ import {
 } from "./types";
 
 export abstract class CategoryService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "update" | "delete" | "index"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Kategori bulunamadı");
-      }
-      if (error.code === "P2002" && context === "create") {
-        throw new ConflictException("Kategori zaten mevcut");
-      }
-    }
-  }
-
   private static async prepareCategoryPayloadForCreate(
     payloadRaw: CategoryCreatePayload
   ): Promise<Omit<Prisma.CategoryCreateInput, "id" | "createdAt">> {
@@ -57,7 +43,7 @@ export abstract class CategoryService {
 
       return categories;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "category", "find");
       throw error;
     }
   }
@@ -74,7 +60,7 @@ export abstract class CategoryService {
 
       return category;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "category", "find");
       throw error;
     }
   }
@@ -87,7 +73,7 @@ export abstract class CategoryService {
       });
       return category;
     } catch (error) {
-      this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "category", "create");
       throw error;
     }
   }
@@ -114,7 +100,7 @@ export abstract class CategoryService {
       });
       return updatedCategory;
     } catch (error) {
-      this.handlePrismaError(error, "update");
+      await HandleError.handlePrismaError(error, "category", "update");
       throw error;
     }
   }
@@ -126,7 +112,7 @@ export abstract class CategoryService {
       });
       return deletedCategory;
     } catch (error) {
-      this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "category", "delete");
       throw error;
     }
   }

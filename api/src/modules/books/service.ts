@@ -1,39 +1,12 @@
 import prisma from "#core/prisma";
-import { ConflictException, NotFoundException } from "#utils/http-errors";
+import { HandleError } from "#shared/error/handle-error";
+import { NotFoundException } from "#utils/http-errors";
 import { Book, Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { AuthService } from "../auth/service";
 import { getBooksFilters } from "./dtos";
 import { BookCreatePayload, BookIndexQuery, BookUpdatePayload } from "./types";
 
 export abstract class BookService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "update" | "delete"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Kitap bulunamadı");
-      }
-      if (
-        error.code === "P2002" &&
-        (context === "create" || context === "update")
-      ) {
-        const target = (error.meta?.target as string[])?.join(", ");
-        if (target?.includes("isbn")) {
-          throw new ConflictException("Bu ISBN numarası zaten kullanılıyor");
-        }
-        throw new ConflictException(`${target} zaten kullanılıyor`);
-      }
-      if (error.code === "P2003" && context === "create") {
-        throw new NotFoundException(
-          "Belirtilen yazar, kategori veya yayınevi bulunamadı"
-        );
-      }
-    }
-    throw error;
-  }
-
   private static async getUserIdFromAuthHeader(
     authorizationHeader: string | undefined
   ): Promise<string> {
@@ -253,7 +226,6 @@ export abstract class BookService {
 
       return books;
     } catch (error) {
-      this.handlePrismaError(error, "find");
       throw error;
     }
   }
@@ -289,7 +261,7 @@ export abstract class BookService {
       }
       return book;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "book", "find");
       throw error;
     }
   }
@@ -331,7 +303,7 @@ export abstract class BookService {
       });
       return book;
     } catch (error) {
-      await this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "book", "create");
       throw error;
     }
   }
@@ -371,7 +343,7 @@ export abstract class BookService {
       });
       return updatedBook;
     } catch (error) {
-      await this.handlePrismaError(error, "update");
+      await HandleError.handlePrismaError(error, "book", "update");
       throw error;
     }
   }
@@ -383,7 +355,7 @@ export abstract class BookService {
       });
       return deletedBook;
     } catch (error) {
-      await this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "book", "delete");
       throw error;
     }
   }
@@ -421,7 +393,7 @@ export abstract class BookService {
       });
       return books;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "book", "find");
       throw error;
     }
   }
@@ -459,7 +431,7 @@ export abstract class BookService {
       });
       return books;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "book", "find");
       throw error;
     }
   }
@@ -497,7 +469,7 @@ export abstract class BookService {
       });
       return books;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "book", "find");
       throw error;
     }
   }
@@ -532,7 +504,7 @@ export abstract class BookService {
       });
       return book;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "book", "find");
       throw error;
     }
   }

@@ -1,4 +1,5 @@
 import prisma from "#core/prisma";
+import { HandleError } from "#shared/error/handle-error";
 import { ConflictException, NotFoundException } from "#utils/http-errors";
 import { StudentService } from "../students/service";
 import { TransferHistoryService } from "../transfer-histories/service";
@@ -23,6 +24,7 @@ export abstract class StudentClassroomService {
         class: student.class,
       };
     } catch (error) {
+      await HandleError.handlePrismaError(error, "student-classroom", "find");
       throw error;
     }
   }
@@ -37,15 +39,12 @@ export abstract class StudentClassroomService {
     try {
       const { newClassId, reason } = transferData;
 
-      // Öğrencinin mevcut durumunu kontrol et
       const currentStudent = await StudentService.show({ id: studentId });
 
-      // Aynı sınıfa transfer kontrolü
       if (currentStudent.classId === newClassId) {
         throw new ConflictException("Öğrenci zaten bu sınıfta bulunuyor");
       }
 
-      // Yeni sınıfın var olduğunu kontrol et
       const newClassExists = await prisma.classroom.findUnique({
         where: { id: newClassId },
       });
@@ -54,7 +53,6 @@ export abstract class StudentClassroomService {
         throw new NotFoundException("Belirtilen yeni sınıf bulunamadı");
       }
 
-      // Student service'ini kullanarak güncelle
       const updatedStudent = await StudentService.update(studentId, {
         classId: newClassId,
       });
@@ -76,6 +74,7 @@ export abstract class StudentClassroomService {
         class: updatedStudent.class,
       };
     } catch (error) {
+      await HandleError.handlePrismaError(error, "student-classroom", "update");
       throw error;
     }
   }
@@ -129,6 +128,7 @@ export abstract class StudentClassroomService {
         },
       };
     } catch (error) {
+      await HandleError.handlePrismaError(error, "student-classroom", "update");
       throw error;
     }
   }
@@ -143,6 +143,7 @@ export abstract class StudentClassroomService {
       });
       return count;
     } catch (error) {
+      await HandleError.handlePrismaError(error, "student-classroom", "find");
       throw error;
     }
   }
@@ -156,6 +157,7 @@ export abstract class StudentClassroomService {
         await TransferHistoryService.getStudentTransferHistory(studentId);
       return history;
     } catch (error) {
+      await HandleError.handlePrismaError(error, "student-classroom", "find");
       throw error;
     }
   }

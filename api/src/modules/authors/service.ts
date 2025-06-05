@@ -1,7 +1,7 @@
 import prisma from "#core/prisma";
-import { ConflictException, NotFoundException } from "#utils/http-errors";
+import { HandleError } from "#shared/error/handle-error";
+import { NotFoundException } from "#utils/http-errors";
 import { Author, Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getAuthorFilters } from "./dtos";
 import {
   AuthorCreatePayload,
@@ -10,20 +10,6 @@ import {
 } from "./types";
 
 export abstract class AuthorService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "update" | "delete" | "index"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Yazar bulunamadı");
-      }
-      if (error.code === "P2002" && context === "create") {
-        throw new ConflictException("Yazar zaten mevcut");
-      }
-    }
-  }
-
   private static async prepareAuthorPayloadForCreate(
     payloadRaw: AuthorCreatePayload
   ): Promise<Omit<Prisma.AuthorCreateInput, "id" | "createdAt">> {
@@ -57,7 +43,7 @@ export abstract class AuthorService {
 
       return authors;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "author", "find");
       throw error;
     }
   }
@@ -73,7 +59,7 @@ export abstract class AuthorService {
       }
       return author;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "author", "find");
       throw error;
     }
   }
@@ -86,7 +72,7 @@ export abstract class AuthorService {
       });
       return author;
     } catch (error) {
-      this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "author", "create");
       throw error;
     }
   }
@@ -112,7 +98,7 @@ export abstract class AuthorService {
       });
       return updatedAuthor;
     } catch (error) {
-      this.handlePrismaError(error, "update");
+      await HandleError.handlePrismaError(error, "author", "update");
       throw error;
     }
   }
@@ -124,7 +110,7 @@ export abstract class AuthorService {
       });
       return deletedAuthor;
     } catch (error) {
-      this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "author", "delete");
       throw error;
     }
   }

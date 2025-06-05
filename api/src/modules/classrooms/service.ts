@@ -1,7 +1,7 @@
 import prisma from "#core/prisma";
-import { ConflictException, NotFoundException } from "#utils/http-errors";
+import { HandleError } from "#shared/error/handle-error";
+import { NotFoundException } from "#utils/http-errors";
 import { Classroom, Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getClassroomFilters } from "./dtos";
 import {
   ClassroomCreatePayload,
@@ -10,20 +10,6 @@ import {
 } from "./types";
 
 export abstract class ClassroomService {
-  private static async handlePrismaError(
-    error: unknown,
-    context: "find" | "create" | "update" | "delete" | "index"
-  ) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2025") {
-        throw new NotFoundException("Sınıf bulunamadı");
-      }
-      if (error.code === "P2002" && context === "create") {
-        throw new ConflictException("Sınıf zaten mevcut");
-      }
-    }
-  }
-
   private static async prepareClassroomPayloadForCreate(
     payloadRaw: ClassroomCreatePayload
   ): Promise<Omit<Prisma.ClassroomCreateInput, "id" | "createdAt">> {
@@ -70,7 +56,7 @@ export abstract class ClassroomService {
 
       return classrooms;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "classroom", "find");
       throw error;
     }
   }
@@ -99,7 +85,7 @@ export abstract class ClassroomService {
       }
       return classroom;
     } catch (error) {
-      this.handlePrismaError(error, "find");
+      await HandleError.handlePrismaError(error, "classroom", "find");
       throw error;
     }
   }
@@ -113,7 +99,7 @@ export abstract class ClassroomService {
       });
       return classroom;
     } catch (error) {
-      this.handlePrismaError(error, "create");
+      await HandleError.handlePrismaError(error, "classroom", "create");
       throw error;
     }
   }
@@ -139,7 +125,7 @@ export abstract class ClassroomService {
       });
       return updatedClassroom;
     } catch (error) {
-      this.handlePrismaError(error, "update");
+      await HandleError.handlePrismaError(error, "classroom", "update");
       throw error;
     }
   }
@@ -151,7 +137,7 @@ export abstract class ClassroomService {
       });
       return deletedClassroom;
     } catch (error) {
-      await this.handlePrismaError(error, "delete");
+      await HandleError.handlePrismaError(error, "classroom", "delete");
       throw error;
     }
   }

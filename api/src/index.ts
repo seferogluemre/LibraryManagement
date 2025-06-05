@@ -2,6 +2,7 @@ import { authorController } from "#modules/authors";
 import { bookAssignmentController } from "#modules/book-assignment";
 import { bookController } from "#modules/books";
 import { categoryController } from "#modules/categories";
+import { reportController } from "#modules/reports";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import { authController } from "@modules/auth";
@@ -60,6 +61,7 @@ const app = new Elysia()
   .use(bookController)
   .use(publisherController)
   .use(bookAssignmentController)
+  .use(reportController)
   .listen(3000);
 
 console.log(
