@@ -1,4 +1,5 @@
 export * from "./UserRole";
+export * from "./NotificationType";
 export * from "./User";
 export * from "./Author";
 export * from "./Category";
@@ -9,5 +10,6 @@ export * from "./Classroom";
 export * from "./BookAssignment";
 export * from "./Session";
 export * from "./TransferHistory";
+export * from "./Notification";
 export * from "./__nullable__";
 export * from "./__transformDate__";

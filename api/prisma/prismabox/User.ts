@@ -53,6 +53,18 @@ export const UserRelations = t.Object({
       updatedAt: t.Date(),
     }),
   ),
+  Notification: t.Array(
+    t.Object({
+      id: t.String(),
+      type: t.Union([t.Literal("OVERDUE_BOOK"), t.Literal("SYSTEM")]),
+      userId: t.String(),
+      message: t.String(),
+      isRead: t.Boolean(),
+      metadata: __nullable__(t.Any()),
+      createdAt: t.Date(),
+    }),
+    { additionalProperties: true },
+  ),
 });
 
 export const UserPlainInputCreate = t.Object({
@@ -97,6 +109,16 @@ export const UserRelationsInputCreate = t.Object({
       }),
     }),
   ),
+  Notification: t.Optional(
+    t.Object({
+      connect: t.Array(
+        t.Object({
+          id: t.String(),
+        }),
+        { additionalProperties: true },
+      ),
+    }),
+  ),
 });
 
 export const UserRelationsInputUpdate = t.Partial(
@@ -139,6 +161,22 @@ export const UserRelationsInputUpdate = t.Partial(
           id: t.String(),
         }),
         disconnect: t.Boolean(),
+      }),
+    ),
+    Notification: t.Partial(
+      t.Object({
+        connect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+        disconnect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
       }),
     ),
   }),
@@ -215,6 +253,7 @@ export const UserSelect = t.Partial(
     createdBooks: t.Boolean(),
     assignments: t.Boolean(),
     session: t.Boolean(),
+    Notification: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -225,6 +264,7 @@ export const UserInclude = t.Partial(
     createdBooks: t.Boolean(),
     assignments: t.Boolean(),
     session: t.Boolean(),
+    Notification: t.Boolean(),
     _count: t.Boolean(),
   }),
 );

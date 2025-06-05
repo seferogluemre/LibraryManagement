@@ -4,6 +4,7 @@ import { authorController } from "#modules/authors";
 import { bookAssignmentController } from "#modules/book-assignment";
 import { bookController } from "#modules/books";
 import { categoryController } from "#modules/categories";
+import { notificationController } from "#modules/notifications";
 import { reportController } from "#modules/reports";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
@@ -15,8 +16,6 @@ import { studentController } from "@modules/students";
 import { transferHistoryController } from "@modules/transfer-histories";
 import { userController } from "@modules/users";
 import { Elysia } from "elysia";
-
-let tags;
 
 const app = new Elysia()
   .use(cors())
@@ -64,6 +63,7 @@ const app = new Elysia()
   .use(publisherController)
   .use(bookAssignmentController)
   .use(reportController)
+  .use(notificationController)
   .get("/health", () => ({ status: "ok" }), {
     detail: {
       tags: ["System"],

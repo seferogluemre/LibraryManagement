@@ -28,6 +28,11 @@ enum UserRole {
   @@map("user_roles")
 }
 
+enum NotificationType {
+  OVERDUE_BOOK
+  SYSTEM
+}
+
 model User {
   id             String   @id @default(uuid()) @map("user_id")
   name           String   @map("user_name")
@@ -39,6 +44,7 @@ model User {
   createdBooks Book[]           @relation("BookCreatedBy")
   assignments  BookAssignment[] @relation("AssignedBy")
   session      Session?
+  Notification Notification[]
 
   @@index([role])
   @@index([name])
@@ -193,4 +199,22 @@ model TransferHistory {
   @@index([oldClassId])
   @@index([newClassId])
   @@map("transfer_histories")
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  type NotificationType @map("notification_type")
+
+  userId    String
+  message   String
+  isRead    Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+  @@map("notifications")
 }
