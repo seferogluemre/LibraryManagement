@@ -1,16 +1,17 @@
 import { handleElysiaError } from "#config/error-handler";
 import { prepareSwaggerConfig } from "#config/swagger-config";
-import { authorController } from "#modules/authors";
-import { bookAssignmentController } from "#modules/book-assignment";
-import { bookController } from "#modules/books";
-import { categoryController } from "#modules/categories";
-import { notificationController } from "#modules/notifications";
-import { reportController } from "#modules/reports";
+// import "#modules/notifications/queues/notification.worker";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import { authController } from "@modules/auth";
+import { authorController } from "@modules/authors";
+import { bookAssignmentController } from "@modules/book-assignment";
+import { bookController } from "@modules/books";
+import { categoryController } from "@modules/categories";
 import { classroomController } from "@modules/classrooms";
+import { notificationController } from "@modules/notifications";
 import { publisherController } from "@modules/publishers";
+import { reportController } from "@modules/reports";
 import { studentClassroomController } from "@modules/student-classrooms";
 import { studentController } from "@modules/students";
 import { transferHistoryController } from "@modules/transfer-histories";
@@ -92,6 +93,29 @@ if (process.env.NODE_ENV === "development") {
 
   app.use(swagger(swaggerConfig));
 }
+
+if (process.env.NODE_ENV !== "production") {
+  const swaggerConfig = {
+    path: "/docs",
+    documentation: {
+      info: {
+        title: "Kütüphane Takip API",
+        version: "1.0.0",
+      },
+      servers: [
+        {
+          url: `http://${app.server?.hostname}:${app.server?.port}`,
+          description: "Development Server",
+        },
+      ],
+    },
+  };
+  // @ts-ignore
+  app.use(swagger(swaggerConfig));
+}
+
+// Notification system start
+// startOverdueBooksCron();
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
