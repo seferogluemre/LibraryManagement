@@ -12,6 +12,7 @@
   "dependencies": {
     "@elysiajs/eden": "^1.2.0",
     "@hookform/resolvers": "^3.10.0",
+    "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-slot": "^1.2.3",
     "@sinclair/typebox": "^0.34.0",
     "@tabler/icons-react": "^3.26.0",
@@ -24,6 +25,7 @@
     "cmdk": "^1.0.4",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.513.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.54.0",
