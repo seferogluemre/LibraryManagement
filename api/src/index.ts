@@ -1,3 +1,4 @@
+// import { startOverdueBooksCron } from "#modules/notifications/cron-jobs/overdue-books.cron";
 // import "#modules/notifications/queues/notification.worker";
 import { handleElysiaError } from "@config/error-handler";
 import { prepareSwaggerConfig } from "@config/swagger-config";
@@ -30,6 +31,20 @@ const app = new Elysia()
           version: "1.0.0",
           description: "Kütüphane yönetim sistemi API dokümantasyonu",
         },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+            },
+          },
+        },
+        security: [
+          {
+            bearerAuth: [],
+          },
+        ],
         tags: [
           { name: "Auth", description: "Kimlik doğrulama işlemleri" },
           { name: "Books", description: "Kitap yönetimi" },
@@ -99,7 +114,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(swagger(swaggerConfig));
 }
 
-// startOverdueBooksCron();
+//startOverdueBooksCron();
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

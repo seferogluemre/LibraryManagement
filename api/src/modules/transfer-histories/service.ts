@@ -106,16 +106,34 @@ export abstract class TransferHistoryService {
    * Yeni transfer kaydı oluştur
    */
   static async create(
-    data: CreateTransferHistoryRequest
+    data: CreateTransferHistoryRequest,
+    createdById: string
   ): Promise<TransferHistoryRecord> {
     try {
       const { studentId, oldClassId, newClassId, notes } = data;
 
       const transferRecord = await prisma.transferHistory.create({
         data: {
-          studentId,
-          oldClassId,
-          newClassId,
+          student: {
+            connect: {
+              id: studentId,
+            },
+          },
+          oldClass: {
+            connect: {
+              id: oldClassId,
+            },
+          },
+          newClass: {
+            connect: {
+              id: newClassId,
+            },
+          },
+          createdBy: {
+            connect: {
+              id: createdById,
+            },
+          },
           notes,
         },
         include: {

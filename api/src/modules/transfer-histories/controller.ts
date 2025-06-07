@@ -1,3 +1,4 @@
+import { authGuard } from "@utils/auth-middleware";
 import Elysia from "elysia";
 import {
   transferHistoryCreateDto,
@@ -20,6 +21,20 @@ export const app = new Elysia({
     tags: ["Transfer History"],
   },
 })
+  .derive(async (context) => {
+    const authContext = {
+      user: null as any,
+      isAuthenticated: false,
+    };
+    try {
+      const user = await authGuard(context.headers);
+      authContext.user = user;
+      authContext.isAuthenticated = true;
+    } catch (error) {
+      // do nothing
+    }
+    return authContext;
+  })
   .get(
     "/",
     async ({ query }) => {
@@ -40,11 +55,20 @@ export const app = new Elysia({
   )
   .post(
     "/",
-    async ({ body }) => {
-      const transfer = await TransferHistoryService.create(body);
+    async ({ body, user }) => {
+      const transfer = await TransferHistoryService.create(body, user.id);
       return TransferHistoryFormatter.response(transfer);
     },
-    transferHistoryCreateDto
+    {
+      ...transferHistoryCreateDto,
+      beforeHandle: [
+        ({ isAuthenticated }) => {
+          if (!isAuthenticated) {
+            throw new Error("Unauthorized");
+          }
+        },
+      ],
+    }
   )
   .get(
     "/student/:studentId",
@@ -97,5 +121,14 @@ export const app = new Elysia({
       await TransferHistoryService.destroy(id);
       return TransferHistoryFormatter.deleteResponse();
     },
-    transferHistoryDestroyDto
+    {
+      ...transferHistoryDestroyDto,
+      beforeHandle: [
+        ({ isAuthenticated }) => {
+          if (!isAuthenticated) {
+            throw new Error("Unauthorized");
+          }
+        },
+      ],
+    }
   );

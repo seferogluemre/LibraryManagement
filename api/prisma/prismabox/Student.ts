@@ -13,7 +13,12 @@ export const StudentPlain = t.Object({
 });
 
 export const StudentRelations = t.Object({
-  class: t.Object({ id: t.String(), name: t.String(), createdAt: t.Date() }),
+  class: t.Object({
+    id: t.String(),
+    name: t.String(),
+    createdAt: t.Date(),
+    createdById: t.String(),
+  }),
   assignments: t.Array(
     t.Object({
       id: t.String(),
@@ -27,7 +32,7 @@ export const StudentRelations = t.Object({
     }),
     { additionalProperties: true },
   ),
-  TransferHistory: t.Array(
+  transferHistories: t.Array(
     t.Object({
       id: t.String(),
       studentId: t.String(),
@@ -36,6 +41,7 @@ export const StudentRelations = t.Object({
       notes: __nullable__(t.String()),
       transferDate: t.Date(),
       createdAt: t.Date(),
+      createdById: t.String(),
     }),
     { additionalProperties: true },
   ),
@@ -69,7 +75,7 @@ export const StudentRelationsInputCreate = t.Object({
       ),
     }),
   ),
-  TransferHistory: t.Optional(
+  transferHistories: t.Optional(
     t.Object({
       connect: t.Array(
         t.Object({
@@ -104,7 +110,7 @@ export const StudentRelationsInputUpdate = t.Partial(
         ),
       }),
     ),
-    TransferHistory: t.Partial(
+    transferHistories: t.Partial(
       t.Object({
         connect: t.Array(
           t.Object({
@@ -190,7 +196,7 @@ export const StudentSelect = t.Partial(
     class: t.Boolean(),
     classId: t.Boolean(),
     assignments: t.Boolean(),
-    TransferHistory: t.Boolean(),
+    transferHistories: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -199,7 +205,7 @@ export const StudentInclude = t.Partial(
   t.Object({
     class: t.Boolean(),
     assignments: t.Boolean(),
-    TransferHistory: t.Boolean(),
+    transferHistories: t.Boolean(),
     _count: t.Boolean(),
   }),
 );

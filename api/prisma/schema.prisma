@@ -39,10 +39,12 @@ model User {
   role           UserRole
   createdAt      DateTime @default(now()) @map("created_at")
 
-  createdBooks  Book[]           @relation("BookCreatedBy")
-  assignments   BookAssignment[] @relation("AssignedBy")
-  session       Session?
-  notifications Notification[]
+  createdBooks             Book[]            @relation("BookCreatedBy")
+  assignments              BookAssignment[]  @relation("AssignedBy")
+  session                  Session?
+  notifications            Notification[]
+  createdClassrooms        Classroom[]       @relation("ClassroomCreatedBy")
+  createdTransferHistories TransferHistory[] @relation("TransferHistoryCreatedBy")
 
   @@index([role])
   @@index([name])
@@ -131,6 +133,9 @@ model Classroom {
   oldTransfer TransferHistory[] @relation("OldTransfer")
   newTransfer TransferHistory[] @relation("NewTransfer")
 
+  createdBy   User   @relation("ClassroomCreatedBy", fields: [createdById], references: [id])
+  createdById String @map("created_by_id")
+
   @@index([name])
   @@map("classrooms")
 }
@@ -192,10 +197,14 @@ model TransferHistory {
   transferDate DateTime @default(now()) @map("transfer_date")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  createdBy   User   @relation("TransferHistoryCreatedBy", fields: [createdById], references: [id])
+  createdById String @map("created_by_id")
+
   @@index([studentId])
   @@index([transferDate])
   @@index([oldClassId])
   @@index([newClassId])
+  @@index([createdById])
   @@map("transfer_histories")
 }
 

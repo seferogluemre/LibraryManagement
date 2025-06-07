@@ -1,4 +1,5 @@
 import { Classroom } from "@prisma/client";
+import { authGuard } from "@utils/auth-middleware";
 import Elysia from "elysia";
 import {
   classroomCreateDto,
@@ -17,13 +18,36 @@ export const app = new Elysia({
     tags: ["Classrooms"],
   },
 })
+  .derive(async (context) => {
+    const authContext = {
+      user: null as any,
+      isAuthenticated: false,
+    };
+    try {
+      const user = await authGuard(context.headers);
+      authContext.user = user;
+      authContext.isAuthenticated = true;
+    } catch (error) {
+      // do nothing
+    }
+    return authContext;
+  })
   .post(
     "",
-    async ({ body }) => {
-      const classroom = await ClassroomService.store(body);
+    async ({ body, user }) => {
+      const classroom = await ClassroomService.store(body, user.id);
       return ClassroomFormatter.response(classroom);
     },
-    classroomCreateDto
+    {
+      ...classroomCreateDto,
+      beforeHandle: [
+        ({ isAuthenticated }) => {
+          if (!isAuthenticated) {
+            throw new Error("Unauthorized");
+          }
+        },
+      ],
+    }
   )
   .get(
     "",
@@ -43,19 +67,37 @@ export const app = new Elysia({
   )
   .patch(
     "/:id",
-    async ({ params: { id }, body }) => {
+    async ({ params: { id }, body, user }) => {
       const updatedClassroom = await ClassroomService.update(id, body);
       return ClassroomFormatter.response(
         updatedClassroom as unknown as Classroom
       );
     },
-    classroomUpdateDto
+    {
+      ...classroomUpdateDto,
+      beforeHandle: [
+        ({ isAuthenticated }) => {
+          if (!isAuthenticated) {
+            throw new Error("Unauthorized");
+          }
+        },
+      ],
+    }
   )
   .delete(
     "/:id",
-    async ({ params: { id } }) => {
+    async ({ params: { id }, user }) => {
       await ClassroomService.destroy(id);
       return { message: "Sınıf başarıyla silindi" };
     },
-    classroomDestroyDto
+    {
+      ...classroomDestroyDto,
+      beforeHandle: [
+        ({ isAuthenticated }) => {
+          if (!isAuthenticated) {
+            throw new Error("Unauthorized");
+          }
+        },
+      ],
+    }
   );

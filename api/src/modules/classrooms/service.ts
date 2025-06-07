@@ -11,10 +11,18 @@ import {
 
 export abstract class ClassroomService {
   private static async prepareClassroomPayloadForCreate(
-    payloadRaw: ClassroomCreatePayload
-  ): Promise<Omit<Prisma.ClassroomCreateInput, "id" | "createdAt">> {
+    payloadRaw: ClassroomCreatePayload,
+    createdById: string
+  ): Promise<Prisma.ClassroomCreateInput> {
     const { name } = payloadRaw;
-    return { name };
+    return {
+      name,
+      createdBy: {
+        connect: {
+          id: createdById,
+        },
+      },
+    };
   }
 
   private static async prepareClasroomPayloadForUpdate(
@@ -90,10 +98,15 @@ export abstract class ClassroomService {
     }
   }
 
-  static async store(payload: ClassroomCreatePayload): Promise<Classroom> {
+  static async store(
+    payload: ClassroomCreatePayload,
+    createdById: string
+  ): Promise<Classroom> {
     try {
-      const classroomData =
-        await this.prepareClassroomPayloadForCreate(payload);
+      const classroomData = await this.prepareClassroomPayloadForCreate(
+        payload,
+        createdById
+      );
       const classroom = await prisma.classroom.create({
         data: classroomData,
       });

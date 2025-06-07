@@ -8,6 +8,7 @@ export const ClassroomPlain = t.Object({
   id: t.String(),
   name: t.String(),
   createdAt: t.Date(),
+  createdById: t.String(),
 });
 
 export const ClassroomRelations = t.Object({
@@ -30,6 +31,7 @@ export const ClassroomRelations = t.Object({
       notes: __nullable__(t.String()),
       transferDate: t.Date(),
       createdAt: t.Date(),
+      createdById: t.String(),
     }),
     { additionalProperties: true },
   ),
@@ -42,9 +44,18 @@ export const ClassroomRelations = t.Object({
       notes: __nullable__(t.String()),
       transferDate: t.Date(),
       createdAt: t.Date(),
+      createdById: t.String(),
     }),
     { additionalProperties: true },
   ),
+  createdBy: t.Object({
+    id: t.String(),
+    name: t.String(),
+    email: t.String(),
+    hashedPassword: t.String(),
+    role: t.Union([t.Literal("TEACHER"), t.Literal("ADMIN")]),
+    createdAt: t.Date(),
+  }),
 });
 
 export const ClassroomPlainInputCreate = t.Object({ name: t.String() });
@@ -84,6 +95,11 @@ export const ClassroomRelationsInputCreate = t.Object({
       ),
     }),
   ),
+  createdBy: t.Object({
+    connect: t.Object({
+      id: t.String(),
+    }),
+  }),
 });
 
 export const ClassroomRelationsInputUpdate = t.Partial(
@@ -136,6 +152,11 @@ export const ClassroomRelationsInputUpdate = t.Partial(
         ),
       }),
     ),
+    createdBy: t.Object({
+      connect: t.Object({
+        id: t.String(),
+      }),
+    }),
   }),
 );
 
@@ -150,6 +171,7 @@ export const ClassroomWhere = t.Partial(
           id: t.String(),
           name: t.String(),
           createdAt: t.Date(),
+          createdById: t.String(),
         },
         { additionalProperties: true },
       ),
@@ -175,7 +197,12 @@ export const ClassroomWhereUnique = t.Recursive(
           { additionalProperties: true },
         ),
         t.Partial(
-          t.Object({ id: t.String(), name: t.String(), createdAt: t.Date() }),
+          t.Object({
+            id: t.String(),
+            name: t.String(),
+            createdAt: t.Date(),
+            createdById: t.String(),
+          }),
         ),
       ],
       { additionalProperties: true },
@@ -191,6 +218,8 @@ export const ClassroomSelect = t.Partial(
     students: t.Boolean(),
     oldTransfer: t.Boolean(),
     newTransfer: t.Boolean(),
+    createdBy: t.Boolean(),
+    createdById: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -200,6 +229,7 @@ export const ClassroomInclude = t.Partial(
     students: t.Boolean(),
     oldTransfer: t.Boolean(),
     newTransfer: t.Boolean(),
+    createdBy: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -213,6 +243,9 @@ export const ClassroomOrderBy = t.Partial(
       additionalProperties: true,
     }),
     createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    createdById: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
   }),

@@ -53,7 +53,7 @@ export const UserRelations = t.Object({
       updatedAt: t.Date(),
     }),
   ),
-  Notification: t.Array(
+  notifications: t.Array(
     t.Object({
       id: t.String(),
       type: t.Union([t.Literal("OVERDUE_BOOK"), t.Literal("SYSTEM")]),
@@ -62,6 +62,28 @@ export const UserRelations = t.Object({
       isRead: t.Boolean(),
       metadata: __nullable__(t.Any()),
       createdAt: t.Date(),
+    }),
+    { additionalProperties: true },
+  ),
+  createdClassrooms: t.Array(
+    t.Object({
+      id: t.String(),
+      name: t.String(),
+      createdAt: t.Date(),
+      createdById: t.String(),
+    }),
+    { additionalProperties: true },
+  ),
+  createdTransferHistories: t.Array(
+    t.Object({
+      id: t.String(),
+      studentId: t.String(),
+      oldClassId: t.String(),
+      newClassId: t.String(),
+      notes: __nullable__(t.String()),
+      transferDate: t.Date(),
+      createdAt: t.Date(),
+      createdById: t.String(),
     }),
     { additionalProperties: true },
   ),
@@ -109,7 +131,27 @@ export const UserRelationsInputCreate = t.Object({
       }),
     }),
   ),
-  Notification: t.Optional(
+  notifications: t.Optional(
+    t.Object({
+      connect: t.Array(
+        t.Object({
+          id: t.String(),
+        }),
+        { additionalProperties: true },
+      ),
+    }),
+  ),
+  createdClassrooms: t.Optional(
+    t.Object({
+      connect: t.Array(
+        t.Object({
+          id: t.String(),
+        }),
+        { additionalProperties: true },
+      ),
+    }),
+  ),
+  createdTransferHistories: t.Optional(
     t.Object({
       connect: t.Array(
         t.Object({
@@ -163,7 +205,39 @@ export const UserRelationsInputUpdate = t.Partial(
         disconnect: t.Boolean(),
       }),
     ),
-    Notification: t.Partial(
+    notifications: t.Partial(
+      t.Object({
+        connect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+        disconnect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+      }),
+    ),
+    createdClassrooms: t.Partial(
+      t.Object({
+        connect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+        disconnect: t.Array(
+          t.Object({
+            id: t.String(),
+          }),
+          { additionalProperties: true },
+        ),
+      }),
+    ),
+    createdTransferHistories: t.Partial(
       t.Object({
         connect: t.Array(
           t.Object({
@@ -253,7 +327,9 @@ export const UserSelect = t.Partial(
     createdBooks: t.Boolean(),
     assignments: t.Boolean(),
     session: t.Boolean(),
-    Notification: t.Boolean(),
+    notifications: t.Boolean(),
+    createdClassrooms: t.Boolean(),
+    createdTransferHistories: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -264,7 +340,9 @@ export const UserInclude = t.Partial(
     createdBooks: t.Boolean(),
     assignments: t.Boolean(),
     session: t.Boolean(),
-    Notification: t.Boolean(),
+    notifications: t.Boolean(),
+    createdClassrooms: t.Boolean(),
+    createdTransferHistories: t.Boolean(),
     _count: t.Boolean(),
   }),
 );

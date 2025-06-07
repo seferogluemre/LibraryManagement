@@ -12,6 +12,7 @@ export const TransferHistoryPlain = t.Object({
   notes: __nullable__(t.String()),
   transferDate: t.Date(),
   createdAt: t.Date(),
+  createdById: t.String(),
 });
 
 export const TransferHistoryRelations = t.Object({
@@ -22,8 +23,26 @@ export const TransferHistoryRelations = t.Object({
     studentNo: t.Integer(),
     classId: t.String(),
   }),
-  oldClass: t.Object({ id: t.String(), name: t.String(), createdAt: t.Date() }),
-  newClass: t.Object({ id: t.String(), name: t.String(), createdAt: t.Date() }),
+  oldClass: t.Object({
+    id: t.String(),
+    name: t.String(),
+    createdAt: t.Date(),
+    createdById: t.String(),
+  }),
+  newClass: t.Object({
+    id: t.String(),
+    name: t.String(),
+    createdAt: t.Date(),
+    createdById: t.String(),
+  }),
+  createdBy: t.Object({
+    id: t.String(),
+    name: t.String(),
+    email: t.String(),
+    hashedPassword: t.String(),
+    role: t.Union([t.Literal("TEACHER"), t.Literal("ADMIN")]),
+    createdAt: t.Date(),
+  }),
 });
 
 export const TransferHistoryPlainInputCreate = t.Object({
@@ -52,6 +71,11 @@ export const TransferHistoryRelationsInputCreate = t.Object({
       id: t.String(),
     }),
   }),
+  createdBy: t.Object({
+    connect: t.Object({
+      id: t.String(),
+    }),
+  }),
 });
 
 export const TransferHistoryRelationsInputUpdate = t.Partial(
@@ -67,6 +91,11 @@ export const TransferHistoryRelationsInputUpdate = t.Partial(
       }),
     }),
     newClass: t.Object({
+      connect: t.Object({
+        id: t.String(),
+      }),
+    }),
+    createdBy: t.Object({
       connect: t.Object({
         id: t.String(),
       }),
@@ -89,6 +118,7 @@ export const TransferHistoryWhere = t.Partial(
           notes: t.String(),
           transferDate: t.Date(),
           createdAt: t.Date(),
+          createdById: t.String(),
         },
         { additionalProperties: true },
       ),
@@ -122,6 +152,7 @@ export const TransferHistoryWhereUnique = t.Recursive(
             notes: t.String(),
             transferDate: t.Date(),
             createdAt: t.Date(),
+            createdById: t.String(),
           }),
         ),
       ],
@@ -142,6 +173,8 @@ export const TransferHistorySelect = t.Partial(
     notes: t.Boolean(),
     transferDate: t.Boolean(),
     createdAt: t.Boolean(),
+    createdBy: t.Boolean(),
+    createdById: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -151,6 +184,7 @@ export const TransferHistoryInclude = t.Partial(
     student: t.Boolean(),
     oldClass: t.Boolean(),
     newClass: t.Boolean(),
+    createdBy: t.Boolean(),
     _count: t.Boolean(),
   }),
 );
@@ -176,6 +210,9 @@ export const TransferHistoryOrderBy = t.Partial(
       additionalProperties: true,
     }),
     createdAt: t.Union([t.Literal("asc"), t.Literal("desc")], {
+      additionalProperties: true,
+    }),
+    createdById: t.Union([t.Literal("asc"), t.Literal("desc")], {
       additionalProperties: true,
     }),
   }),

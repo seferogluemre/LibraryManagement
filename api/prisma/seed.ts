@@ -1,17 +1,32 @@
-import { faker } from "@faker-js/faker";
+import { en, Faker, tr } from "@faker-js/faker";
 import { config } from "dotenv";
 
 import prisma from "../src/core/prisma";
 
+const faker = new Faker({
+  locale: [tr, en],
+});
+
 // Load environment variables from .env file
 config({ path: "../../.env" });
 
-const predefinedVesselTypes = Array.from(
-  new Set(["Tanker", "Cargo", "Container", "Bulk Carrier", "Passenger"])
-);
-
 async function main() {
   try {
+    // Önceki verileri temizle (ilişkisel sıraya göre)
+    console.info("🧹 Mevcut veriler temizleniyor...");
+    await prisma.bookAssignment.deleteMany();
+    await prisma.notification.deleteMany();
+    await prisma.transferHistory.deleteMany();
+    await prisma.session.deleteMany();
+    await prisma.book.deleteMany();
+    await prisma.student.deleteMany();
+    await prisma.classroom.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.author.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.publisher.deleteMany();
+    console.info("✅ Veriler temizlendi.");
+
     // 1. Önce Admin ve Öğretmen kullanıcıları oluştur
     console.info("👥 Kullanıcılar oluşturuluyor...");
     const admin = await prisma.user.create({
@@ -77,7 +92,10 @@ async function main() {
     const classrooms = await Promise.all(
       ["9-A", "9-B", "10-A", "10-B", "11-A", "11-B"].map((name) =>
         prisma.classroom.create({
-          data: { name },
+          data: {
+            name,
+            createdById: admin.id,
+          },
         })
       )
     );
