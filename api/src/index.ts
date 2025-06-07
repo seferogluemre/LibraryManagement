@@ -75,7 +75,7 @@ const app = new Elysia()
   })
   .listen(process.env.PORT || 3000);
 
-if (process.env.NODE_ENV === "DEVELOPMENT") {
+if (process.env.NODE_ENV === "development") {
   const tags = [
     { name: "User", description: "User endpoints" },
     { name: "Auth", description: "Auth endpoints" },
@@ -89,6 +89,9 @@ if (process.env.NODE_ENV === "DEVELOPMENT") {
     { name: "Publisher", description: "Publisher endpoints" },
     { name: "Book Assignment", description: "Book Assignment endpoints" },
     { name: "Report", description: "Report endpoints" },
+    { name: "Notification", description: "Notification endpoints" },
+    { name: "Websocket", description: "Websocket endpoints" },
+    { name: "System", description: "System endpoints" },
   ];
 
   const swaggerConfig = await prepareSwaggerConfig({ tags });
