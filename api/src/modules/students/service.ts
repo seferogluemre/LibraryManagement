@@ -1,7 +1,7 @@
-import prisma from "#core/prisma";
-import { HandleError } from "#shared/error/handle-error";
-import { NotFoundException } from "#utils/http-errors";
+import prisma from "@core/prisma";
 import { Prisma, Student } from "@prisma/client";
+import { HandleError } from "@shared/error/handle-error";
+import { NotFoundException } from "@utils/http-errors";
 import { getStudentFilters } from "./dtos";
 import {
   StudentCreatePayload,
@@ -15,7 +15,6 @@ export abstract class StudentService {
   ): Promise<Omit<Prisma.StudentCreateInput, "id">> {
     const { name, email, studentNo, classId } = payloadRaw;
 
-    // Sınıfın var olduğunu kontrol et
     const classExists = await prisma.classroom.findUnique({
       where: { id: classId },
     });

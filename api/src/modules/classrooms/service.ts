@@ -1,7 +1,7 @@
-import prisma from "#core/prisma";
-import { HandleError } from "#shared/error/handle-error";
-import { NotFoundException } from "#utils/http-errors";
+import prisma from "@core/prisma";
 import { Classroom, Prisma } from "@prisma/client";
+import { HandleError } from "@shared/error/handle-error";
+import { NotFoundException } from "@utils/http-errors";
 import { getClassroomFilters } from "./dtos";
 import {
   ClassroomCreatePayload,

@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { t } from "elysia";
 
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 
 export function getTransferHistoryFilters(query?: {
   studentId?: string;

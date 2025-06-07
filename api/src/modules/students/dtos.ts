@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { t } from "elysia";
 
-import { StudentPlain } from "../../../prisma/prismabox/Student";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
+import { StudentPlain } from "@prisma/prismabox/Student";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 
 export function getStudentFilters(query?: {
   id?: string;

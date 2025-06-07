@@ -62,10 +62,6 @@ class Cache {
           }
         }
       } catch (streamError) {
-        console.error(
-          "[CacheService] Redis tarama (scanStream) sırasında hata:",
-          streamError
-        );
         return {
           status: "SCAN_STREAM_ERROR",
           error: (streamError as Error).message,
@@ -77,7 +73,6 @@ class Cache {
         users: onlineUsers,
       };
     } catch (error) {
-      console.error("[CacheService] getAllOnlineUsers genel hatası:", error);
       return {
         status: "GENERAL_CACHE_ERROR",
         error: (error as Error).message,

@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { t } from "elysia";
 
 import { ClassroomPlain } from "@prismabox/Classroom";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 
 export function getClassroomFilters(query?: { id?: string; name?: string }) {
   if (!query) {

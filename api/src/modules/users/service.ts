@@ -1,8 +1,8 @@
-import { HandleError } from "#shared/error/handle-error";
+import prisma from "#core/prisma";
 import { Prisma } from "@prisma/client";
+import { HandleError } from "@shared/error/handle-error";
+import { NotFoundException } from "@utils/http-errors";
 import bcrypt from "bcryptjs";
-import prisma from "../../core/prisma";
-import { NotFoundException } from "../../utils/http-errors";
 import { getUserFilters } from "./dtos";
 import { UserCreatePayload, UserIndexQuery, UserUpdatePayload } from "./types";
 

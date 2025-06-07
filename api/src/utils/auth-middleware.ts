@@ -1,6 +1,6 @@
+import { AuthService } from "@modules/auth/service";
+import { UnauthorizedException } from "@utils/http-errors";
 import { Elysia } from "elysia";
-import { AuthService } from "../modules/auth/service";
-import { UnauthorizedException } from "./http-errors";
 
 /**
  * JWT Authentication Guard

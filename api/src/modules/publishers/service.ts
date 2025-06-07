@@ -1,6 +1,6 @@
-import prisma from "#core/prisma";
-import { HandleError } from "#shared/error/handle-error";
-import { NotFoundException } from "#utils/http-errors";
+import prisma from "@core/prisma";
+import { HandleError } from "@shared/error/handle-error";
+import { NotFoundException } from "@utils/http-errors";
 import { Prisma, Publisher } from "@prisma/client";
 import { getPublisherFilters } from "./dtos";
 import {

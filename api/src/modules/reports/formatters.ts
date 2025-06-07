@@ -1,4 +1,4 @@
-import { BaseFormatter } from "#utils/base-formatter";
+import { BaseFormatter } from "@utils/base-formatter";
 import { reportResponseSchema } from "./dtos";
 import { ReportsResponse } from "./types";
 

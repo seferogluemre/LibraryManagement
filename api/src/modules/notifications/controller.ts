@@ -5,7 +5,7 @@ import { NotificationService } from "./service";
 
 export const app = new Elysia({
   prefix: "/notifications",
-  tags: ["notifications"],
+  tags: ["Notifications"],
   name: "Notifications",
 })
   .get(

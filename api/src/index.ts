@@ -1,6 +1,6 @@
-import { handleElysiaError } from "#config/error-handler";
-import { prepareSwaggerConfig } from "#config/swagger-config";
-import { websockets } from "#modules/websockets";
+import { handleElysiaError } from "@config/error-handler";
+import { prepareSwaggerConfig } from "@config/swagger-config";
+import { websockets } from "@modules/websockets";
 // import "#modules/notifications/queues/notification.worker";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
@@ -39,7 +39,7 @@ const app = new Elysia()
         ],
         servers: [
           {
-            url: "http://localhost:3001",
+            url: "http://localhost:3000",
             description: "Development server",
           },
         ],
@@ -75,7 +75,7 @@ const app = new Elysia()
   })
   .listen(process.env.PORT || 3000);
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "DEVELOPMENT") {
   const tags = [
     { name: "User", description: "User endpoints" },
     { name: "Auth", description: "Auth endpoints" },
@@ -93,26 +93,6 @@ if (process.env.NODE_ENV === "development") {
 
   const swaggerConfig = await prepareSwaggerConfig({ tags });
 
-  app.use(swagger(swaggerConfig));
-}
-
-if (process.env.NODE_ENV !== "production") {
-  const swaggerConfig = {
-    path: "/docs",
-    documentation: {
-      info: {
-        title: "Kütüphane Takip API",
-        version: "1.0.0",
-      },
-      servers: [
-        {
-          url: `http://${app.server?.hostname}:${app.server?.port}`,
-          description: "Development Server",
-        },
-      ],
-    },
-  };
-  // @ts-ignore
   app.use(swagger(swaggerConfig));
 }
 

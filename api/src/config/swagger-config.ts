@@ -39,12 +39,12 @@ export async function prepareSwaggerConfig({
         const newPaths: typeof paths = {};
 
         for (const key in paths) {
-          if (Object.hasOwn(paths, key)) {
+          if (Object.prototype.hasOwnProperty.call(paths, key)) {
             const newKey = `/auth${key}`;
             newPaths[newKey] = paths[key];
             const methods = newPaths[newKey];
             for (const method in methods) {
-              if (Object.hasOwn(methods, method)) {
+              if (Object.prototype.hasOwnProperty.call(methods, method)) {
                 // @ts-ignore
                 methods[method].tags = ["Better Auth"];
               }

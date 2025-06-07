@@ -1,4 +1,4 @@
-import redis from "#core/redis";
+import redis from "@core/redis";
 import { Queue } from "bullmq";
 import { TeacherNotificationData } from "../types";
 

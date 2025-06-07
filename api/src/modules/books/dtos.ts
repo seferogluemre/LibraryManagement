@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { t } from "elysia";
 
-import { BookPlain } from "../../../prisma/prismabox/Book";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
+import { BookPlain } from "@prisma/prismabox/Book";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 
 export function getBooksFilters(query?: {
   id?: string;
@@ -168,35 +168,28 @@ export const bookDestroyDto = {
 
 export const bookCreateDto = {
   body: t.Object({
-    title: BookPlain.properties.title,
-    isbn: t.Optional(t.String()),
-    publishedYear: t.Optional(t.Number()),
-    totalCopies: t.Number({ minimum: 1 }),
-    availableCopies: t.Optional(t.Number({ minimum: 0 })),
-    authorId: t.String(),
-    categoryId: t.Optional(t.String()),
-    publisherId: t.Optional(t.String()),
-  }),
-  headers: t.Object({
-    authorization: t.String({
-      description: "Bearer {access_token}",
-      pattern: "^Bearer .+$",
-    }),
+    title: t.String(),
+    author_id: t.String(),
+    publisher_id: t.String(),
+    category_id: t.String(),
+    published_year: t.Number(),
+    isbn: t.String(),
+    stock: t.Number(),
+    description: t.Optional(t.String()),
+    shelf_location: t.Optional(t.String()),
   }),
   response: {
-    200: bookWithRelationsResponseSchema,
+    201: bookWithRelationsResponseSchema,
+    400: errorResponseDto[400],
     401: errorResponseDto[401],
-    409: errorResponseDto[409],
     422: errorResponseDto[422],
   },
   detail: {
     summary: "Yeni Kitap Oluştur",
-    description:
-      "Yeni kitap oluşturur. Sisteme giriş yapmış kullanıcının bilgisi otomatik olarak addedById alanına eklenir.",
   },
 } satisfies ControllerHook;
 
-export const bookCreateResponseDto = bookCreateDto.response["200"];
+export const bookCreateResponseDto = bookCreateDto.response["201"];
 
 // Additional DTOs for special endpoints
 export const booksByAuthorDto = {

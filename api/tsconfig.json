@@ -5,7 +5,11 @@
       "@utils/*": ["./src/utils/*"],
       "@modules/*": ["./src/modules/*"],
       "@prismabox/*": ["./prisma/prismabox/*"],
-      "@core": ["./src/core/*"]
+      "@core/*": ["./src/core/*"],
+      "@prisma/*": ["./prisma/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@config/*": ["./src/config/*"],
+      "@emails/*": ["./src/emails/*"]
     },
     "target": "ES2021",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */

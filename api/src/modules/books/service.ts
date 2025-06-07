@@ -1,7 +1,7 @@
-import prisma from "#core/prisma";
-import { HandleError } from "#shared/error/handle-error";
-import { NotFoundException } from "#utils/http-errors";
+import prisma from "@core/prisma";
 import { Book, Prisma } from "@prisma/client";
+import { HandleError } from "@shared/error/handle-error";
+import { NotFoundException } from "@utils/http-errors";
 import { AuthService } from "../auth/service";
 import { getBooksFilters } from "./dtos";
 import { BookCreatePayload, BookIndexQuery, BookUpdatePayload } from "./types";

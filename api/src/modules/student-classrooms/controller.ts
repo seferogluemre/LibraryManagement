@@ -1,5 +1,5 @@
+import { TransferHistoryFormatter } from "@modules/transfer-histories/formatters";
 import Elysia from "elysia";
-import { TransferHistoryFormatter } from "../transfer-histories/formatters";
 import {
   studentClassroomBulkTransferDto,
   studentClassroomClassCountDto,

@@ -1,4 +1,4 @@
-import { ControllerHook } from "#utils/elysia-types";
+import { ControllerHook } from "@utils/elysia-types";
 import { t } from "elysia";
 
 export const topStudentsSchema = t.Object({

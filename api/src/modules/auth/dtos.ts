@@ -1,6 +1,6 @@
+import { UserPlain } from "@prisma/prismabox/User";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 import { t } from "elysia";
-import { UserPlain } from "../../../prisma/prismabox/User";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
 
 // Auth response schemas
 export const authUserResponseSchema = t.Object({

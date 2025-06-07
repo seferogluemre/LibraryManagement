@@ -1,4 +1,4 @@
-import prisma from "#core/prisma";
+import prisma from "@core/prisma";
 import { schedule } from "node-cron";
 import { NotificationQueue } from "../queues/notification.queue";
 import { NotificationService } from "../service";
@@ -13,9 +13,6 @@ const cronSchedule = "* * * * *";
 export function startOverdueBooksCron() {
   schedule(cronSchedule, async () => {
     try {
-      console.log("🔍 Gecikmiş kitaplar kontrol ediliyor...");
-
-      // 1. Geciken kitapları bul
       const overdueAssignments = await prisma.bookAssignment.findMany({
         where: {
           returned: false,
@@ -34,21 +31,10 @@ export function startOverdueBooksCron() {
         },
       });
 
-      console.log(
-        `📚 Bulunan gecikmiş kitap sayısı: ${overdueAssignments.length}`
-      );
-
-      // 2. Öğretmenlere göre grupla
       const teacherGroups = new Map<string, TeacherNotificationData>();
 
       for (const assignment of overdueAssignments) {
         const teacherId = assignment.assignedBy.id;
-        console.log(`👩‍🏫 Öğretmen bilgileri:`, {
-          id: teacherId,
-          name: assignment.assignedBy.name,
-          email: assignment.assignedBy.email,
-        });
-
         if (!teacherGroups.has(teacherId)) {
           teacherGroups.set(teacherId, {
             teacherId,
@@ -70,32 +56,17 @@ export function startOverdueBooksCron() {
         });
       }
 
-      console.log(
-        `👥 Bildirim gönderilecek öğretmen sayısı: ${teacherGroups.size}`
-      );
-
-      // 3. Her öğretmen için bildirim oluştur ve mail gönder
       for (const data of teacherGroups.values()) {
-        console.log(`📧 Mail kuyruğa ekleniyor:`, {
-          teacherName: data.teacherName,
-          teacherEmail: data.teacherEmail,
-          studentCount: data.overdueStudents.length,
-        });
-
         try {
-          // Bildirim oluştur
           await NotificationService.overdueNotification(data);
 
-          // Mail kuyruğuna ekle
           await NotificationQueue.addOverdueBookEmail(data);
         } catch (error) {
           console.error(`❌ İşlem hatası (${data.teacherEmail}):`, error);
         }
       }
-
-      console.log("✅ Geciken kitap kontrolleri tamamlandı");
     } catch (error) {
-      console.error("❌ Cron job hatası:", error);
+      throw error;
     }
   });
 }

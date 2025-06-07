@@ -1,4 +1,4 @@
-import { BaseFormatter } from "#utils/base-formatter";
+import { BaseFormatter } from "@utils/base-formatter";
 import { bookWithRelationsResponseSchema } from "./dtos";
 import { BookWithRelationsResponse } from "./types";
 

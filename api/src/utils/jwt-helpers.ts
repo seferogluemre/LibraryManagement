@@ -32,7 +32,9 @@ export class JWTHelpers {
         this.parseTimeToSeconds(jwtConfig.accessTokenExpireTime),
     };
 
-    return await this.jwtInstance.decorator.jwt.sign(payload);
+    return await this.jwtInstance.decorator.jwt.sign(
+      payload as unknown as Record<string, string | number>
+    );
   }
 
   /**

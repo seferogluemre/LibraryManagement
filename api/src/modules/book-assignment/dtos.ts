@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
-import { t } from "elysia";
 
 import { BookAssignmentPlain } from "@prismabox/BookAssignment";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
+import { t } from "elysia";
 
 export function getBookAssignmentsFilters(query?: {
   id?: string;
@@ -149,12 +149,6 @@ export const bookAssignmentCreateDto = {
       format: "date-time",
       description: "ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ",
       examples: ["2025-06-18T15:30:00.000Z"],
-    }),
-  }),
-  headers: t.Object({
-    authorization: t.String({
-      description: "Bearer {access_token}",
-      pattern: "^Bearer .+$",
     }),
   }),
   response: {

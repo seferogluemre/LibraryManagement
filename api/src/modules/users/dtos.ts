@@ -1,8 +1,8 @@
 import { Prisma, UserRole } from "@prisma/client";
 import { t } from "elysia";
 
-import { UserPlain } from "../../../prisma/prismabox/User";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
+import { UserPlain } from "@prismabox/User";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 import { passwordValidation } from "./field-validation";
 
 const UserRoleEnum = t.Enum(UserRole);

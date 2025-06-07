@@ -1,6 +1,6 @@
-import prisma from "#core/prisma";
-import { HandleError } from "#shared/error/handle-error";
+import prisma from "@core/prisma";
 import { NotificationType } from "@prisma/client";
+import { HandleError } from "@shared/error/handle-error";
 import { TeacherNotificationData } from "./types";
 
 const modulName = "notification";

@@ -1,4 +1,4 @@
-import { CacheService } from "#core/cache.service";
+import { CacheService } from "@core/cache.service";
 import { randomUUID } from "crypto";
 import Elysia from "elysia";
 import { websocketQuerySchema } from "./dtos";

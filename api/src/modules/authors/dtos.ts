@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { AuthorPlain } from "@prismabox/Author";
 import { BookPlain } from "@prismabox/Book";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 import { t } from "elysia";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
 
 export function getAuthorFilters(query?: {
   id?: string;

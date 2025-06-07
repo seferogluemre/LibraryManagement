@@ -25,7 +25,7 @@ export const app = new Elysia({
     userCreateDto
   )
   .get(
-    "", // Kullanıcıları listeleme
+    "",
     async ({ query }) => {
       const users = await UsersService.index(query);
       return users.map(UserFormatter.response);
@@ -49,7 +49,7 @@ export const app = new Elysia({
     userUpdateDto
   )
   .delete(
-    "/:id", // Kullanıcı silme
+    "/:id",
     async ({ params: { id } }) => {
       await UsersService.destroy(id);
       return { message: "Kullanıcı başarıyla silindi" };

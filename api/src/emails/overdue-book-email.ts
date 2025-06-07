@@ -1,20 +1,16 @@
-import { TeacherNotificationData } from "#modules/notifications";
+import { TeacherNotificationData } from "@modules/notifications";
 import { createTransport } from "nodemailer";
 
 export async function sendOverdueBookEmail(data: TeacherNotificationData) {
-  console.log("📧 SMTP bağlantısı oluşturuluyor...");
-
   const transport = createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
-    secure: Number(process.env.SMTP_PORT) === 465, // Port 465 için true, diğerleri için false
+    secure: Number(process.env.SMTP_PORT) === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
   });
-
-  console.log("📝 Email içeriği hazırlanıyor...");
 
   const studentListHTML = data.overdueStudents
     .map(
@@ -55,11 +51,6 @@ export async function sendOverdueBookEmail(data: TeacherNotificationData) {
 
   const fromAddress = `"Ümmü Mihcen Kütüphane Yönetim" <${process.env.SMTP_FROM}>`;
 
-  console.log("✉️ Email gönderiliyor...", {
-    from: fromAddress,
-    to: data.teacherEmail,
-  });
-
   try {
     await transport.sendMail({
       from: fromAddress,
@@ -67,9 +58,7 @@ export async function sendOverdueBookEmail(data: TeacherNotificationData) {
       subject: "Geciken Kitap Bildirimi",
       html: html,
     });
-    console.log("✅ Email başarıyla gönderildi!");
   } catch (error) {
-    console.error("❌ Email gönderme hatası:", error);
     throw error;
   }
 }

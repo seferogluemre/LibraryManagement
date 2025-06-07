@@ -1,8 +1,8 @@
 import prisma from "#core/prisma";
 import { HandleError } from "#shared/error/handle-error";
 import { ConflictException, NotFoundException } from "#utils/http-errors";
-import { StudentService } from "../students/service";
-import { TransferHistoryService } from "../transfer-histories/service";
+import { StudentService } from "@modules/students/service";
+import { TransferHistoryService } from "@modules/transfer-histories/service";
 import type { ClassroomTransferRequest, StudentWithClassroom } from "./types";
 
 export abstract class StudentClassroomService {

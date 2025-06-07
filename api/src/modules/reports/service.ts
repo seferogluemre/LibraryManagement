@@ -1,5 +1,5 @@
-import prisma from "#core/prisma";
-import { HandleError } from "#shared/error/handle-error";
+import prisma from "@core/prisma";
+import { HandleError } from "@shared/error/handle-error";
 import { ReportsResponse } from "./types";
 
 export abstract class ReportsService {

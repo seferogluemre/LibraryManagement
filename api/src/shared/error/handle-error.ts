@@ -1,5 +1,5 @@
-import { ConflictException, NotFoundException } from "#utils/http-errors";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ConflictException, NotFoundException } from "@utils/http-errors";
 
 export abstract class HandleError {
   static async handlePrismaError(

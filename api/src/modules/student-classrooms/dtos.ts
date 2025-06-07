@@ -1,7 +1,7 @@
 import { t } from "elysia";
 
-import { StudentPlain } from "../../../prisma/prismabox/Student";
-import { ControllerHook, errorResponseDto } from "../../utils/elysia-types";
+import { StudentPlain } from "@prisma/prismabox/Student";
+import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 
 // Response schemas
 export const studentClassroomResponseSchema = t.Object({

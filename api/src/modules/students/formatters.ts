@@ -1,5 +1,5 @@
-import { BaseFormatter } from "#utils/base-formatter";
 import { Student } from "@prisma/client";
+import { BaseFormatter } from "@utils/base-formatter";
 import { studentWithClassResponseSchema } from "./dtos";
 import { StudentResponse } from "./types";
 
