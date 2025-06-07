@@ -37,7 +37,6 @@ export abstract class AuthService {
       throw new UnauthorizedException("Geçersiz email veya şifre");
     }
 
-    // JWT token'ları oluştur
     const accessToken = await JWTHelpers.generateAccessToken(
       user.id,
       user.email,

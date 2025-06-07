@@ -24,8 +24,6 @@ generator prismabox {
 enum UserRole {
   TEACHER
   ADMIN
-
-  @@map("user_roles")
 }
 
 enum NotificationType {
@@ -38,13 +36,13 @@ model User {
   name           String   @map("user_name")
   email          String   @unique @map("user_email")
   hashedPassword String   @map("hashed_password")
-  role           UserRole @map("user_role")
+  role           UserRole
   createdAt      DateTime @default(now()) @map("created_at")
 
-  createdBooks Book[]           @relation("BookCreatedBy")
-  assignments  BookAssignment[] @relation("AssignedBy")
-  session      Session?
-  Notification Notification[]
+  createdBooks  Book[]           @relation("BookCreatedBy")
+  assignments   BookAssignment[] @relation("AssignedBy")
+  session       Session?
+  notifications Notification[]
 
   @@index([role])
   @@index([name])
@@ -85,8 +83,8 @@ model Student {
   class     Classroom @relation(fields: [classId], references: [id])
   classId   String    @map("class_id")
 
-  assignments     BookAssignment[]
-  TransferHistory TransferHistory[]
+  assignments       BookAssignment[]
+  transferHistories TransferHistory[]
 
   @@index([classId])
   @@index([name])

@@ -1,7 +1,6 @@
+// import "#modules/notifications/queues/notification.worker";
 import { handleElysiaError } from "@config/error-handler";
 import { prepareSwaggerConfig } from "@config/swagger-config";
-import { websockets } from "@modules/websockets";
-// import "#modules/notifications/queues/notification.worker";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
 import { authController } from "@modules/auth";
@@ -17,6 +16,7 @@ import { studentClassroomController } from "@modules/student-classrooms";
 import { studentController } from "@modules/students";
 import { transferHistoryController } from "@modules/transfer-histories";
 import { userController } from "@modules/users";
+import { websockets } from "@modules/websockets";
 import { Elysia } from "elysia";
 
 const app = new Elysia()
@@ -99,7 +99,6 @@ if (process.env.NODE_ENV === "development") {
   app.use(swagger(swaggerConfig));
 }
 
-// Notification system start
 // startOverdueBooksCron();
 
 console.log(
