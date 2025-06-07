@@ -1,5 +1,6 @@
 import { handleElysiaError } from "#config/error-handler";
 import { prepareSwaggerConfig } from "#config/swagger-config";
+import { websockets } from "#modules/websockets";
 // import "#modules/notifications/queues/notification.worker";
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
@@ -65,6 +66,7 @@ const app = new Elysia()
   .use(bookAssignmentController)
   .use(reportController)
   .use(notificationController)
+  .use(websockets)
   .get("/health", () => ({ status: "ok" }), {
     detail: {
       tags: ["System"],

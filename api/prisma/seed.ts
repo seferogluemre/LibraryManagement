@@ -130,9 +130,9 @@ async function main() {
 
         // Bazı kitapları teslim edilmiş, bazılarını edilmemiş olarak işaretle
         const isReturned = Math.random() > 0.5;
-        const assignedAt = faker.date.past({ days: 30 });
+        const assignedAt = faker.date.past();
         const returnDue = new Date(assignedAt);
-        returnDue.setDate(returnDue.getDate() + 14); // 14 gün ödünç süresi
+        returnDue.setDate(assignedAt.getDate() + 14); // 14 gün ödünç süresi
 
         return prisma.bookAssignment.create({
           data: {
