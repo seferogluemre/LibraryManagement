@@ -1,6 +1,5 @@
-import { Sidebar } from "@/components/layout/sidebar.tsx";
+import { Sidebar } from "@/components/layout/sidebar";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-
 
 const beforeLoad = ({ context, location }) => {
   if (!context.accessToken) {

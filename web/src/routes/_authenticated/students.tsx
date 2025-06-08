@@ -1,10 +1,9 @@
 import { columns } from '@/components/columns/student-columns'
-import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table'
+import { AddStudentForm } from '@/features/students/components/AddStudentForm'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { PlusCircle } from 'lucide-react'
 
 
 export const Route = createFileRoute('/_authenticated/students')({
@@ -39,10 +38,7 @@ function StudentManagementPage() {
             Okuldaki tüm öğrencileri yönetin
           </p>
         </div>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Yeni Öğrenci Ekle
-        </Button>
+        <AddStudentForm />
       </div>
 
       {/* DataTable Bileşenini Kullanımı */}

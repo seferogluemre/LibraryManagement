@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +16,10 @@ export type Student = {
   id: string;
   name: string;
   studentNo: string;
-  class: string;
+  class: {
+    id: string;
+    name: string;
+  };
   email: string;
   borrowedBooks: number;
 };
@@ -39,6 +41,10 @@ export const columns: ColumnDef<Student>[] = [
   {
     accessorKey: "class",
     header: "Sınıf",
+    cell: ({ row }) => {
+      const className = row.original.class.name;
+      return <span>{className}</span>;
+    },
   },
   // "E-posta" kolonu
   {
@@ -46,21 +52,10 @@ export const columns: ColumnDef<Student>[] = [
     header: "E-posta",
   },
   // "Ödünç Kitap" kolonu
-  {
-    accessorKey: "borrowedBooks",
-    header: "Ödünç Kitap",
-    // 5. Özel Hücre Tanımı ('cell')
-    // Bu hücrenin içeriğini standart metin yerine özel bir bileşenle (Badge) oluşturuyoruz.
-    cell: ({ row }) => {
-      const borrowedCount = row.original.borrowedBooks;
-      if (borrowedCount > 0) {
-        return <Badge variant="secondary">{borrowedCount} kitap</Badge>;
-      }
-      return <span className="text-muted-foreground">-</span>;
-    },
-  },
+ 
   // "İşlemler" kolonu
   {
+    header: "İşlemler",
     id: "actions", // 6. Benzersiz ID (Veriyle direkt bağlı olmadığı için)
     cell: ({ row }) => {
       const student = row.original;
