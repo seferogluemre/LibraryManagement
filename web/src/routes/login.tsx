@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -21,8 +22,9 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-function App() {
+function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -39,9 +41,16 @@ function App() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       console.log("Login attempt:", data);
-      // TODO: API call will be here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      alert("Giriş başarılı!");
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Store login state
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", data.email);
+
+      // Navigate to dashboard
+      navigate({ to: "/dashboard" });
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -115,4 +124,6 @@ function App() {
   );
 }
 
-export default App;
+export const Route = createFileRoute("/login")({
+  component: LoginPage,
+});
