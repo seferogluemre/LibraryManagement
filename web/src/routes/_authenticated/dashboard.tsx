@@ -14,7 +14,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { clearLocalStorageAuthState } from "@/lib/auth";
+import type { OverdueBook, ReportsResponse, TopBook, TopStudent } from "@/features/reports/types";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext, useRouter } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -29,49 +31,57 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-// Mock Data (Yer Tutucu Veriler)
-const stats = [
-  { title: "Toplam Kitap", value: "2,847", change: "+12 bu ay", icon: Book },
-  { title: "Toplam Öğrenci", value: "1,245", change: "+23 bu dönem", icon: Users },
-  { title: "Ödünç Verilen", value: "342", change: "+18% geçen haftadan", icon: ArrowUpRight },
-  { title: "Gecikmiş Kitap", value: "28", change: "Acil eylem gerekli", icon: AlertTriangle, color: "text-red-500" },
-];
-
-const mostReadBooks = [
-  { title: "Suç ve Ceza", author: "Dostoyevski", count: 24 },
-  { title: "1984", author: "George Orwell", count: 18 },
-  { title: "Simyacı", author: "Paulo Coelho", count: 15 },
-  { title: "Küçük Prens", author: "Saint-Exupéry", count: 12 },
-];
-
-const activeStudents = [
-  { name: "Ahmet Yılmaz", class: "11-A", books: 8, fallback: "AY" },
-  { name: "Zeynep Kaya", class: "10-B", books: 7, fallback: "ZK" },
-  { name: "Mehmet Demir", class: "12-C", books: 6, fallback: "MD" },
-  { name: "Elif Arslan", class: "9-A", books: 5, fallback: "EA" },
-];
-
-const overdueBooks = [
-    { title: "Sefiller", author: "Can Öztürk", due: 12 },
-    { title: "Hayvan Çiftliği", author: "Ayşe Yıldız", due: 8 },
-    { title: "Dönüşüm", author: "Emre Şahin", due: 5 },
-    { title: "Satranç", author: "Selin Koç", due: 3 },
-];
-
 function DashboardPage() {
-  const auth = useRouteContext({ from: Route.id });
+  const auth = useRouteContext({ from: "/_authenticated/dashboard" });
   const router = useRouter();
 
+  const {
+    data: reports,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<ReportsResponse>({
+    queryKey: ["reports"],
+    queryFn: async () => {
+      const response = await api.reports.get();
+      if (response.error || !response.data) {
+        throw new Error(
+          (response.error?.value as { message: string })?.message || "Raporlar alınamadı"
+        );
+      }
+      return response.data;
+    },
+  });
+
+  if (isLoading) {
+    return <div className="p-4">Raporlar yükleniyor...</div>;
+  }
+
+  if (isError) {
+    return <div className="p-4 text-red-500">Hata: {error.message}</div>;
+  }
+  
+  if (!reports) {
+    return <div className="p-4">Rapor verisi bulunamadı.</div>;
+  }
+
   const handleLogout = () => {
-    auth.logout();
-    toast.info("Oturumunuz başarıyla kapatıldı.");
-    clearLocalStorageAuthState();
-    router.navigate({ to: "/login" });
+    if (auth.logout) {
+      auth.logout();
+      toast.info("Oturumunuz başarıyla kapatıldı.");
+      router.navigate({ to: "/login" });
+    }
   };  
+
+  const stats = [
+    { title: "Toplam Kitap", value: reports.systemStats[0].totalBooks, icon: Book },
+    { title: "Toplam Öğrenci", value: reports.systemStats[0].totalStudents, icon: Users },
+    { title: "Ödünç Verilen", value: reports.systemStats[0].totalActiveAssignments, icon: ArrowUpRight },
+    { title: "Gecikmiş Kitap", value: reports.systemStats[0].totalOverdueBooks, icon: AlertTriangle, color: "text-red-500" },
+  ];
 
   return (
     <div className="flex flex-col gap-8 py-4">
-      {/* Header Alanı */}
       <header className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -102,8 +112,6 @@ function DashboardPage() {
             </AlertDialog>
         </div>
       </header>
-
-      {/* 2. İstatistik Kartları */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
           <Card key={stat.title}>
@@ -113,75 +121,67 @@ function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
             </CardContent>
           </Card>
         ))}
       </div>
-      
-      {/* 3. Liste Kartları */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* En Çok Okunanlar */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>En Çok Okunan Kitaplar</CardTitle>
             <p className="text-sm text-muted-foreground">Bu ay en popüler kitaplar</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {mostReadBooks.map((book) => (
-                <div key={book.title} className="flex items-center">
+            {reports.topBooks.map((book: TopBook) => (
+                <div key={book.id} className="flex items-center">
                     <div className="p-3 bg-muted rounded-md mr-4">
                         <Book className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1">
                         <p className="font-semibold">{book.title}</p>
-                        <p className="text-sm text-muted-foreground">{book.author}</p>
+                        <p className="text-sm text-muted-foreground">{book.authorName}</p>
                     </div>
-                    <Badge variant="secondary" className="font-mono text-sm">{book.count}</Badge>
+                    <Badge variant="secondary" className="font-mono text-sm">{book.totalTimesRead}</Badge>
                 </div>
             ))}
           </CardContent>
         </Card>
-
-        {/* En Aktif Öğrenciler */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>En Aktif Öğrenciler</CardTitle>
             <p className="text-sm text-muted-foreground">Bu dönem en çok kitap okuyan öğrenciler</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {activeStudents.map((student) => (
-              <div key={student.name} className="flex items-center">
+            {reports.topStudents.map((student: TopStudent) => (
+              <div key={student.id} className="flex items-center">
                 <Avatar className="h-10 w-10 mr-4">
-                  <AvatarFallback>{student.fallback}</AvatarFallback>
+                  <AvatarFallback>{student.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <p className="font-semibold">{student.name}</p>
-                  <p className="text-sm text-muted-foreground">{student.class}</p>
+                  <p className="text-sm text-muted-foreground">{student.className}</p>
                 </div>
-                <Badge variant="outline">{student.books} kitap</Badge>
+                <Badge variant="outline">{student.totalBooksRead} kitap</Badge>
               </div>
             ))}
           </CardContent>
         </Card>
-
-        {/* Geciken Kitaplar */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="text-red-500">Geciken Kitaplar</CardTitle>
             <p className="text-sm text-muted-foreground">Acil eylem gerektiren iadeler</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {overdueBooks.map((book) => (
-                <div key={book.title} className="flex items-center">
+            {reports.overdueBooks.map((book: OverdueBook) => (
+                <div key={book.assignmentId} className="flex items-center">
                     <div className="p-3 text-red-500 rounded-md mr-4">
                         <AlertTriangle className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                        <p className="font-semibold">{book.title}</p>
-                        <p className="text-sm text-muted-foreground">{book.author}</p>
+                        <p className="font-semibold">{book.bookTitle}</p>
+                        <p className="text-sm text-muted-foreground">{book.studentName}</p>
                     </div>
-                    <Badge variant="destructive">{book.due} gün</Badge>
+                    <Badge variant="destructive">{book.daysOverdue} gün</Badge>
                 </div>
             ))}
           </CardContent>
@@ -190,3 +190,4 @@ function DashboardPage() {
     </div>
   );
 }
+

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -9,8 +10,6 @@ import { routeTree } from "./routeTree.gen";
 // Auth state'i ve tiplerini import et
 import { getAuthState, type AuthState, type User } from "./lib/auth";
 
-// Auth context'i için arayüz (interface) tanımla
-// Bu, tüm router tarafından kullanılacak context'in yapısıdır.
 export interface RouterContext extends AuthState {
   login: (data: {
     accessToken: string;
@@ -20,15 +19,17 @@ export interface RouterContext extends AuthState {
   logout: () => void;
 }
 
+const queryClient = new QueryClient();
+
 // Router'ı oluştur
 const router = createRouter({
   routeTree,
   context: {
-
     ...getAuthState(), 
     login: () => {},
     logout: () => {},
   },
+  defaultPreload: 'intent',
 });
 
 // Router'ı register et
@@ -43,7 +44,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </React.StrictMode>
   );
 }
