@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 interface SidebarStore {
   isOpen: boolean;
   isMobile: boolean;
+  setIsMobile: (mobile: boolean) => void;
   toggle: () => void;
   close: () => void;
   open: () => void;

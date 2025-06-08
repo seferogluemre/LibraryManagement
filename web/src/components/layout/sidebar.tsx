@@ -1,58 +1,60 @@
-import { navigationItems } from "@/constants/navigation";
-import { cn } from "@/lib/utils";
-import { useSidebarStore } from "@/stores/sidebar-store";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
-import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouteContext } from "@tanstack/react-router";
+import {
+    ArrowRightLeft,
+    Book,
+    BookCopy,
+    Building,
+    History,
+    LayoutDashboard,
+    PenSquare,
+    School,
+    Settings,
+    Tags,
+    Users
+} from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 
+const navItems = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/users", icon: Users, label: "Online Kullanıcılar" },
+  { href: "/students", icon: Users, label: "Öğrenci Yönetimi" },
+  { href: "/classes", icon: School, label: "Sınıf Yönetimi" },
+  { href: "/transfers", icon: ArrowRightLeft, label: "Öğrenci Transferi" },
+  { href: "/history", icon: History, label: "Transfer Geçmişi" },
+  { href: "/books", icon: Book, label: "Kitap Yönetimi" },
+  { href: "/authors", icon: PenSquare, label: "Yazar Yönetimi" },
+  { href: "/categories", icon: Tags, label: "Kategori Yönetimi" },
+  { href: "/publishers", icon: Building, label: "Yayınevi Yönetimi" },
+  { href: "/lending", icon: BookCopy, label: "Ödünç İşlemleri" },
+  { href: "/settings", icon: Settings, label: "Ayarlar" },
+];
+
 export function Sidebar() {
-  const { isOpen, isMobile } = useSidebarStore();
-  const [activeItem, setActiveItem] = useState("dashboard");
+    const { user } = useRouteContext({ from: '/_authenticated' });
 
-  return (
-    <aside
-      className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-slate-900 border-r border-slate-800 transition-transform duration-300 ease-in-out",
-        "flex flex-col",
-        isOpen ? "translate-x-0" : "-translate-x-full",
-        isMobile ? "w-full" : "w-80"
-      )}
-    >
-      {/* Header */}
-      <div className="p-6 border-b border-slate-800">
-        <h1 className="text-xl font-semibold text-white">Navigasyon</h1>
-      </div>
-
-      {/* Navigation Items */}
-      <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
-        {navigationItems.map((item) => (
-          <SidebarItem
-            key={item.id}
-            item={item}
-            isActive={activeItem === item.id}
-            onClick={() => {
-              setActiveItem(item.id);
-              // Burada routing logic gelecek
-              console.log(`Navigate to: ${item.href}`);
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Footer - Profile */}
-      <div className="p-4 border-t border-slate-800">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              K
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-white">Kütüphaneci</p>
-            <p className="text-xs text-slate-400">librarian</p>
-          </div>
-        </div>
-      </div>
-    </aside>
-  );
+    return (
+        <aside className="w-64 flex-shrink-0 bg-background border-r flex flex-col">
+            <div className="p-4 border-b">
+                <h1 className="text-xl font-bold tracking-wider">Navigasyon</h1>
+            </div>
+            <nav className="flex-1 p-4 space-y-1">
+                {navItems.map((item) => (
+                    <SidebarItem key={item.label} item={item} />
+                ))}
+            </nav>
+            <div className="p-4 border-t">
+                <div className="flex items-center gap-3">
+                    <Avatar className="w-10 h-10">
+                        <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+                        <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="text-sm font-semibold">{user?.name || 'Kullanıcı'}</p>
+                        <p className="text-xs text-muted-foreground">{user?.role || 'user'}</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    );
 }

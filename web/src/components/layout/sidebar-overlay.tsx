@@ -1,10 +1,16 @@
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/stores/sidebar-store";
+import { useEffect, useState } from "react";
 
 export function SidebarOverlay() {
+  const [isMounted, setIsMounted] = useState(false);
   const { isOpen, isMobile, close } = useSidebarStore();
 
-  if (!isMobile || !isOpen) return null;
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted || !isMobile || !isOpen) return null;
 
   return (
     <div

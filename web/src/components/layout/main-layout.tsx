@@ -3,6 +3,7 @@ import { useMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { Menu, X } from "lucide-react";
+import React from "react";
 import { Sidebar } from "./sidebar";
 import { SidebarOverlay } from "./sidebar-overlay";
 
@@ -11,8 +12,17 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const [isMounted, setIsMounted] = React.useState(false);
   const isMobile = useMobile();
   const { isOpen, toggle } = useSidebarStore();
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">

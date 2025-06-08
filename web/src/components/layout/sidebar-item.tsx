@@ -1,34 +1,25 @@
-import { cn } from "@/lib/utils";
-import type { NavigationItem } from "@/types/navigation";
+import { Link } from "@tanstack/react-router";
+import type { LucideIcon } from "lucide-react";
 
 interface SidebarItemProps {
-  item: NavigationItem;
-  isActive?: boolean;
-  onClick?: () => void;
+  item: {
+    href: string;
+    label: string;
+    icon: LucideIcon;
+  };
 }
 
-export function SidebarItem({ item, isActive, onClick }: SidebarItemProps) {
-  const Icon = item.icon;
-
+export function SidebarItem({ item }: SidebarItemProps) {
   return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg transition-all duration-200",
-        "hover:bg-slate-700/50 hover:text-white",
-        "focus:outline-none focus:ring-2 focus:ring-primary/50",
-        isActive ? "bg-slate-700 text-white shadow-sm" : "text-slate-300"
-      )}
+    <Link
+      to={item.href}
+      className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+      activeProps={{
+        className: "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+      }}
     >
-      <Icon size={20} className="shrink-0" />
-
-      <span className="flex-1 font-medium">{item.title}</span>
-
-      {item.badge && (
-        <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-          {item.badge}
-        </span>
-      )}
-    </button>
+      <item.icon className="w-5 h-5 mr-3" />
+      {item.label}
+    </Link>
   );
 }

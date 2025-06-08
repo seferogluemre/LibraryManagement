@@ -18,7 +18,8 @@
     /* Import Alias */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@api/*": ["../api/src/*"]
     },
 
     /* Linting */

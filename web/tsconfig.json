@@ -7,7 +7,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@api/*": ["../api/src/*"],
+      "@types/*": ["../types/*"],
+      "@stores/*": ["./src/stores/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@components/*": ["./src/components/*"],
+      "@tanstack/react-router": ["../node_modules/@tanstack/react-router"]
     }
   }
 }

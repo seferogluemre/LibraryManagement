@@ -1,30 +1,48 @@
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api } from "@/lib/api";
+import { setAuthState } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  redirect,
+  useRouter,
+} from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const loginSchema = z.object({
   email: z
     .string()
-    .email("Geçerli bir email adresi giriniz")
-    .min(1, "Email gereklidir"),
-  password: z
-    .string()
-    .min(6, "Şifre en az 6 karakter olmalıdır")
-    .min(1, "Şifre gereklidir"),
+    .min(1, "Email gereklidir")
+    .email("Geçerli bir email adresi giriniz"),
+  password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+export const Route = createFileRoute("/login")({
+  beforeLoad: ({ context }) => {
+    if (context.accessToken) {
+      throw redirect({
+        to: "/dashboard",
+        replace: true,
+      });
+    }
+  },
+  component: LoginPage,
+});
+
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
+  const auth = Route.useRouteContext();
 
   const {
     register,
@@ -32,32 +50,38 @@ function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      console.log("Login attempt:", data);
+      const response = await api.auth.login.post({
+        email: data.email,
+        password: data.password,
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Store login state
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", data.email);
-
-      // Navigate to dashboard
-      navigate({ to: "/dashboard" });
+      if (response.data && 'accessToken' in response.data) {
+        auth.login(response.data);
+        setAuthState(response.data);
+        toast.success("Giriş başarılı! Yönlendiriliyorsunuz...");
+        router.navigate({ to: "/dashboard", replace: true });
+      } else {
+        const errorMsg = (response.data)?.error || "Lütfen bilgilerinizi kontrol edin.";
+        toast.error("Giriş başarısız.", {
+          description: errorMsg,
+        });
+      }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login hatası:", error);
+      toast.error("Bir sunucu hatası oluştu.");
     }
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <Card className="border-border/50 bg-card/50 backdrop-blur">
           <CardHeader className="space-y-1 text-center">
@@ -123,7 +147,3 @@ function LoginPage() {
     </div>
   );
 }
-
-export const Route = createFileRoute("/login")({
-  component: LoginPage,
-});

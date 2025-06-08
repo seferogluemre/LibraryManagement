@@ -6,7 +6,7 @@ export const handleElysiaError: ErrorHandler<any, any, any, any, any> = ({
   code,
   set,
 }) => {
-  set.headers["Content-Type"] = "application/json";
+
 
   if (code === "VALIDATION") {
     return {
