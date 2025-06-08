@@ -11,22 +11,18 @@ export const Route = createFileRoute('/_authenticated/students')({
 })
 
 function StudentManagementPage() {
-  const { data: students, isLoading, isError, error } = useQuery({
+  const { data: students, isLoading } = useQuery({
     queryKey: ['students'],
-    queryFn: () => api.students.get(),
+    queryFn: async () => {
+      const res = await api.students.index.get()
+      if (res.error) {
+        throw new Error('Öğrenciler getirilemedi')
+      }
+      return res.data
+    },
   })
 
-  if (isLoading) {
-    return <div>Yükleniyor...</div>
-  }
-  if (isError) {
-    return <div>Hata: {error.message}</div>
-  }
-
-  if (!students) {
-    return <div>Öğrenci verisi bulunamadı.</div>
-  }
-
+  const tableData = students ?? []
 
   return (
     <div className="p-4 md:p-6">
@@ -42,7 +38,12 @@ function StudentManagementPage() {
       </div>
 
       {/* DataTable Bileşenini Kullanımı */}
-      <DataTable columns={columns} data={students.data} searchKey="name" />
+      <DataTable
+        columns={columns}
+        data={tableData}
+        isLoading={isLoading}
+        searchKey="name"
+      />
     </div>
   )
 }

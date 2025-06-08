@@ -45,6 +45,9 @@ export const columns: ColumnDef<Student>[] = [
       const className = row.original.class.name;
       return <span>{className}</span>;
     },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue<any>(id).name);
+    },
   },
   // "E-posta" kolonu
   {
