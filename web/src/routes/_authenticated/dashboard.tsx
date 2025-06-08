@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { OverdueBook, ReportsResponse, TopBook, TopStudent } from "@/features/reports/types";
 import { api } from "@/lib/api";
+import { clearLocalStorageAuthState } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext, useRouter } from "@tanstack/react-router";
 import {
@@ -68,8 +69,11 @@ function DashboardPage() {
   const handleLogout = () => {
     if (auth.logout) {
       auth.logout();
+      clearLocalStorageAuthState();
       toast.info("Oturumunuz başarıyla kapatıldı.");
-      router.navigate({ to: "/login" });
+      if(router.history.location.pathname !== "/login") {
+        router.navigate({ to: "/login" });
+      }
     }
   };  
 
@@ -132,7 +136,7 @@ function DashboardPage() {
             <p className="text-sm text-muted-foreground">Bu ay en popüler kitaplar</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {reports.topBooks.map((book: TopBook) => (
+            {reports.topBooks.slice(0, 10).map((book: TopBook) => (
                 <div key={book.id} className="flex items-center">
                     <div className="p-3 bg-muted rounded-md mr-4">
                         <Book className="w-5 h-5 text-muted-foreground" />
@@ -152,7 +156,7 @@ function DashboardPage() {
             <p className="text-sm text-muted-foreground">Bu dönem en çok kitap okuyan öğrenciler</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {reports.topStudents.map((student: TopStudent) => (
+            {reports.topStudents.slice(0, 10).map((student: TopStudent) => (
               <div key={student.id} className="flex items-center">
                 <Avatar className="h-10 w-10 mr-4">
                   <AvatarFallback>{student.name.charAt(0)}</AvatarFallback>
@@ -172,7 +176,7 @@ function DashboardPage() {
             <p className="text-sm text-muted-foreground">Acil eylem gerektiren iadeler</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {reports.overdueBooks.map((book: OverdueBook) => (
+            {reports.overdueBooks.slice(0, 10).map((book: OverdueBook) => (
                 <div key={book.assignmentId} className="flex items-center">
                     <div className="p-3 text-red-500 rounded-md mr-4">
                         <AlertTriangle className="w-5 h-5" />
