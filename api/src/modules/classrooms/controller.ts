@@ -18,34 +18,28 @@ export const app = new Elysia({
     tags: ["Classrooms"],
   },
 })
-  .derive(async (context) => {
-    const authContext = {
-      user: null as any,
-      isAuthenticated: false,
-    };
+  .derive(async ({ headers }) => {
     try {
-      const user = await authGuard(context.headers);
-      authContext.user = user;
-      authContext.isAuthenticated = true;
+      const user = await authGuard(headers);
+      return { user, isAuthenticated: true };
     } catch (error) {
+      return { user: null, isAuthenticated: false };
     }
-    return authContext;
   })
   .post(
     "",
     async ({ body, user }) => {
-      const classroom = await ClassroomService.store(body, user.id);
+      const classroom = await ClassroomService.store(body, user!.id);
       return ClassroomFormatter.response(classroom);
     },
     {
       ...classroomCreateDto,
-      beforeHandle: [
-        ({ isAuthenticated }) => {
-          if (!isAuthenticated) {
-            throw new Error("Unauthorized");
-          }
-        },
-      ],
+      beforeHandle: ({ isAuthenticated, set }) => {
+        if (!isAuthenticated) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+      },
     }
   )
   .get(
@@ -74,19 +68,18 @@ export const app = new Elysia({
     },
     {
       ...classroomUpdateDto,
-      beforeHandle: [
-        ({ isAuthenticated }) => {
-          if (!isAuthenticated) {
-            throw new Error("Unauthorized");
-          }
-        },
-      ],
+      beforeHandle: ({ isAuthenticated, set }) => {
+        if (!isAuthenticated) {
+          set.status = 401;
+          return "Unauthorized";
+        }
+      },
     }
   )
   .delete(
     "/:id",
-    async ({  body }) => {
-        await ClassroomService.destroy(body.params.id);
+    async ({ params,body }) => {
+      await ClassroomService.destroy(body.params.id);
       return { message: "Sınıf başarıyla silindi" };
     },
     {
