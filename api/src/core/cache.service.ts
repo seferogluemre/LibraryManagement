@@ -91,11 +91,20 @@ class Cache {
         {} as Record<string, { name: string; role: string }>,
       );
 
-      const combinedUsers = onlineUsersData.map((user) => ({
-        ...user,
-        name: usersMap[user.userId]?.name || "Bilinmeyen Kullanıcı",
-        role: usersMap[user.userId]?.role || "Bilinmiyor",
-      }));
+      const combinedUsers = onlineUsersData
+        .map((user) => {
+          const dbUser = usersMap[user.userId];
+          if (!dbUser) {
+            // Eğer kullanıcı veritabanında bulunamazsa, bu kaydı atla
+            return null;
+          }
+          return {
+            ...user,
+            name: dbUser.name,
+            role: dbUser.role,
+          };
+        })
+        .filter(Boolean); // null olan kayıtları filtrele
 
       return {
         count: combinedUsers.length,

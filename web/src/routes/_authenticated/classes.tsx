@@ -1,16 +1,12 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AddClassroomForm } from "@/features/classes/components/AddClassroomForm";
 import { classColumns } from "@/features/classes/components/class-columns";
-import {
-  classroomsResponseSchema,
-  type ClassroomsResponse,
-} from "@/features/classes/schemas/classroom-schema";
+import { type ClassroomsResponse } from "@/features/classes/types";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/_authenticated/classes")({
@@ -27,12 +23,12 @@ function ClassesPage() {
       if (res.error) {
         throw new Error(res.error.value.message);
       }
-      return classroomsResponseSchema.parse(res.data);
+      return res.data as ClassroomsResponse;
     },
   });
 
   const formattedData: Class[] = useMemo(() => {
-    if (!data) return [];
+    if (!data) return []; 
     return data.map((classroom) => ({
       ...classroom,
       studentCount: classroom.students.length,
@@ -53,12 +49,7 @@ function ClassesPage() {
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <Button size="sm" className="h-8 gap-1">
-            <Plus className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Yeni Sınıf Ekle
-            </span>
-          </Button>
+          <AddClassroomForm />
         </div>
       </div>
 

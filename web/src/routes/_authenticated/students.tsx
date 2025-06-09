@@ -41,7 +41,8 @@ function StudentManagementPage() {
         columns={columns}
         data={tableData}
         isLoading={isLoading}
-        searchKey="name"
+        searchColumn="name"
+        searchPlaceholder="İsme göre ara..."
       />
     </div>
   )

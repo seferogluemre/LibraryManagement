@@ -24,19 +24,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, Loader2, PlusCircle, XCircle } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { addStudentSchema, type AddStudentFormData } from "../schemas/add-student-schema";
 
 export type Classroom = {
   id: string;
   name: string;
 };
 
+export type AddStudentFormData = {
+  name: string;
+  email: string | null;
+  studentNo: string;
+  classId: string;
+};
 
 export function AddStudentForm() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -77,8 +81,7 @@ export function AddStudentForm() {
   });
 
   const form = useForm<AddStudentFormData>({
-    resolver: zodResolver(addStudentSchema),
-    defaultValues: { name: "", email: "", studentNo: "" },
+    defaultValues: { name: "", email: "", studentNo: "", classId: "" },
   });
 
   function onSubmit(values: AddStudentFormData) {
@@ -115,7 +118,7 @@ export function AddStudentForm() {
                 <FormItem>
                   <FormLabel>İsim Soyisim</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ahmet Yılmaz" {...field} />
+                    <Input placeholder="Ahmet Yılmaz" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,9 +129,9 @@ export function AddStudentForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-posta</FormLabel>
+                  <FormLabel>E-posta (İsteğe Bağlı)</FormLabel>
                   <FormControl>
-                    <Input placeholder="ornek@okul.edu.tr" {...field} />
+                    <Input type="email" placeholder="ornek@okul.edu.tr" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -141,7 +144,7 @@ export function AddStudentForm() {
                 <FormItem>
                   <FormLabel>Öğrenci Numarası</FormLabel>
                   <FormControl>
-                    <Input placeholder="12345" {...field} />
+                    <Input placeholder="12345" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -157,6 +160,7 @@ export function AddStudentForm() {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                     disabled={isLoadingClassrooms}
+                    required
                   >
                     <FormControl>
                       <SelectTrigger>
