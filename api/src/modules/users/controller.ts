@@ -1,6 +1,8 @@
 import { Elysia } from "elysia";
 
+import { CacheService } from "../../core/cache.service";
 import {
+  onlineUserResponseDto,
   userCreateDto,
   userDestroyDto,
   userIndexDto,
@@ -31,6 +33,13 @@ export const app = new Elysia({
       return users.map(UserFormatter.response);
     },
     userIndexDto
+  )
+  .get(
+    "/online-users",
+    async () => {
+      return CacheService.getAllOnlineUsers();
+    },
+    onlineUserResponseDto,
   )
   .get(
     "/:id", // Tek kullanıcı gösterme

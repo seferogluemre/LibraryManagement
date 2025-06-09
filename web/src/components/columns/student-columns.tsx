@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,8 +19,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EditStudentForm } from "@/features/students/components/EditStudentForm";
+import { api } from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import {
+  MoreHorizontal,
+  Trash
+} from "lucide-react";
+import React from "react";
+import { toast } from "sonner";
 
 export type Student = {
   id: string;
@@ -20,51 +38,57 @@ export type Student = {
     id: string;
     name: string;
   };
-  email: string;
+  email: string | null; // email nullable olabilir
   borrowedBooks: number;
 };
 
-// 2. Kolon Tanımları
-// Bu, tablomuzun kolonlarını tanımlayan ana yapıdır. Her bir obje, bir sütunu temsil eder.
 export const columns: ColumnDef<Student>[] = [
-  // "Ad Soyad" kolonu
   {
-    accessorKey: "name", // 3. Hangi veriyi gösterecek? (Student objesindeki 'name' alanı)
-    header: "Ad Soyad", // 4. Sütun başlığında ne yazacak?
+    accessorKey: "name",
+    header: "Ad Soyad",
   },
-  // "Öğrenci No" kolonu
   {
     accessorKey: "studentNo",
     header: "Öğrenci No",
   },
-  // "Sınıf" kolonu
   {
     accessorKey: "class",
     header: "Sınıf",
-    cell: ({ row }) => {
-      const className = row.original.class.name;
-      return <span>{className}</span>;
-    },
+    cell: ({ row }) => row.original.class.name,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue<any>(id).name);
     },
   },
-  // "E-posta" kolonu
   {
     accessorKey: "email",
     header: "E-posta",
   },
-  // "Ödünç Kitap" kolonu
- 
-  // "İşlemler" kolonu
+  
   {
+    id: "actions",
     header: "İşlemler",
-    id: "actions", // 6. Benzersiz ID (Veriyle direkt bağlı olmadığı için)
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const student = row.original;
+      const queryClient = useQueryClient();
+      const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+      const [showEditDialog, setShowEditDialog] = React.useState(false);
+
+      const { mutate: deleteStudent, isPending: isDeleting } = useMutation({
+        mutationFn: async (studentId: string) => {
+          const res = await api.students[":id"].delete({ params: { id: studentId } });
+          if (res.error) throw new Error(res.error.value.message);
+          return res.data;
+        },
+        onSuccess: () => {
+          toast.success("Öğrenci başarıyla silindi.");
+          queryClient.invalidateQueries({ queryKey: ["students"] });
+        },
+        onError: (error) => toast.error(error.message),
+        onSettled: () => setShowDeleteDialog(false),
+      });
 
       return (
-        <div className="text-right">
+        <>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -74,19 +98,50 @@ export const columns: ColumnDef<Student>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(student.id)}
-              >
-                Detayları Görüntüle
+              <DropdownMenuItem>Detayları Görüntüle</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
+                Düzenle
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Düzenle</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                Sil
+              <DropdownMenuItem
+                className="text-red-500"
+                onSelect={() => setShowDeleteDialog(true)}
+              >
+                <Trash className="mr-2 h-4 w-4" /> Sil
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+
+          <AlertDialog
+            open={showDeleteDialog}
+            onOpenChange={setShowDeleteDialog}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Bu işlem geri alınamaz.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>İptal</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => deleteStudent(student.id)}
+                  disabled={isDeleting}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  {isDeleting ? "Siliniyor..." : "Evet, Sil"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <EditStudentForm
+            student={student}
+            isOpen={showEditDialog}
+            onOpenChange={setShowEditDialog}
+          />
+        </>
       );
     },
   },

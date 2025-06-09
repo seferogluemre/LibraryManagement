@@ -37,7 +37,6 @@ function StudentManagementPage() {
         <AddStudentForm />
       </div>
 
-      {/* DataTable Bileşenini Kullanımı */}
       <DataTable
         columns={columns}
         data={tableData}

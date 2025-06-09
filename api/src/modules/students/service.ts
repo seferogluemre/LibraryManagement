@@ -145,6 +145,8 @@ export abstract class StudentService {
     payload: StudentUpdatePayload
   ): Promise<Student & { class: { id: string; name: string } }> {
     try {
+      console.log("gelen id service", id);
+      console.log("gelen payload service", payload);
       const updateData = await this.prepareStudentPayloadForUpdate(payload);
 
       if (Object.keys(updateData).length === 0) {
@@ -171,10 +173,12 @@ export abstract class StudentService {
     }
   }
 
-  static async destroy(id: string): Promise<Student> {
+  static async destroy(params: { id: string }): Promise<Student> {
     try {
       const deletedStudent = await prisma.student.delete({
-        where: { id },
+        where: {
+          id:params.params.id
+        },
       });
       return deletedStudent;
     } catch (error) {

@@ -9,6 +9,8 @@ export const websockets = new Elysia({
 }).ws("/", {
   query: websocketQuerySchema,
 
+  
+
   open(ws) {
     const { userId } = ws.data.query;
     const socketId = randomUUID();

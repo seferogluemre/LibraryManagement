@@ -44,16 +44,16 @@ export const app = new Elysia({
   )
   .patch(
     "/:id",
-    async ({ params: { id }, body }) => {
-      const updatedStudent = await StudentService.update(id, body);
+    async ({  body , params}) => {
+      const updatedStudent = await StudentService.update(params.id, body);
       return StudentFormatter.response(updatedStudent);
     },
     studentUpdateDto
   )
   .delete(
     "/:id",
-    async ({ params: { id } }) => {
-      await StudentService.destroy(id);
+    async ({ body }) => {
+      const student = await StudentService.destroy(body);
       return { message: "Öğrenci başarıyla silindi" };
     },
     studentDestroyDto

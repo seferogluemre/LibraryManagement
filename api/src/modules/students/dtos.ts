@@ -90,13 +90,13 @@ export const studentShowDto = {
 
 export const studentUpdateDto = {
   params: t.Object({
-    id: StudentPlain.properties.id,
+    id: t.String(),
   }),
   body: t.Object({
-    name: t.Optional(StudentPlain.properties.name),
-    email: t.Optional(t.String()),
-    studentNo: t.Optional(t.Number()),
-    classId: t.Optional(t.String()),
+    name: t.Optional(t.Union([t.String(), t.Null()])),
+    email: t.Optional(t.Union([t.String(), t.Null()])),
+    studentNo: t.Optional(t.Union([t.Number(), t.Null()])),
+    classId: t.Optional(t.Union([t.String(), t.Null()])),
   }),
   response: {
     200: studentWithClassResponseSchema,

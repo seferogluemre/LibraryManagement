@@ -142,7 +142,7 @@ model Classroom {
 
 model BookAssignment {
   id        String  @id @default(uuid()) @map("assignment_id")
-  student   Student @relation(fields: [studentId], references: [id])
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId String  @map("student_id")
 
   book   Book   @relation(fields: [bookId], references: [id])
@@ -185,7 +185,7 @@ model Session {
 model TransferHistory {
   id        String  @id @default(uuid()) @map("transfer_history_id")
   studentId String  @map("student_id")
-  student   Student @relation(fields: [studentId], references: [id])
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   oldClassId String    @map("old_class_id")
   oldClass   Classroom @relation("OldTransfer", fields: [oldClassId], references: [id])

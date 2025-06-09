@@ -42,6 +42,28 @@ export const userResponseSchema = t.Object({
   createdAt: UserPlain.properties.createdAt,
 });
 
+export const onlineUserResponseDto = {
+  detail: {
+    summary: "Get all online users",
+    tags: ["Users"],
+  },
+  response: {
+    200: t.Object({
+      count: t.Number(),
+      users: t.Array(
+        t.Object({
+          userId: t.String(),
+          isOnline: t.Boolean(),
+          socketId: t.String(),
+          lastSeen: t.String(),
+          name: t.String(),
+          role: UserRoleEnum,
+        }),
+      ),
+    }),
+  },
+} satisfies ControllerHook;
+
 export const userIndexDto = {
   query: t.Object({
     id: t.Optional(UserPlain.properties.id),

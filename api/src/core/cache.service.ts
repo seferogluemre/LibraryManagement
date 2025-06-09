@@ -1,3 +1,4 @@
+import prisma from "./prisma";
 import redis from "./redis";
 
 class Cache {
@@ -31,53 +32,78 @@ class Cache {
   }
 
   async getAllOnlineUsers() {
-    try {
-      const stream = this.redis.scanStream({
-        match: `${this.onlineUserPrefix}*`,
-        count: 100,
-      });
+    const stream = this.redis.scanStream({
+      match: `${this.onlineUserPrefix}*`,
+      count: 100,
+    });
 
-      const onlineUsers = [];
-      try {
-        for await (const keys of stream) {
-          if (keys.length > 0) {
-            const values = await this.redis.mget(keys);
-            const parsedData = values
-              .map((val, index) => {
-                if (!val) return null;
-                try {
-                  const userId = keys[index].replace(this.onlineUserPrefix, "");
-                  const data = JSON.parse(val);
-                  return { userId, ...data };
-                } catch (e) {
-                  console.error(
-                    `[CacheService] JSON parse hatası. Anahtar: ${keys[index]}`,
-                    e
-                  );
-                  return null;
-                }
-              })
-              .filter(Boolean);
-            onlineUsers.push(...parsedData);
-          }
+    const onlineUsersData = [];
+    try {
+      for await (const keys of stream) {
+        if (keys.length > 0) {
+          const values = await this.redis.mget(keys);
+          const parsedData = values
+            .map((val, index) => {
+              if (!val) return null;
+              try {
+                const userId = keys[index].replace(this.onlineUserPrefix, "");
+                const data = JSON.parse(val);
+                return { userId, ...data };
+              } catch (e) {
+                console.error(
+                  `[CacheService] JSON parse hatası. Anahtar: ${keys[index]}`,
+                  e,
+                );
+                return null;
+              }
+            })
+            .filter(Boolean);
+          onlineUsersData.push(...parsedData);
         }
-      } catch (streamError) {
+      }
+
+      if (onlineUsersData.length === 0) {
         return {
-          status: "SCAN_STREAM_ERROR",
-          error: (streamError as Error).message,
+          count: 0,
           users: [],
         };
       }
+
+      const userIds = onlineUsersData.map((user) => user.userId);
+      const usersFromDb = await prisma.user.findMany({
+        where: {
+          id: {
+            in: userIds,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+        },
+      });
+
+      const usersMap = usersFromDb.reduce(
+        (acc, user) => {
+          acc[user.id] = { name: user.name, role: user.role };
+          return acc;
+        },
+        {} as Record<string, { name: string; role: string }>,
+      );
+
+      const combinedUsers = onlineUsersData.map((user) => ({
+        ...user,
+        name: usersMap[user.userId]?.name || "Bilinmeyen Kullanıcı",
+        role: usersMap[user.userId]?.role || "Bilinmiyor",
+      }));
+
       return {
-        count: onlineUsers.length,
-        users: onlineUsers,
+        count: combinedUsers.length,
+        users: combinedUsers,
       };
     } catch (error) {
-      return {
-        status: "GENERAL_CACHE_ERROR",
-        error: (error as Error).message,
-        users: [],
-      };
+      console.error("[CacheService] Çevrimiçi kullanıcılar alınırken hata oluştu:", error);
+      throw new Error("Çevrimiçi kullanıcılar alınamadı.");
     }
   }
 }

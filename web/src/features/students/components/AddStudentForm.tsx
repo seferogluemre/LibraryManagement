@@ -32,6 +32,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { addStudentSchema, type AddStudentFormData } from "../schemas/add-student-schema";
 
+export type Classroom = {
+  id: string;
+  name: string;
+};
+
+
 export function AddStudentForm() {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -158,7 +164,7 @@ export function AddStudentForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {classrooms?.map((classroom) => (
+                      {classrooms?.map((classroom: Classroom) => (
                         <SelectItem key={classroom.id} value={classroom.id}>
                           {classroom.name}
                         </SelectItem>
