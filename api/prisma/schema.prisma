@@ -188,10 +188,10 @@ model TransferHistory {
   student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   oldClassId String    @map("old_class_id")
-  oldClass   Classroom @relation("OldTransfer", fields: [oldClassId], references: [id])
+  oldClass   Classroom @relation("OldTransfer", fields: [oldClassId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   newClassId String    @map("new_class_id")
-  newClass   Classroom @relation("NewTransfer", fields: [newClassId], references: [id])
+  newClass   Classroom @relation("NewTransfer", fields: [newClassId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   notes        String?  @map("notes")
   transferDate DateTime @default(now()) @map("transfer_date")

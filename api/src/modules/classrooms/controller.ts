@@ -28,7 +28,6 @@ export const app = new Elysia({
       authContext.user = user;
       authContext.isAuthenticated = true;
     } catch (error) {
-      // do nothing
     }
     return authContext;
   })
@@ -67,7 +66,7 @@ export const app = new Elysia({
   )
   .patch(
     "/:id",
-    async ({ params: { id }, body, user }) => {
+    async ({ params: { id }, body }) => {
       const updatedClassroom = await ClassroomService.update(id, body);
       return ClassroomFormatter.response(
         updatedClassroom as unknown as Classroom
@@ -86,18 +85,11 @@ export const app = new Elysia({
   )
   .delete(
     "/:id",
-    async ({ params: { id }, user }) => {
-      await ClassroomService.destroy(id);
+    async ({  body }) => {
+        await ClassroomService.destroy(body.params.id);
       return { message: "Sınıf başarıyla silindi" };
     },
     {
       ...classroomDestroyDto,
-      beforeHandle: [
-        ({ isAuthenticated }) => {
-          if (!isAuthenticated) {
-            throw new Error("Unauthorized");
-          }
-        },
-      ],
     }
   );

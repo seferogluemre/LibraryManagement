@@ -145,8 +145,41 @@ export abstract class ClassroomService {
 
   static async destroy(id: string): Promise<Classroom> {
     try {
-      const deletedClassroom = await prisma.classroom.delete({
-        where: { id },
+      const deletedClassroom = await prisma.$transaction(async (tx) => {
+        const unclassifiedClassName = "Sınıfsız";
+        let unclassifiedClass = await tx.classroom.findFirst({
+          where: { name: unclassifiedClassName },
+        });
+
+        if (!unclassifiedClass) {
+          const adminUser = await tx.user.findFirst({
+            where: { role: "ADMIN" },
+          });
+
+          if (!adminUser) {
+            throw new Error(
+              "Sınıfsız sınıfı oluşturmak için bir admin kullanıcı bulunamadı."
+            );
+          }
+
+          unclassifiedClass = await tx.classroom.create({
+            data: {
+              name: unclassifiedClassName,
+              createdById: adminUser.id,
+            },
+          });
+        }
+
+        await tx.student.updateMany({
+          where: { classId: id },
+          data: { classId: unclassifiedClass.id },
+        });
+
+        const classroomToDelete = await tx.classroom.delete({
+          where: { id },
+        });
+
+        return classroomToDelete;
       });
       return deletedClassroom;
     } catch (error) {

@@ -20,43 +20,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { api } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
 import { Skeleton } from "./skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  searchKey: string;
+  searchColumn: string;
+  searchPlaceholder: string;
   isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  searchKey,
+  searchColumn,
+  searchPlaceholder,
   isLoading,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-
-  const { data: classrooms } = useQuery({
-    queryKey: ["classrooms"],
-    queryFn: async () => {
-      const res = await api.classrooms.index.get();
-      if (res.error) throw new Error("Sınıflar alınamadı");
-      return res.data;
-    },
-  });
 
   const table = useReactTable({
     data,
@@ -75,7 +59,6 @@ export function DataTable<TData, TValue>({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-32" />
         </div>
         <div className="rounded-md border">
           <Table>
@@ -112,35 +95,13 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder={`'${searchKey}' alanına göre ara...`}
-          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+          placeholder={searchPlaceholder}
+          value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn(searchKey)?.setFilterValue(event.target.value)
+            table.getColumn(searchColumn)?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
-
-        <Select
-          onValueChange={(value) => {
-            if (value === "all") {
-              table.getColumn("class")?.setFilterValue(undefined);
-              return;
-            }
-            table.getColumn("class")?.setFilterValue(value);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sınıfa Göre Filtrele" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tüm Sınıflar</SelectItem>
-            {classrooms?.map((c) => (
-              <SelectItem key={c.id} value={c.name}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
       <div className="rounded-md border">
         <Table>
