@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as IndexImport } from './routes/index'
+import { Route as AuthenticatedTransferImport } from './routes/_authenticated/transfer'
 import { Route as AuthenticatedStudentsImport } from './routes/_authenticated/students'
 import { Route as AuthenticatedOnlineUsersImport } from './routes/_authenticated/online-users'
 import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
@@ -36,6 +37,12 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const AuthenticatedTransferRoute = AuthenticatedTransferImport.update({
+  id: '/transfer',
+  path: '/transfer',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 const AuthenticatedStudentsRoute = AuthenticatedStudentsImport.update({
@@ -115,6 +122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentsImport
       parentRoute: typeof AuthenticatedImport
     }
+    '/_authenticated/transfer': {
+      id: '/_authenticated/transfer'
+      path: '/transfer'
+      fullPath: '/transfer'
+      preLoaderRoute: typeof AuthenticatedTransferImport
+      parentRoute: typeof AuthenticatedImport
+    }
   }
 }
 
@@ -125,6 +139,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnlineUsersRoute: typeof AuthenticatedOnlineUsersRoute
   AuthenticatedStudentsRoute: typeof AuthenticatedStudentsRoute
+  AuthenticatedTransferRoute: typeof AuthenticatedTransferRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -132,6 +147,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnlineUsersRoute: AuthenticatedOnlineUsersRoute,
   AuthenticatedStudentsRoute: AuthenticatedStudentsRoute,
+  AuthenticatedTransferRoute: AuthenticatedTransferRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -146,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
   '/students': typeof AuthenticatedStudentsRoute
+  '/transfer': typeof AuthenticatedTransferRoute
 }
 
 export interface FileRoutesByTo {
@@ -156,6 +173,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
   '/students': typeof AuthenticatedStudentsRoute
+  '/transfer': typeof AuthenticatedTransferRoute
 }
 
 export interface FileRoutesById {
@@ -167,6 +185,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/online-users': typeof AuthenticatedOnlineUsersRoute
   '/_authenticated/students': typeof AuthenticatedStudentsRoute
+  '/_authenticated/transfer': typeof AuthenticatedTransferRoute
 }
 
 export interface FileRouteTypes {
@@ -179,6 +198,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/online-users'
     | '/students'
+    | '/transfer'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +208,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/online-users'
     | '/students'
+    | '/transfer'
   id:
     | '__root__'
     | '/'
@@ -197,6 +218,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/online-users'
     | '/_authenticated/students'
+    | '/_authenticated/transfer'
   fileRoutesById: FileRoutesById
 }
 
@@ -236,7 +258,8 @@ export const routeTree = rootRoute
         "/_authenticated/classes",
         "/_authenticated/dashboard",
         "/_authenticated/online-users",
-        "/_authenticated/students"
+        "/_authenticated/students",
+        "/_authenticated/transfer"
       ]
     },
     "/login": {
@@ -256,6 +279,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/students": {
       "filePath": "_authenticated/students.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/transfer": {
+      "filePath": "_authenticated/transfer.tsx",
       "parent": "/_authenticated"
     }
   }
