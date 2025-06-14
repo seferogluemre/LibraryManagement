@@ -2,24 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .email("Geçerli bir email adresi giriniz")
-    .min(1, "Email gereklidir"),
-  password: z
-    .string()
-    .min(6, "Şifre en az 6 karakter olmalıdır")
-    .min(1, "Şifre gereklidir"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
 
 function App() {
   const [showPassword, setShowPassword] = useState(false);

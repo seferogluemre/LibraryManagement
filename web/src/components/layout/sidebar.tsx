@@ -1,39 +1,16 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { navItems } from "@/constants/navigation";
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { useRouteContext } from "@tanstack/react-router";
 import {
-    ArrowRightLeft,
-    Book,
-    BookCopy,
-    Building,
-    History,
-    LayoutDashboard,
     Menu,
-    PenSquare,
-    School,
-    Settings,
-    Tags,
-    Users,
     X
 } from "lucide-react";
 import { useEffect } from "react";
 import { SidebarItem } from "./sidebar-item";
 
-const navItems = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/online-users", icon: Users, label: "Online Kullanıcılar" },
-  { href: "/students", icon: Users, label: "Öğrenci Yönetimi" },
-  { href: "/classes", icon: School, label: "Sınıf Yönetimi" },
-  { href: "/transfers", icon: ArrowRightLeft, label: "Öğrenci Transferi" },
-  { href: "/history", icon: History, label: "Transfer Geçmişi" },
-  { href: "/books", icon: Book, label: "Kitap Yönetimi" },
-  { href: "/authors", icon: PenSquare, label: "Yazar Yönetimi" },
-  { href: "/categories", icon: Tags, label: "Kategori Yönetimi" },
-  { href: "/publishers", icon: Building, label: "Yayınevi Yönetimi" },
-  { href: "/lending", icon: BookCopy, label: "Ödünç İşlemleri" },
-  { href: "/settings", icon: Settings, label: "Ayarlar" },
-];
+
 
 export function Sidebar() {
     const { user } = useRouteContext({ from: '/_authenticated' });

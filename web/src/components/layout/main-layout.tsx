@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { useSidebarStore } from "@/stores/sidebar-store";
 import React from "react";
 import { Sidebar } from "./sidebar";
 
@@ -9,7 +8,6 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const [isMounted, setIsMounted] = React.useState(false);
-  const { isOpen } = useSidebarStore();
 
   React.useEffect(() => {
     setIsMounted(true);
