@@ -4,6 +4,7 @@ import { t } from "elysia";
 import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
 
 export function getTransferHistoryFilters(query?: {
+  q?: string;
   studentId?: string;
   oldClassId?: string;
   newClassId?: string;
@@ -15,7 +16,18 @@ export function getTransferHistoryFilters(query?: {
   }
 
   const filters: Prisma.TransferHistoryWhereInput[] = [];
-  const { studentId, oldClassId, newClassId, fromDate, toDate } = query;
+  const { q, studentId, oldClassId, newClassId, fromDate, toDate } = query;
+
+  if (q) {
+    filters.push({
+      OR: [
+        { student: { name: { contains: q, mode: 'insensitive' } } },
+        { oldClass: { name: { contains: q, mode: 'insensitive' } } },
+        { newClass: { name: { contains: q, mode: 'insensitive' } } },
+        { notes: { contains: q, mode: 'insensitive' } }
+      ],
+    });
+  }
 
   if (studentId) {
     filters.push({ studentId });
@@ -66,6 +78,7 @@ export const transferHistoryResponseSchema = t.Object({
 // DTOs
 export const transferHistoryIndexDto = {
   query: t.Object({
+    q: t.Optional(t.String()),
     studentId: t.Optional(t.String()),
     oldClassId: t.Optional(t.String()),
     newClassId: t.Optional(t.String()),

@@ -7,23 +7,44 @@ import { TransferHistoryStats } from "@/features/transfer-history/components/Tra
 import { TransferHistoryToolbar } from "@/features/transfer-history/components/TransferHistoryToolbar";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { z } from "zod";
+
+const transferHistorySearchSchema = z.object({
+  q: z.string().optional(),
+  classId: z.string().optional(),
+  fromDate: z.string().optional(),
+  toDate: z.string().optional(),
+});
 
 export const Route = createFileRoute("/_authenticated/transfer-history")({
+  validateSearch: transferHistorySearchSchema,
   component: TransferHistoryPage,
 });
 
 function TransferHistoryPage() {
+  const router = useRouter();
+  const search = Route.useSearch();
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["transfer-history"],
+    queryKey: ["transfer-history", search],
     queryFn: async () => {
-      const res = await api["transfer-history"].index.get();
+      // @ts-ignore - a bug in eden-treaty requires this for now
+      const res = await api["transfer-history"].index.get({ query: search });
       if (res.error) {
         throw new Error("Transfer geçmişi alınamadı");
       }
       return res.data;
     },
   });
+
+  const handleFilterChange = (newSearch: Record<string, any>) => {
+    router.navigate({
+        to: Route.fullPath,
+        search: (prev) => ({ ...prev, ...newSearch }),
+        replace: true
+    });
+  };
 
   if (isLoading) {
     return <div className="p-8">Yükleniyor...</div>;
@@ -46,7 +67,7 @@ function TransferHistoryPage() {
         </div>
       </div>
 
-      <TransferHistoryToolbar />
+      <TransferHistoryToolbar filters={search} onFilterChange={handleFilterChange} />
       <TransferHistoryStats />
       <TransferHistoryDataTable
         columns={columns}
