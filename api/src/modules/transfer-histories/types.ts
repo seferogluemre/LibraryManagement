@@ -25,6 +25,11 @@ export interface TransferHistoryRecord {
   notes?: string;
   transferDate: Date;
   createdAt: Date;
+  createdBy: {
+    id: string;
+    name: string;
+    role: string;
+  };
   student: {
     id: string;
     name: string;

@@ -45,13 +45,20 @@ export abstract class TransferHistoryService {
               name: true,
             },
           },
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+            },
+          },
         },
         orderBy: {
           transferDate: "desc",
         },
       });
 
-      return transferHistory;
+      return transferHistory as unknown as TransferHistoryRecord[];
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
@@ -92,10 +99,7 @@ export abstract class TransferHistoryService {
         throw new NotFoundException("Transfer kaydı bulunamadı");
       }
 
-      return {
-        ...transferRecord,
-        notes: transferRecord.notes ?? undefined,
-      };
+      return transferRecord as unknown as TransferHistoryRecord;
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
@@ -156,13 +160,17 @@ export abstract class TransferHistoryService {
               name: true,
             },
           },
+          createdBy: {
+            select: {
+                id: true,
+                name: true,
+                role: true,
+            }
+          }
         },
       });
 
-      return {
-        ...transferRecord,
-        notes: transferRecord.notes ?? undefined,
-      };
+      return transferRecord as unknown as TransferHistoryRecord;
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "create");
       throw error;
@@ -204,10 +212,7 @@ export abstract class TransferHistoryService {
         },
       });
 
-      return transferHistory.map((record) => ({
-        ...record,
-        notes: record.notes ?? undefined,
-      }));
+      return transferHistory as unknown as TransferHistoryRecord[];
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
@@ -247,7 +252,7 @@ export abstract class TransferHistoryService {
         },
       });
 
-      return transfers;
+      return transfers as unknown as TransferHistoryRecord[];
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
@@ -287,7 +292,7 @@ export abstract class TransferHistoryService {
         },
       });
 
-      return transfers;
+      return transfers as unknown as TransferHistoryRecord[];
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;
@@ -302,7 +307,7 @@ export abstract class TransferHistoryService {
       const deletedRecord = await prisma.transferHistory.delete({
         where: { id },
       });
-      return deletedRecord;
+      return deletedRecord as unknown as TransferHistoryRecord;
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "delete");
       throw error;
@@ -342,7 +347,7 @@ export abstract class TransferHistoryService {
         },
       });
 
-      return transfers;
+      return transfers as unknown as TransferHistoryRecord[];
     } catch (error) {
       await HandleError.handlePrismaError(error, "transfer-history", "find");
       throw error;

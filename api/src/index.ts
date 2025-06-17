@@ -1,5 +1,6 @@
 // import { startOverdueBooksCron } from "#modules/notifications/cron-jobs/overdue-books.cron";
 // import "#modules/notifications/queues/notification.worker";
+import { transferHistoryController } from "#modules/transfer-histories";
 import { handleElysiaError } from "@config/error-handler";
 import { prepareSwaggerConfig } from "@config/swagger-config";
 import cors from "@elysiajs/cors";
@@ -72,7 +73,7 @@ const app = new Elysia()
   .use(studentController)
   .use(classroomController)
   .use(studentClassroomController)
-  // .use(transferHistoryController) // GEÇİCİ OLARAK DEVRE DIŞI BIRAKILDI
+  .use(transferHistoryController)
   .use(authorController)
   .use(categoryController)
   .use(bookController)

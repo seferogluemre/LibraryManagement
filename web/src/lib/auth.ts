@@ -39,3 +39,13 @@ export function clearLocalStorageAuthState() {
     localStorage.removeItem(ACCESS_STORAGE_KEY);
     localStorage.removeItem(REFRESH_STORAGE_KEY);
 }
+
+export const getAccessToken = () => {
+    const accessToken = localStorage.getItem(ACCESS_STORAGE_KEY);
+    return accessToken;
+}
+
+export const getRefreshToken = () => {
+    const refreshToken = localStorage.getItem(REFRESH_STORAGE_KEY);
+    return refreshToken;
+}

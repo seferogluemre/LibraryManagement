@@ -78,10 +78,10 @@ function DashboardPage() {
   };  
 
   const stats = [
-    { title: "Toplam Kitap", value: reports.systemStats[0].totalBooks, icon: Book },
-    { title: "Toplam Öğrenci", value: reports.systemStats[0].totalStudents, icon: Users },
-    { title: "Ödünç Verilen", value: reports.systemStats[0].totalActiveAssignments, icon: ArrowUpRight },
-    { title: "Gecikmiş Kitap", value: reports.systemStats[0].totalOverdueBooks, icon: AlertTriangle, color: "text-red-500" },
+    { title: "Toplam Kitap", value: String(reports.systemStats[0].totalBooks ?? 'N/A'), icon: Book },
+    { title: "Toplam Öğrenci", value: String(reports.systemStats[0].totalStudents ?? 'N/A'), icon: Users },
+    { title: "Ödünç Verilen", value: String(reports.systemStats[0].totalActiveAssignments ?? 'N/A'), icon: ArrowUpRight },
+    { title: "Gecikmiş Kitap", value: String(reports.systemStats[0].totalOverdueBooks ?? 'N/A'), icon: AlertTriangle, color: "text-red-500" },
   ];
 
   return (
@@ -142,10 +142,10 @@ function DashboardPage() {
                         <Book className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1">
-                        <p className="font-semibold">{book.title}</p>
-                        <p className="text-sm text-muted-foreground">{book.authorName}</p>
+                        <p className="font-semibold">{String(book.title)}</p>
+                        <p className="text-sm text-muted-foreground">{String(book.authorName)}</p>
                     </div>
-                    <Badge variant="secondary" className="font-mono text-sm">{book.totalTimesRead}</Badge>
+                    <Badge variant="secondary" className="font-mono text-sm">{String(book.totalTimesRead)}</Badge>
                 </div>
             ))}
           </CardContent>
@@ -159,13 +159,13 @@ function DashboardPage() {
             {reports.topStudents.slice(0, 10).map((student: TopStudent) => (
               <div key={student.id} className="flex items-center">
                 <Avatar className="h-10 w-10 mr-4">
-                  <AvatarFallback>{student.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{String(student.name).charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="font-semibold">{student.name}</p>
-                  <p className="text-sm text-muted-foreground">{student.className}</p>
+                  <p className="font-semibold">{String(student.name)}</p>
+                  <p className="text-sm text-muted-foreground">{String(student.className)}</p>
                 </div>
-                <Badge variant="outline">{student.totalBooksRead} kitap</Badge>
+                <Badge variant="outline">{String(student.totalBooksRead)} kitap</Badge>
               </div>
             ))}
           </CardContent>
@@ -182,10 +182,10 @@ function DashboardPage() {
                         <AlertTriangle className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                        <p className="font-semibold">{book.bookTitle}</p>
-                        <p className="text-sm text-muted-foreground">{book.studentName}</p>
+                        <p className="font-semibold">{String(book.bookTitle)}</p>
+                        <p className="text-sm text-muted-foreground">{String(book.studentName)}</p>
                     </div>
-                    <Badge variant="destructive">{book.daysOverdue} gün</Badge>
+                    <Badge variant="destructive">{String(book.daysOverdue)} gün</Badge>
                 </div>
             ))}
           </CardContent>

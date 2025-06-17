@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { setAuthState } from "@/lib/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createFileRoute,
   redirect,
@@ -146,3 +147,4 @@ function LoginPage() {
     </div>
   );
 }
+

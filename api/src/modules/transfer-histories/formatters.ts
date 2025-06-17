@@ -13,6 +13,11 @@ export abstract class TransferHistoryFormatter {
       notes: data.notes || undefined,
       transferDate: data.transferDate,
       createdAt: data.createdAt,
+      createdBy: {
+        id: data.createdBy.id,
+        name: data.createdBy.name,
+        role: data.createdBy.role,
+      },
       student: {
         id: data.student.id,
         name: data.student.name,

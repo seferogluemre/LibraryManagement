@@ -1,18 +1,25 @@
 import { authGuard } from "@utils/auth-middleware";
 import Elysia from "elysia";
 import {
-    transferHistoryCreateDto,
-    transferHistoryDestroyDto,
-    transferHistoryFromClassDto,
-    transferHistoryIndexDto,
-    transferHistoryRecentDto,
-    transferHistoryShowDto,
-    transferHistoryStudentDto,
-    transferHistoryToClassDto,
+  transferHistoryCreateDto,
+  transferHistoryDestroyDto,
+  transferHistoryFromClassDto,
+  transferHistoryIndexDto,
+  transferHistoryRecentDto,
+  transferHistoryShowDto,
+  transferHistoryStudentDto,
+  transferHistoryToClassDto,
 } from "./dtos";
 import { TransferHistoryFormatter } from "./formatters";
 import { TransferHistoryService } from "./service";
 import { TransferHistoryRecord } from "./types";
+
+// Define the user type explicitly to ensure type safety
+type AuthenticatedUser = {
+  id: string;
+  email: string;
+  role: string;
+};
 
 export const transferHistoryController = new Elysia({
   prefix: "/transfer-history",
@@ -22,7 +29,7 @@ export const transferHistoryController = new Elysia({
 })
   .derive(async (context) => {
     const authContext = {
-      user: null as any,
+      user: null as AuthenticatedUser | null,
       isAuthenticated: false,
     };
     try {
@@ -30,7 +37,6 @@ export const transferHistoryController = new Elysia({
       authContext.user = user;
       authContext.isAuthenticated = true;
     } catch (error) {
-      // do nothing
     }
     return authContext;
   })
@@ -55,6 +61,10 @@ export const transferHistoryController = new Elysia({
   .post(
     "/",
     async ({ body, user }) => {
+      if (!user) {
+        // This should theoretically not be reached if beforeHandle is effective
+        throw new Error("Unauthorized");
+      }
       const transfer = await TransferHistoryService.create(body, user.id);
       return TransferHistoryFormatter.response(transfer);
     },
