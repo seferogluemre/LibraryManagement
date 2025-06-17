@@ -3,11 +3,14 @@ import {
   columns,
 } from "@/components/columns/transfer-history.columns";
 import { TransferHistoryDataTable } from "@/components/data-table/transfer-history-data-table";
+import { Button } from "@/components/ui/button";
 import { TransferHistoryStats } from "@/features/transfer-history/components/TransferHistoryStats";
 import { TransferHistoryToolbar } from "@/features/transfer-history/components/TransferHistoryToolbar";
 import { api } from "@/lib/api";
+import { exportToExcel } from "@/lib/export-utils";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { Download } from "lucide-react";
 import { z } from "zod";
 
 const transferHistorySearchSchema = z.object({
@@ -38,6 +41,17 @@ function TransferHistoryPage() {
     },
   });
 
+  // Prepare data for Excel export
+  const excelData = (data as TransferHistoryRow[] | undefined)?.map(item => ({
+    studentName: item.student.name,
+    oldClassName: typeof item.oldClass === 'object' ? item.oldClass.name : item.oldClass,
+    newClassName: typeof item.newClass === 'object' ? item.newClass.name : item.newClass,
+    transferDate: new Date(item.transferDate).toLocaleDateString('tr-TR'),
+    reason: item.reason,
+    processedBy: item.createdBy ? `${item.createdBy.role} ${item.createdBy.name}` : 'N/A',
+    notes: item.notes,
+  })) ?? [];
+
   const handleFilterChange = (newSearch: Record<string, any>) => {
     router.navigate({
         to: Route.fullPath,
@@ -65,6 +79,10 @@ function TransferHistoryPage() {
             Tüm öğrenci transfer işlemlerinin kaydı
           </p>
         </div>
+        <Button onClick={() => exportToExcel(excelData, "Transfer_Gecmisi")}>
+            <Download className="mr-2 h-4 w-4" />
+            Excel'e Aktar
+        </Button>
       </div>
 
       <TransferHistoryToolbar filters={search} onFilterChange={handleFilterChange} />
