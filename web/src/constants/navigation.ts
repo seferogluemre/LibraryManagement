@@ -17,7 +17,7 @@ export const navItems = [
   { href: "/students", icon: Users, label: "Öğrenci Yönetimi" },
   { href: "/classes", icon: School, label: "Sınıf Yönetimi" },
   { href: "/transfers", icon: ArrowRightLeft, label: "Öğrenci Transferi" },
-  { href: "/history", icon: History, label: "Transfer Geçmişi" },
+  { href: "/transfer-history", icon: History, label: "Transfer Geçmişi" },
   { href: "/books", icon: Book, label: "Kitap Yönetimi" },
   { href: "/authors", icon: PenSquare, label: "Yazar Yönetimi" },
   { href: "/categories", icon: Tags, label: "Kategori Yönetimi" },

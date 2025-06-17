@@ -1,22 +1,21 @@
 import { authGuard } from "@utils/auth-middleware";
 import Elysia from "elysia";
 import {
-  transferHistoryCreateDto,
-  transferHistoryDestroyDto,
-  transferHistoryFromClassDto,
-  transferHistoryIndexDto,
-  transferHistoryRecentDto,
-  transferHistoryShowDto,
-  transferHistoryStudentDto,
-  transferHistoryToClassDto,
+    transferHistoryCreateDto,
+    transferHistoryDestroyDto,
+    transferHistoryFromClassDto,
+    transferHistoryIndexDto,
+    transferHistoryRecentDto,
+    transferHistoryShowDto,
+    transferHistoryStudentDto,
+    transferHistoryToClassDto,
 } from "./dtos";
 import { TransferHistoryFormatter } from "./formatters";
 import { TransferHistoryService } from "./service";
 import { TransferHistoryRecord } from "./types";
 
-export const app = new Elysia({
+export const transferHistoryController = new Elysia({
   prefix: "/transfer-history",
-  name: "TransferHistory",
   detail: {
     tags: ["Transfer History"],
   },

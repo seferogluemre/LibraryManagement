@@ -15,7 +15,6 @@ import { publisherController } from "@modules/publishers";
 import { reportController } from "@modules/reports";
 import { studentClassroomController } from "@modules/student-classrooms";
 import { studentController } from "@modules/students";
-import { transferHistoryController } from "@modules/transfer-histories";
 import { userController } from "@modules/users";
 import { websockets } from "@modules/websockets";
 import { Elysia } from "elysia";
@@ -73,7 +72,7 @@ const app = new Elysia()
   .use(studentController)
   .use(classroomController)
   .use(studentClassroomController)
-  .use(transferHistoryController)
+  // .use(transferHistoryController) // GEÇİCİ OLARAK DEVRE DIŞI BIRAKILDI
   .use(authorController)
   .use(categoryController)
   .use(bookController)
@@ -82,6 +81,10 @@ const app = new Elysia()
   .use(reportController)
   .use(notificationController)
   .use(websockets)
+  .post("/transfer-history-test", ({ body }) => {
+    console.log("✅ TEST ROTASI BAŞARIYLA ÇALIŞTI!", body);
+    return { success: true, message: "Test rotası çalıştı!" };
+  })
   .get("/health", () => ({ status: "ok" }), {
     detail: {
       tags: ["System"],

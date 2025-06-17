@@ -1,7 +1,7 @@
 import { TransferForm } from '@/features/transfer/components/TransferForm'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_authenticated/transfer')({
+export const Route = createFileRoute('/_authenticated/transfers')({
   component: TransferPage,
 })
 

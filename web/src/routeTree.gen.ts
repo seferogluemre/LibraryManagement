@@ -8,176 +8,86 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated/transfers'
+import { Route as AuthenticatedTransferHistoryRouteImport } from './routes/_authenticated/transfer-history'
+import { Route as AuthenticatedStudentsRouteImport } from './routes/_authenticated/students'
+import { Route as AuthenticatedOnlineUsersRouteImport } from './routes/_authenticated/online-users'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedClassesRouteImport } from './routes/_authenticated/classes'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as LoginImport } from './routes/login'
-import { Route as AuthenticatedImport } from './routes/_authenticated'
-import { Route as IndexImport } from './routes/index'
-import { Route as AuthenticatedTransferImport } from './routes/_authenticated/transfer'
-import { Route as AuthenticatedStudentsImport } from './routes/_authenticated/students'
-import { Route as AuthenticatedOnlineUsersImport } from './routes/_authenticated/online-users'
-import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedClassesImport } from './routes/_authenticated/classes'
-
-// Create/Update Routes
-
-const LoginRoute = LoginImport.update({
+const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthenticatedRoute = AuthenticatedImport.update({
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthenticatedTransferRoute = AuthenticatedTransferImport.update({
-  id: '/transfer',
-  path: '/transfer',
+const AuthenticatedTransfersRoute = AuthenticatedTransfersRouteImport.update({
+  id: '/transfers',
+  path: '/transfers',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-
-const AuthenticatedStudentsRoute = AuthenticatedStudentsImport.update({
+const AuthenticatedTransferHistoryRoute =
+  AuthenticatedTransferHistoryRouteImport.update({
+    id: '/transfer-history',
+    path: '/transfer-history',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentsRoute = AuthenticatedStudentsRouteImport.update({
   id: '/students',
   path: '/students',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-
-const AuthenticatedOnlineUsersRoute = AuthenticatedOnlineUsersImport.update({
-  id: '/online-users',
-  path: '/online-users',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-
-const AuthenticatedDashboardRoute = AuthenticatedDashboardImport.update({
+const AuthenticatedOnlineUsersRoute =
+  AuthenticatedOnlineUsersRouteImport.update({
+    id: '/online-users',
+    path: '/online-users',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-
-const AuthenticatedClassesRoute = AuthenticatedClassesImport.update({
+const AuthenticatedClassesRoute = AuthenticatedClassesRouteImport.update({
   id: '/classes',
   path: '/classes',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthenticatedImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/_authenticated/classes': {
-      id: '/_authenticated/classes'
-      path: '/classes'
-      fullPath: '/classes'
-      preLoaderRoute: typeof AuthenticatedClassesImport
-      parentRoute: typeof AuthenticatedImport
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardImport
-      parentRoute: typeof AuthenticatedImport
-    }
-    '/_authenticated/online-users': {
-      id: '/_authenticated/online-users'
-      path: '/online-users'
-      fullPath: '/online-users'
-      preLoaderRoute: typeof AuthenticatedOnlineUsersImport
-      parentRoute: typeof AuthenticatedImport
-    }
-    '/_authenticated/students': {
-      id: '/_authenticated/students'
-      path: '/students'
-      fullPath: '/students'
-      preLoaderRoute: typeof AuthenticatedStudentsImport
-      parentRoute: typeof AuthenticatedImport
-    }
-    '/_authenticated/transfer': {
-      id: '/_authenticated/transfer'
-      path: '/transfer'
-      fullPath: '/transfer'
-      preLoaderRoute: typeof AuthenticatedTransferImport
-      parentRoute: typeof AuthenticatedImport
-    }
-  }
-}
-
-// Create and export the route tree
-
-interface AuthenticatedRouteChildren {
-  AuthenticatedClassesRoute: typeof AuthenticatedClassesRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedOnlineUsersRoute: typeof AuthenticatedOnlineUsersRoute
-  AuthenticatedStudentsRoute: typeof AuthenticatedStudentsRoute
-  AuthenticatedTransferRoute: typeof AuthenticatedTransferRoute
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedClassesRoute: AuthenticatedClassesRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedOnlineUsersRoute: AuthenticatedOnlineUsersRoute,
-  AuthenticatedStudentsRoute: AuthenticatedStudentsRoute,
-  AuthenticatedTransferRoute: AuthenticatedTransferRoute,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/classes': typeof AuthenticatedClassesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
   '/students': typeof AuthenticatedStudentsRoute
-  '/transfer': typeof AuthenticatedTransferRoute
+  '/transfer-history': typeof AuthenticatedTransferHistoryRoute
+  '/transfers': typeof AuthenticatedTransfersRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/classes': typeof AuthenticatedClassesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
   '/students': typeof AuthenticatedStudentsRoute
-  '/transfer': typeof AuthenticatedTransferRoute
+  '/transfer-history': typeof AuthenticatedTransferHistoryRoute
+  '/transfers': typeof AuthenticatedTransfersRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
@@ -185,30 +95,30 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/online-users': typeof AuthenticatedOnlineUsersRoute
   '/_authenticated/students': typeof AuthenticatedStudentsRoute
-  '/_authenticated/transfer': typeof AuthenticatedTransferRoute
+  '/_authenticated/transfer-history': typeof AuthenticatedTransferHistoryRoute
+  '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | ''
     | '/login'
     | '/classes'
     | '/dashboard'
     | '/online-users'
     | '/students'
-    | '/transfer'
+    | '/transfer-history'
+    | '/transfers'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | ''
     | '/login'
     | '/classes'
     | '/dashboard'
     | '/online-users'
     | '/students'
-    | '/transfer'
+    | '/transfer-history'
+    | '/transfers'
   id:
     | '__root__'
     | '/'
@@ -218,73 +128,111 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/online-users'
     | '/_authenticated/students'
-    | '/_authenticated/transfer'
+    | '/_authenticated/transfer-history'
+    | '/_authenticated/transfers'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/transfers': {
+      id: '/_authenticated/transfers'
+      path: '/transfers'
+      fullPath: '/transfers'
+      preLoaderRoute: typeof AuthenticatedTransfersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/transfer-history': {
+      id: '/_authenticated/transfer-history'
+      path: '/transfer-history'
+      fullPath: '/transfer-history'
+      preLoaderRoute: typeof AuthenticatedTransferHistoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/students': {
+      id: '/_authenticated/students'
+      path: '/students'
+      fullPath: '/students'
+      preLoaderRoute: typeof AuthenticatedStudentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/online-users': {
+      id: '/_authenticated/online-users'
+      path: '/online-users'
+      fullPath: '/online-users'
+      preLoaderRoute: typeof AuthenticatedOnlineUsersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/classes': {
+      id: '/_authenticated/classes'
+      path: '/classes'
+      fullPath: '/classes'
+      preLoaderRoute: typeof AuthenticatedClassesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+  }
+}
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedClassesRoute: typeof AuthenticatedClassesRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedOnlineUsersRoute: typeof AuthenticatedOnlineUsersRoute
+  AuthenticatedStudentsRoute: typeof AuthenticatedStudentsRoute
+  AuthenticatedTransferHistoryRoute: typeof AuthenticatedTransferHistoryRoute
+  AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedClassesRoute: AuthenticatedClassesRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedOnlineUsersRoute: AuthenticatedOnlineUsersRoute,
+  AuthenticatedStudentsRoute: AuthenticatedStudentsRoute,
+  AuthenticatedTransferHistoryRoute: AuthenticatedTransferHistoryRoute,
+  AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/_authenticated",
-        "/login"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/_authenticated": {
-      "filePath": "_authenticated.tsx",
-      "children": [
-        "/_authenticated/classes",
-        "/_authenticated/dashboard",
-        "/_authenticated/online-users",
-        "/_authenticated/students",
-        "/_authenticated/transfer"
-      ]
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/_authenticated/classes": {
-      "filePath": "_authenticated/classes.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/dashboard": {
-      "filePath": "_authenticated/dashboard.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/online-users": {
-      "filePath": "_authenticated/online-users.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/students": {
-      "filePath": "_authenticated/students.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/transfer": {
-      "filePath": "_authenticated/transfer.tsx",
-      "parent": "/_authenticated"
-    }
-  }
-}
-ROUTE_MANIFEST_END */
