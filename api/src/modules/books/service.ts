@@ -92,12 +92,12 @@ export abstract class BookService {
     const {
       title,
       isbn,
-      publishedYear,
-      totalCopies,
-      availableCopies,
-      authorId,
-      categoryId,
-      publisherId,
+      published_year,
+      total_copies,
+      available_copies,
+      author_id,
+      category_id,
+      publisher_id,
       addedBy,
     } = payloadRaw;
 
@@ -105,67 +105,40 @@ export abstract class BookService {
 
     if (title !== undefined) dataToUpdate.title = title;
     if (isbn !== undefined) dataToUpdate.isbn = isbn;
-    if (publishedYear !== undefined) dataToUpdate.publishedYear = publishedYear;
-    if (totalCopies !== undefined) dataToUpdate.totalCopies = totalCopies;
-    if (availableCopies !== undefined)
-      dataToUpdate.availableCopies = availableCopies;
+    if (published_year !== undefined) dataToUpdate.publishedYear = published_year;
+    if (total_copies !== undefined) dataToUpdate.totalCopies = total_copies;
+    if (available_copies !== undefined)
+      dataToUpdate.availableCopies = available_copies;
 
-    if (authorId) {
-      // Yazarın var olduğunu kontrol et
+    if (author_id) {
       const authorExists = await prisma.author.findUnique({
-        where: { id: authorId },
+        where: { id: author_id },
       });
-
-      if (!authorExists) {
-        throw new NotFoundException("Belirtilen yazar bulunamadı");
-      }
-
-      dataToUpdate.author = {
-        connect: { id: authorId },
-      };
+      if (!authorExists) throw new NotFoundException("Belirtilen yazar bulunamadı");
+      dataToUpdate.author = { connect: { id: author_id } };
     }
 
-    if (categoryId !== undefined) {
-      if (categoryId) {
-        // Kategorinin var olduğunu kontrol et
+    if (category_id !== undefined) {
+      if (category_id) {
         const categoryExists = await prisma.category.findUnique({
-          where: { id: categoryId },
+          where: { id: category_id },
         });
-
-        if (!categoryExists) {
-          throw new NotFoundException("Belirtilen kategori bulunamadı");
-        }
-
-        dataToUpdate.category = {
-          connect: { id: categoryId },
-        };
+        if (!categoryExists) throw new NotFoundException("Belirtilen kategori bulunamadı");
+        dataToUpdate.category = { connect: { id: category_id } };
       } else {
-        // Kategoriyi bağlantısını kes
-        dataToUpdate.category = {
-          disconnect: true,
-        };
+        dataToUpdate.category = { disconnect: true };
       }
     }
 
-    if (publisherId !== undefined) {
-      if (publisherId) {
-        // Yayınevinin var olduğunu kontrol et
+    if (publisher_id !== undefined) {
+      if (publisher_id) {
         const publisherExists = await prisma.publisher.findUnique({
-          where: { id: publisherId },
+          where: { id: publisher_id },
         });
-
-        if (!publisherExists) {
-          throw new NotFoundException("Belirtilen yayınevi bulunamadı");
-        }
-
-        dataToUpdate.publisher = {
-          connect: { id: publisherId },
-        };
+        if (!publisherExists) throw new NotFoundException("Belirtilen yayınevi bulunamadı");
+        dataToUpdate.publisher = { connect: { id: publisher_id } };
       } else {
-        // Yayınevini bağlantısını kes
-        dataToUpdate.publisher = {
-          disconnect: true,
-        };
+        dataToUpdate.publisher = { disconnect: true };
       }
     }
 

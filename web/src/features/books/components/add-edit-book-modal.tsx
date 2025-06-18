@@ -126,27 +126,26 @@ export function AddEditBookModal({ isOpen, onClose, book }: AddEditBookModalProp
         published_year: values.publishedYear,
         isbn: values.isbn,
         total_copies: values.stock,
-        available_copies: values.stock, // Initially, all copies are available
+        available_copies: values.stock,
         description: values.description,
         shelf_location: values.shelf_location,
       };
 
       const apiCall = isEditMode && book
-        ? api.books({ id: book.id }).put(payload)
+        ? api.books({ id: book.id }).patch(payload)
         : api.books.post(payload);
       return apiCall;
     },
-    onSuccess: (result: any) => {
-      if (result.error) {
-        toast.error(`Bir hata oluştu: ${result.error.value.message || result.error.value}`);
-        return;
-      }
-      toast.success(isEditMode ? "Kitap başarıyla güncellendi!" : "Kitap başarıyla eklendi!");
+    onSuccess: () => {
+      toast.success(
+        isEditMode ? "Kitap başarıyla güncellendi!" : "Kitap başarıyla eklendi!"
+      );
       queryClient.invalidateQueries({ queryKey: ["books"] });
       onClose();
     },
-    onError: (error) => {
-      toast.error(`Bir ağ hatası oluştu: ${error.message}`);
+    onError: (error: Error & { response?: { data: { message: string } } }) => {
+        const errorMessage = error.response?.data?.message || error.message || "Bilinmeyen bir hata oluştu."
+        toast.error(`İşlem Başarısız: ${errorMessage}`);
     },
   });
 
