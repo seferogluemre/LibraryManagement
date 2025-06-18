@@ -1,64 +1,53 @@
-import { columns, type Book } from '@/components/columns/books-columns';
-import { BooksDataTable } from '@/components/data-table/books-data-table';
-import { BooksToolbar } from '@/features/books/components/books-toolbar';
-import { createFileRoute } from '@tanstack/react-router';
+import { columns } from "@/components/columns/books-columns";
+import { BooksDataTable } from "@/components/data-table/books-data-table";
+import { BooksToolbar } from "@/features/books/components/books-toolbar";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
 
-export const Route = createFileRoute('/_authenticated/books')({
+export const Route = createFileRoute("/_authenticated/books")({
   component: BooksPage,
 });
 
-const mockData: Book[] = [
-  {
-    id: '1',
-    title: 'Suç ve Ceza',
-    author: { name: 'Fyodor Dostoyevski' },
-    category: { name: 'Roman' },
-    publisher: { name: 'İş Bankası Yayınları' },
-    totalCopies: 5,
-    availableCopies: 3,
-  },
-  {
-    id: '2',
-    title: '1984',
-    author: { name: 'George Orwell' },
-    category: { name: 'Distopya' },
-    publisher: { name: 'Can Yayınları' },
-    totalCopies: 4,
-    availableCopies: 2,
-  },
-  {
-    id: '3',
-    title: 'Simyacı',
-    author: { name: 'Paulo Coelho' },
-    category: { name: 'Roman' },
-    publisher: { name: 'Alfa Yayınları' },
-    totalCopies: 6,
-    availableCopies: 4,
-  },
-  {
-    id: '4',
-    title: 'Küçük Prens',
-    author: { name: 'Antoine de Saint-Exupéry' },
-    category: { name: 'Çocuk' },
-    publisher: { name: 'Türkiye İş Bankası Yayınları' },
-    totalCopies: 8,
-    availableCopies: 6,
-  },
-    {
-    id: '5',
-    title: 'Sefiller',
-    author: { name: 'Victor Hugo' },
-    category: null, // Example of a book with no category
-    publisher: { name: 'Can Yayınları' },
-    totalCopies: 3,
-    availableCopies: 1,
-  },
-];
-
 function BooksPage() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["books"],
+    queryFn: async () => {
+      // @ts-ignore
+      const res = await api.books.get();
+      if (res.error) {
+        throw new Error("Kitaplar alınamadı.");
+      }
+      return res.data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-center bg-destructive/10 rounded-md">
+        <h2 className="text-xl font-semibold text-destructive">
+          Bir Hata Oluştu
+        </h2>
+        <p className="text-muted-foreground mt-2">
+          Kitaplar yüklenirken bir sorunla karşılaşıldı. Lütfen daha sonra
+          tekrar deneyin.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
-      <div className='flex justify-between items-center'>
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Kitap Yönetimi</h1>
           <p className="text-muted-foreground">
@@ -67,7 +56,7 @@ function BooksPage() {
         </div>
       </div>
       <BooksToolbar />
-      <BooksDataTable columns={columns} data={mockData} />
+      <BooksDataTable columns={columns} data={data || []} />
     </div>
   );
-} 
+}
