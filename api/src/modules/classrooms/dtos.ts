@@ -102,6 +102,7 @@ export const classroomDestroyDto = {
 
 export const classroomCreateDto = {
   body: t.Object({
+    createdBy: t.String(),
     name: ClassroomPlain.properties.name,
   }),
   response: {

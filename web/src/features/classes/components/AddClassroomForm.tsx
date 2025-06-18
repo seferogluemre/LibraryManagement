@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { getLocalUser } from "@/lib/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, Loader2, Plus, XCircle } from "lucide-react";
 import React from "react";
@@ -68,22 +69,31 @@ export function AddClassroomForm() {
         // Hata fırlatarak işlemi durdur.
         throw new Error("Access token not found in localStorage.");
       }
-      
-      const res = await api.classrooms.post({ name: formattedName },{
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
 
+      const user = getLocalUser();
+      if (!user) {
+        toast.error("Kullanıcı bulunamadı", {
+          description: "Bu işlemi yapmak için lütfen giriş yapın.",
+          icon: <XCircle className="h-5 w-5 text-red-500" />,
+        });
+        throw new Error("User not found in Local");
+      }
+      const res = await api.classrooms.post({
+        name: formattedName,
+        createdBy: user?.id,
+      });
       if (res.error) {
         throw new Error(res.error.value.message);
       }
       return { ...res.data, originalName: data.name };
     },
     onSuccess: (data) => {
-      toast.success(`'${data.originalName}' sınıfı '${data.name}' olarak başarıyla eklendi.`, {
-        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-      });
+      toast.success(
+        `'${data.originalName}' sınıfı '${data.name}' olarak başarıyla eklendi.`,
+        {
+          icon: <CheckCircle className="h-5 w-5 text-green-500" />,
+        }
+      );
       queryClient.invalidateQueries({ queryKey: ["classrooms"] });
       setIsOpen(false);
     },

@@ -60,23 +60,12 @@ export const transferHistoryController = new Elysia({
   )
   .post(
     "/",
-    async ({ body, user }) => {
-      if (!user) {
-        // This should theoretically not be reached if beforeHandle is effective
-        throw new Error("Unauthorized");
-      }
-      const transfer = await TransferHistoryService.create(body, user.id);
+    async ({ body }) => {
+      const transfer = await TransferHistoryService.create(body, body.createdBy);
       return TransferHistoryFormatter.response(transfer);
     },
     {
-      ...transferHistoryCreateDto,
-      beforeHandle: [
-        ({ isAuthenticated }) => {
-          if (!isAuthenticated) {
-            throw new Error("Unauthorized");
-          }
-        },
-      ],
+      ...transferHistoryCreateDto
     }
   )
   .get(

@@ -1,89 +1,88 @@
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { api } from "@/lib/api"
-import { getAccessToken } from "@/lib/auth"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CheckCircle, XCircle } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { api } from "@/lib/api";
+import { getAccessToken, getLocalUser } from "@/lib/auth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CheckCircle, XCircle } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface TransferRequest {
-  studentId: string
-  oldClassId: string
-  newClassId: string
-  notes?: string
+  studentId: string;
+  oldClassId: string;
+  newClassId: string;
+  notes?: string;
 }
 
 // Define explicit types for query data
 interface Student {
-  id: string
-  name: string
-  class: { id: string; name: string }
+  id: string;
+  name: string;
+  class: { id: string; name: string };
 }
 
 interface Classroom {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 export function TransferForm() {
-  const [selectedStudent, setSelectedStudent] = useState<string>("")
-  const [targetClass, setTargetClass] = useState<string>("")
-  const [notes, setNotes] = useState("")
-  const [currentClass, setCurrentClass] = useState<string>("")
+  const [selectedStudent, setSelectedStudent] = useState<string>("");
+  const [targetClass, setTargetClass] = useState<string>("");
+  const [notes, setNotes] = useState("");
+  const [currentClass, setCurrentClass] = useState<string>("");
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   // Öğrenci listesini getir
   const { data: students } = useQuery<Student[]>({
     queryKey: ["students"],
     queryFn: async () => {
-      const res = await api.students.index.get()
-      if (res.error) throw new Error("Öğrenciler getirilemedi")
-      return res.data as Student[]
+      const res = await api.students.index.get();
+      if (res.error) throw new Error("Öğrenciler getirilemedi");
+      return res.data as Student[];
     },
-  })
+  });
 
   const { data: classes } = useQuery<Classroom[]>({
     queryKey: ["classrooms"],
     queryFn: async () => {
-      const classRes = await api.classrooms.index.get()
-      if (classRes.error) throw new Error("Sınıflar getirilemedi")
-      return classRes.data as Classroom[]
+      const classRes = await api.classrooms.index.get();
+      if (classRes.error) throw new Error("Sınıflar getirilemedi");
+      return classRes.data as Classroom[];
     },
-  })
-  
+  });
+
   const { mutate: transferStudent, isPending } = useMutation({
     mutationFn: async (values: TransferRequest) => {
       const accessToken = getAccessToken();
       if (!accessToken) {
-        toast.error("Yetkilendirme hatası", { description: "Lütfen tekrar giriş yapın." });
+        toast.error("Yetkilendirme hatası", {
+          description: "Lütfen tekrar giriş yapın.",
+        });
         throw new Error("Yetkilendirme token'ı bulunamadı");
       }
-      
-      const res = await api["transfer-history"].post(values, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const user = getLocalUser();
+
+      const res = await api["transfer-history"].post({
+        ...values,
+        createdBy: user?.id,
       });
 
       if (res.error) {
         if (res.error.status === 401 || res.error.status === 403) {
-            toast.error("Yetkilendirme hatası", { description: "Token geçersiz veya süresi dolmuş. Lütfen tekrar giriş yapın." });
+          toast.error("Yetkilendirme hatası", {
+            description:
+              "Token geçersiz veya süresi dolmuş. Lütfen tekrar giriş yapın.",
+          });
         }
         throw new Error(res.error.value.message || "Bir hata oluştu");
       }
@@ -92,54 +91,54 @@ export function TransferForm() {
     onSuccess: () => {
       toast.success("Transfer başarıyla gerçekleştirildi", {
         icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-      })
-      queryClient.invalidateQueries({ queryKey: ["students"] })
-      
-      setSelectedStudent("")
-      setTargetClass("")
-      setNotes("")
-      setCurrentClass("")
+      });
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+
+      setSelectedStudent("");
+      setTargetClass("");
+      setNotes("");
+      setCurrentClass("");
     },
     onError: (error) => {
       toast.error("Transfer işlemi başarısız oldu", {
         description: error.message,
         icon: <XCircle className="h-5 w-5 text-red-500" />,
-      })
+      });
     },
-  })
+  });
 
   const handleStudentChange = (value: string) => {
-    setSelectedStudent(value)
-    const student = students?.find(s => s.id === value)
+    setSelectedStudent(value);
+    const student = students?.find((s) => s.id === value);
     if (student) {
-      setCurrentClass(student.class.name)
+      setCurrentClass(student.class.name);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!selectedStudent || !targetClass) {
-      toast.error("Lütfen gerekli alanları doldurun")
-      return
+      toast.error("Lütfen gerekli alanları doldurun");
+      return;
     }
 
-    const student = students?.find(s => s.id === selectedStudent)
-    
+    const student = students?.find((s) => s.id === selectedStudent);
+
     if (!student) {
-      toast.error("Öğrenci bilgisi bulunamadı")
-      return
+      toast.error("Öğrenci bilgisi bulunamadı");
+      return;
     }
 
     const transferData: TransferRequest = {
       studentId: selectedStudent,
       oldClassId: student.class.id,
       newClassId: targetClass,
-      notes: notes.trim() || undefined
-    }
+      notes: notes.trim() || undefined,
+    };
 
-    transferStudent(transferData)
-  }
+    transferStudent(transferData);
+  };
 
   return (
     <Card>
@@ -167,9 +166,7 @@ export function TransferForm() {
           {selectedStudent && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Mevcut Sınıf</label>
-              <div className="p-2 bg-muted rounded-md">
-                {currentClass}
-              </div>
+              <div className="p-2 bg-muted rounded-md">{currentClass}</div>
             </div>
           )}
 
@@ -190,7 +187,9 @@ export function TransferForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Transfer Notları (Opsiyonel)</label>
+            <label className="text-sm font-medium">
+              Transfer Notları (Opsiyonel)
+            </label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -205,5 +204,5 @@ export function TransferForm() {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

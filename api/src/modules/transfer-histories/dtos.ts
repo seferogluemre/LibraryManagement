@@ -122,6 +122,7 @@ export const transferHistoryCreateDto = {
         description: "Transfer notları (opsiyonel)",
       })
     ),
+    createdBy: t.String(),  
   }),
   response: {
     200: transferHistoryResponseSchema,

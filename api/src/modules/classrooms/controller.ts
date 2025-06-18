@@ -33,13 +33,7 @@ export const app = new Elysia({
       return ClassroomFormatter.response(classroom);
     },
     {
-      ...classroomCreateDto,
-      beforeHandle: ({ isAuthenticated, set }) => {
-        if (!isAuthenticated) {
-          set.status = 401;
-          return "Unauthorized";
-        }
-      },
+      ...classroomCreateDto
     }
   )
   .get(
