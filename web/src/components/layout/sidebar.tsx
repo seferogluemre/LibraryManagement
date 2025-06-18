@@ -1,13 +1,27 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { navItems } from "@/constants/navigation";
+import { clearLocalStorageAuthState } from "@/lib/auth";
 import { useSidebarStore } from "@/stores/sidebar-store";
-import { useRouteContext } from "@tanstack/react-router";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 import {
+    LogOut,
     Menu,
     X
 } from "lucide-react";
 import { useEffect } from "react";
+import { toast } from "sonner";
 import { SidebarItem } from "./sidebar-item";
 
 
@@ -15,6 +29,13 @@ import { SidebarItem } from "./sidebar-item";
 export function Sidebar() {
     const { user } = useRouteContext({ from: '/_authenticated' });
     const { isOpen, toggle, setIsMobile } = useSidebarStore();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        clearLocalStorageAuthState();
+        toast.success("Başarıyla çıkış yaptınız.");
+        router.navigate({ to: "/login" });
+    };
 
     // Responsive design listener
     useEffect(() => {
@@ -75,8 +96,8 @@ export function Sidebar() {
                         <SidebarItem key={item.label} item={item} />
                     ))}
                 </nav>
-                <div className="p-4 border-t">
-                    <div className="flex items-center gap-3">
+                <div className="p-4 border-t mt-auto">
+                    <div className="flex items-center gap-3 mb-4">
                         <Avatar className="w-10 h-10">
                             <AvatarImage src={user?.avatarUrl} alt={user?.name} />
                             <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
@@ -86,6 +107,29 @@ export function Sidebar() {
                             <p className="text-xs text-muted-foreground">{user?.role || 'user'}</p>
                         </div>
                     </div>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="outline" className="w-full">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                Çıkış Yap
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Oturumunuzu sonlandırmak ve güvenli bir şekilde çıkış yapmak
+                                    istediğinizden emin misiniz?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>İptal</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleLogout}>
+                                    Evet, Çıkış Yap
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </div>
             </aside>
         </>
