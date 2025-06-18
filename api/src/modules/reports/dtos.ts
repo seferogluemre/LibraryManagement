@@ -61,3 +61,32 @@ export const reportIndexDto = {
       "En çok okuyan öğrenciler, en çok okunan kitaplar, sistem istatistikleri ve geciken kitapları getirir",
   },
 } satisfies ControllerHook;
+
+export const dashboardStatsDto = {
+  response: {
+    200: t.Object({
+        totalBooks: t.Number(),
+        totalStudents: t.Number(),
+        totalActiveAssignments: t.Number(),
+        totalOverdueBooks: t.Number(),
+        totalReturnedBooks: t.Number(),
+    }),
+  },
+  detail: {
+    summary: "Gösterge Paneli İstatistikleri",
+  },
+} satisfies ControllerHook;
+
+export const transferStatsDto = {
+    response: {
+        200: t.Object({
+            totalTransfers: t.Number(),
+            monthlyTransfers: t.Number(),
+            mostActiveClause: t.String(),
+            mostCommonReason: t.String(),
+        }),
+    },
+    detail: {
+        summary: "Transfer Geçmişi İstatistikleri",
+    },
+}

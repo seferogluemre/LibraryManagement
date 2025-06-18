@@ -1,25 +1,20 @@
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface TransferHistoryToolbarProps {
     filters: {
         q?: string;
-        classId?: string;
         fromDate?: string;
         toDate?: string;
     };
     onFilterChange: (filters: {
         q?: string;
-        classId?: string;
         fromDate?: string;
         toDate?: string;
     }) => void;
@@ -30,54 +25,77 @@ interface TransferHistoryToolbarProps {
 
 export function TransferHistoryToolbar({ filters, onFilterChange }: TransferHistoryToolbarProps) {
     const [searchTerm, setSearchTerm] = useState(filters.q || "");
+    const [fromDate, setFromDate] = useState<Date | undefined>(
+        filters.fromDate ? parseISO(filters.fromDate) : undefined
+    );
+    const [toDate, setToDate] = useState<Date | undefined>(
+        filters.toDate ? parseISO(filters.toDate) : undefined
+    );
 
-    // Debounce search term changes
     useEffect(() => {
         const handler = setTimeout(() => {
-            onFilterChange({ q: searchTerm || undefined });
-        }, 300); // 500ms delay
+            onFilterChange({
+                q: searchTerm || undefined,
+                fromDate: fromDate ? fromDate.toISOString() : undefined,
+                toDate: toDate ? toDate.toISOString() : undefined,
+            });
+        }, 500);
 
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [searchTerm, onFilterChange]);
+        return () => clearTimeout(handler);
+    }, [searchTerm, fromDate, toDate, onFilterChange]);
 
-  return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-      <div className="flex flex-col md:flex-row items-center gap-4 w-full">
-        <Input
-          placeholder="Öğrenci adı, sınıf veya sebep ile ara..."
-          className="w-full md:max-w-sm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <Select
-            value={filters.classId}
-            onValueChange={(value) => onFilterChange({ classId: value === 'all' ? undefined : value })}
-        >
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Tüm Sınıflar" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tüm Sınıflar</SelectItem>
-            {/* Placeholder items - This should be populated with actual class data */}
-            <SelectItem value="10-a">10-A</SelectItem>
-            <SelectItem value="11-b">11-B</SelectItem>
-            <SelectItem value="12-c">12-C</SelectItem>
-          </SelectContent>
-        </Select>
-        {/* Placeholder for Date Range Picker */}
-        <div className="flex items-center gap-2">
-           <Button variant={"outline"} className="w-[140px] justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                <span>Başlangıç</span>
-            </Button>
-             <Button variant={"outline"} className="w-[140px] justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                <span>Bitiş</span>
-            </Button>
+    const clearFilters = () => {
+        setSearchTerm("");
+        setFromDate(undefined);
+        setToDate(undefined);
+    };
+
+    return (
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full">
+                <Input
+                    placeholder="Öğrenci adı veya sebep ile ara..."
+                    className="w-full md:max-w-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <div className="flex items-center gap-2">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn("w-[150px] justify-start text-left font-normal", !fromDate && "text-muted-foreground")}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {fromDate ? format(fromDate, "dd/MM/yyyy") : <span>Başlangıç</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar mode="single" selected={fromDate} onSelect={setFromDate} initialFocus />
+                        </PopoverContent>
+                    </Popover>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn("w-[150px] justify-start text-left font-normal", !toDate && "text-muted-foreground")}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {toDate ? format(toDate, "dd/MM/yyyy") : <span>Bitiş</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar mode="single" selected={toDate} onSelect={setToDate} initialFocus />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+                 {(searchTerm || fromDate || toDate) && (
+                    <Button variant="ghost" onClick={clearFilters}>
+                        <X className="mr-2 h-4 w-4" />
+                        Filtreleri Temizle
+                    </Button>
+                )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 } 

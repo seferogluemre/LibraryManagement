@@ -1,5 +1,6 @@
 import prisma from "@core/prisma";
 import { HandleError } from "@shared/error/handle-error";
+import { endOfMonth, startOfMonth } from 'date-fns';
 import { ReportsResponse } from "./types";
 
 export abstract class ReportsService {
@@ -162,5 +163,64 @@ export abstract class ReportsService {
         ReportsService.getOverdueBooks(),
       ]);
     return { topStudents, topBooks, systemStats, overdueBooks };
+  }
+
+  static async getTransferStats() {
+    const now = new Date();
+    const startOfCurrentMonth = startOfMonth(now);
+    const endOfCurrentMonth = endOfMonth(now);
+
+    const totalTransfers = await prisma.transferHistory.count();
+
+    const monthlyTransfers = await prisma.transferHistory.count({
+      where: {
+        transferDate: {
+          gte: startOfCurrentMonth,
+          lte: endOfCurrentMonth,
+        },
+      },
+    });
+
+    const mostActiveClasses = await prisma.transferHistory.groupBy({
+      by: ['newClassId'],
+      _count: { newClassId: true },
+      orderBy: { _count: { newClassId: 'desc' } },
+      take: 1,
+    });
+
+    let mostActiveClassName = "N/A";
+    if (mostActiveClasses.length > 0) {
+        const classInfo = await prisma.classroom.findUnique({
+            where: { id: mostActiveClasses[0].newClassId }
+        });
+        mostActiveClassName = classInfo?.name || "Bilinmeyen Sınıf";
+    }
+
+    const mostCommonNotes = await prisma.transferHistory.groupBy({
+        by: ['notes'],
+        where: {
+            notes: {
+                not: null,
+            }
+        },
+        _count: {
+            notes: true,
+        },
+        orderBy: {
+            _count: {
+                notes: 'desc'
+            }
+        },
+        take: 1
+    });
+
+    const mostCommonReason = mostCommonNotes.length > 0 && mostCommonNotes[0].notes ? mostCommonNotes[0].notes : "N/A";
+
+    return {
+      totalTransfers,
+      monthlyTransfers,
+      mostActiveClause: mostActiveClassName,
+      mostCommonReason
+    };
   }
 }

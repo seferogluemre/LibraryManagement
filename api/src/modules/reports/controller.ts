@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { reportIndexDto } from "./dtos";
+import { dashboardStatsDto, reportIndexDto, transferStatsDto } from "./dtos";
 import { ReportsFormatter } from "./formatters";
 import { ReportsService } from "./service";
 
@@ -17,4 +17,11 @@ export const app = new Elysia({
     return ReportsFormatter.response(reports);
   },
   reportIndexDto
-);
+).get("/dashboard-stats", async () => {
+  const stats = await ReportsService.getSystemStats();
+  return stats;
+}, dashboardStatsDto)
+.get("/transfer-stats", async () => {
+  const stats = await ReportsService.getTransferStats();
+  return stats;
+}, transferStatsDto);
