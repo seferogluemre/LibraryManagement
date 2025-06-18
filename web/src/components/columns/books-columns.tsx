@@ -3,12 +3,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -18,17 +18,22 @@ import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 export type Book = {
   id: string;
   title: string;
+  isbn: string | null;
   author: {
+    id: string;
     name: string;
   };
   category: {
+    id: string;
     name: string;
   } | null;
   publisher: {
+    id: string;
     name: string;
   } | null;
   totalCopies: number;
   availableCopies: number;
+  publishedYear: number | null;
 };
 
 interface ColumnsProps {

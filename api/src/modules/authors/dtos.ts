@@ -34,6 +34,13 @@ export const authorResponseSchema = t.Object({
   name: AuthorPlain.properties.name,
 });
 
+export const paginatedAuthorResponseSchema = t.Object({
+  data: t.Array(authorResponseSchema),
+  total: t.Number(),
+  page: t.Number(),
+  limit: t.Number(),
+});
+
 export const authorWithBooksResponseSchema = t.Object({
   id: AuthorPlain.properties.id,
   name: AuthorPlain.properties.name,
@@ -42,10 +49,13 @@ export const authorWithBooksResponseSchema = t.Object({
 
 export const authorIndexDto = {
   query: t.Object({
-    id: t.Optional(AuthorPlain.properties.id),
+    page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
+    limit: t.Optional(t.Numeric({ default: 10, minimum: 1 })),
     name: t.Optional(t.String()),
   }),
-  response: { 200: t.Array(authorResponseSchema) },
+  response: {
+    200: paginatedAuthorResponseSchema,
+  },
   detail: {
     summary: "Yazarları Listele",
   },

@@ -2,7 +2,6 @@ import prisma from "@core/prisma";
 import { Author, Prisma } from "@prisma/client";
 import { HandleError } from "@shared/error/handle-error";
 import { NotFoundException } from "@utils/http-errors";
-import { getAuthorFilters } from "./dtos";
 import {
   AuthorCreatePayload,
   AuthorIndexQuery,
@@ -28,20 +27,24 @@ export abstract class AuthorService {
 
   static async index(query?: AuthorIndexQuery) {
     try {
-      const [hasFilters, filters] = getAuthorFilters(query);
+      const { page = 1, limit = 10 } = query || {};
+      const skip = (page - 1) * limit;
 
-      const where: Prisma.AuthorWhereInput = {};
+      const [total, authors] = await prisma.$transaction([
+        prisma.author.count(),
+        prisma.author.findMany({
+          skip,
+          take: limit,
+          orderBy: { name: "asc" },
+        }),
+      ]);
 
-      if (hasFilters && filters.length > 0) {
-        where.OR = filters;
-      }
-
-      const authors = await prisma.author.findMany({
-        where,
-        orderBy: { name: "asc" },
-      });
-
-      return authors;
+      return {
+        data: authors,
+        total,
+        page,
+        limit,
+      };
     } catch (error) {
       await HandleError.handlePrismaError(error, "author", "find");
       throw error;

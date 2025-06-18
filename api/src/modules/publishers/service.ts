@@ -1,8 +1,7 @@
 import prisma from "@core/prisma";
+import { Prisma, Publisher } from "@prisma/client";
 import { HandleError } from "@shared/error/handle-error";
 import { NotFoundException } from "@utils/http-errors";
-import { Prisma, Publisher } from "@prisma/client";
-import { getPublisherFilters } from "./dtos";
 import {
   PublisherCreatePayload,
   PublisherIndexQuery,
@@ -35,29 +34,29 @@ export abstract class PublisherService {
     return dataToUpdate;
   }
 
-  static async index(
-    query?: PublisherIndexQuery
-  ): Promise<PublisherWithBooks[]> {
+  static async index(query?: PublisherIndexQuery) {
     try {
-      const [hasFilters, filters] = getPublisherFilters(query);
+      const { page = 1, limit = 10 } = query || {};
+      const skip = (page - 1) * limit;
 
-      const where: Prisma.PublisherWhereInput = {};
+      const [total, publishers] = await prisma.$transaction([
+        prisma.publisher.count(),
+        prisma.publisher.findMany({
+          skip,
+          take: limit,
+          orderBy: { name: "asc" },
+           include: {
+            books: true,
+          },
+        }),
+      ]);
 
-      if (hasFilters && filters.length > 0) {
-        where.OR = filters;
-      }
-
-      const publishers = await prisma.publisher.findMany({
-        where,
-        include: {
-          books: true,
-        },
-        orderBy: {
-          name: "asc",
-        },
-      });
-
-      return publishers;
+      return {
+        data: publishers,
+        total,
+        page,
+        limit,
+      };
     } catch (error) {
       await HandleError.handlePrismaError(error, "publisher", "find");
       throw error;

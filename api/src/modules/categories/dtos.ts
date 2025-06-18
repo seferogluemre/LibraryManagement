@@ -29,6 +29,13 @@ export const categoryResponseSchema = t.Object({
   name: CategoryPlain.properties.name,
 });
 
+export const paginatedCategoryResponseSchema = t.Object({
+  data: t.Array(categoryResponseSchema),
+  total: t.Number(),
+  page: t.Number(),
+  limit: t.Number(),
+});
+
 export const categoryWithBooksResponseSchema = t.Object({
   id: CategoryPlain.properties.id,
   name: CategoryPlain.properties.name,
@@ -37,10 +44,11 @@ export const categoryWithBooksResponseSchema = t.Object({
 
 export const categoryIndexDto = {
   query: t.Object({
-    id: t.Optional(CategoryPlain.properties.id),
+    page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
+    limit: t.Optional(t.Numeric({ default: 10, minimum: 1 })),
     name: t.Optional(t.String()),
   }),
-  response: { 200: t.Array(categoryResponseSchema) },
+  response: { 200: paginatedCategoryResponseSchema },
   detail: {
     summary: "Kategorileri Listele",
   },

@@ -1,47 +1,49 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { Fragment, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import {
-  Button
+    Button
 } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
 } from "@/components/ui/dialog";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
 } from "@/components/ui/form";
 import {
-  Input
+    Input
 } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
 } from "@/components/ui/select";
 import {
-  Textarea
+    Textarea
 } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 
 import type { Book } from "@/components/columns/books-columns";
 import { api } from "@/lib/api";
-import { useEffect } from "react";
 
 // Validation schema
 const bookFormSchema = z.object({
@@ -62,6 +64,32 @@ interface AddEditBookModalProps {
     onClose: () => void;
     book?: Book | null;
 }
+
+// Define a type for the paginated response to avoid using 'any'
+type PaginatedResponse<T> = {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+};
+
+// Define a specific type for the items in the select lists
+type SelectItemData = { id: string; name: string };
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.05, // This creates the staggered effect
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+};
 
 export function AddEditBookModal({
     isOpen,
@@ -90,43 +118,77 @@ export function AddEditBookModal({
         if (isEditMode && book) {
             form.reset({
                 title: book.title,
-                isbn: book.id, // Assuming book.id is the ISBN for now
-                publishedYear: book.totalCopies, // Placeholder, needs correct field
+                isbn: book.isbn || "",
+                publishedYear: book.publishedYear || new Date().getFullYear(),
                 stock: book.totalCopies,
-                authorId: book.author.name, // Placeholder, needs id
-                publisherId: book.publisher?.name, // Placeholder, needs id
-                categoryId: book.category?.name, // Placeholder, needs id
-                description: "", // Add description field if available
+                authorId: book.author.id,
+                publisherId: book.publisher?.id,
+                categoryId: book.category?.id,
+                description: "",
             });
         } else {
-            form.reset(form.formState.defaultValues);
+            form.reset();
         }
     }, [book, isEditMode, form]);
 
-    const { data: authors } = useQuery({
+    const {
+        data: authorsData,
+        fetchNextPage: fetchNextAuthors,
+        hasNextPage: hasNextAuthors,
+        isFetchingNextPage: isFetchingAuthors,
+    } = useInfiniteQuery({
         queryKey: ["authors"],
-        queryFn: async () => (await api.authors.get()).data,
+        queryFn: async ({ pageParam = 1 }) =>
+            (await api.authors.get({ query: { page: pageParam, limit: 10 } })).data as PaginatedResponse<SelectItemData>,
+        getNextPageParam: (lastPage: PaginatedResponse<SelectItemData> | undefined) => {
+            if (!lastPage) return undefined;
+            const morePagesExist = lastPage.data.length === lastPage.limit;
+            return morePagesExist ? lastPage.page + 1 : undefined;
+        },
+        initialPageParam: 1,
     });
 
-    const { data: publishers } = useQuery({
+    const {
+        data: publishersData,
+        fetchNextPage: fetchNextPublishers,
+        hasNextPage: hasNextPublishers,
+        isFetchingNextPage: isFetchingPublishers,
+    } = useInfiniteQuery({
         queryKey: ["publishers"],
-        queryFn: async () => (await api.publishers.get()).data,
+        queryFn: async ({ pageParam = 1 }) =>
+            (await api.publishers.get({ query: { page: pageParam, limit: 10 } })).data as PaginatedResponse<SelectItemData>,
+        getNextPageParam: (lastPage: PaginatedResponse<SelectItemData> | undefined) => {
+            if (!lastPage) return undefined;
+            const morePagesExist = lastPage.data.length === lastPage.limit;
+            return morePagesExist ? lastPage.page + 1 : undefined;
+        },
+        initialPageParam: 1,
     });
 
-    const { data: categories } = useQuery({
+    const {
+        data: categoriesData,
+        fetchNextPage: fetchNextCategories,
+        hasNextPage: hasNextCategories,
+        isFetchingNextPage: isFetchingCategories,
+    } = useInfiniteQuery({
         queryKey: ["categories"],
-        queryFn: async () => (await api.categories.get()).data,
+        queryFn: async ({ pageParam = 1 }) =>
+            (await api.categories.get({ query: { page: pageParam, limit: 10 } })).data as PaginatedResponse<SelectItemData>,
+        getNextPageParam: (lastPage: PaginatedResponse<SelectItemData> | undefined) => {
+            if (!lastPage) return undefined;
+            const morePagesExist = lastPage.data.length === lastPage.limit;
+            return morePagesExist ? lastPage.page + 1 : undefined;
+        },
+        initialPageParam: 1,
     });
     
     const bookMutation = useMutation({
         mutationFn: (values: BookFormData) => {
-            const payload = { ...values };
+            const payload = { ...values, stock: Number(values.stock) };
             if (isEditMode && book) {
-                // This is a scenario, so we're not calling the real update endpoint
                 console.log("UPDATING BOOK (SCENARIO):", book.id, payload);
-                return Promise.resolve(); 
+                return Promise.resolve();
             } else {
-                // Scenario for creating a book
                 console.log("CREATING BOOK (SCENARIO):", payload);
                 return Promise.resolve();
             }
@@ -200,9 +262,31 @@ export function AddEditBookModal({
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {authors?.map((author: any) => (
-                                                    <SelectItem key={author.id} value={author.id}>{author.name}</SelectItem>
-                                                ))}
+                                                <motion.div
+                                                    variants={containerVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                >
+                                                    {authorsData?.pages?.map((page, i) => (
+                                                        <Fragment key={i}>
+                                                            {page?.data?.map((author) => (
+                                                                <motion.div key={author.id} variants={itemVariants}>
+                                                                    <SelectItem value={author.id}>{author.name}</SelectItem>
+                                                                </motion.div>
+                                                            ))}
+                                                        </Fragment>
+                                                    ))}
+                                                </motion.div>
+                                                {hasNextAuthors && (
+                                                    <Button
+                                                        className="w-full mt-2"
+                                                        variant="ghost"
+                                                        onClick={() => fetchNextAuthors()}
+                                                        disabled={isFetchingAuthors}
+                                                    >
+                                                        {isFetchingAuthors ? <Loader2 className="h-4 w-4 animate-spin" /> : "Daha Fazla Yükle"}
+                                                    </Button>
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -222,9 +306,31 @@ export function AddEditBookModal({
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {publishers?.map((publisher: any) => (
-                                                    <SelectItem key={publisher.id} value={publisher.id}>{publisher.name}</SelectItem>
-                                                ))}
+                                                <motion.div
+                                                    variants={containerVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                >
+                                                    {publishersData?.pages?.map((page, i) => (
+                                                        <Fragment key={i}>
+                                                            {page?.data?.map((publisher) => (
+                                                                <motion.div key={publisher.id} variants={itemVariants}>
+                                                                    <SelectItem value={publisher.id}>{publisher.name}</SelectItem>
+                                                                </motion.div>
+                                                            ))}
+                                                        </Fragment>
+                                                    ))}
+                                                </motion.div>
+                                                {hasNextPublishers && (
+                                                    <Button
+                                                        className="w-full mt-2"
+                                                        variant="ghost"
+                                                        onClick={() => fetchNextPublishers()}
+                                                        disabled={isFetchingPublishers}
+                                                    >
+                                                        {isFetchingPublishers ? <Loader2 className="h-4 w-4 animate-spin" /> : "Daha Fazla Yükle"}
+                                                    </Button>
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -246,9 +352,31 @@ export function AddEditBookModal({
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {categories?.map((category: any) => (
-                                                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
-                                                ))}
+                                                <motion.div
+                                                    variants={containerVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                >
+                                                    {categoriesData?.pages?.map((page, i) => (
+                                                        <Fragment key={i}>
+                                                            {page?.data?.map((category) => (
+                                                                <motion.div key={category.id} variants={itemVariants}>
+                                                                    <SelectItem value={category.id}>{category.name}</SelectItem>
+                                                                </motion.div>
+                                                            ))}
+                                                        </Fragment>
+                                                    ))}
+                                                </motion.div>
+                                                {hasNextCategories && (
+                                                    <Button
+                                                        className="w-full mt-2"
+                                                        variant="ghost"
+                                                        onClick={() => fetchNextCategories()}
+                                                        disabled={isFetchingCategories}
+                                                    >
+                                                        {isFetchingCategories ? <Loader2 className="h-4 w-4 animate-spin" /> : "Daha Fazla Yükle"}
+                                                    </Button>
+                                                )}
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />

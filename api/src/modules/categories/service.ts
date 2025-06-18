@@ -28,20 +28,24 @@ export abstract class CategoryService {
 
   static async index(query?: CategoryIndexQuery) {
     try {
-      const [hasFilters, filters] = getCategoryFilters(query);
+      const { page = 1, limit = 10 } = query || {};
+      const skip = (page - 1) * limit;
 
-      const where: Prisma.CategoryWhereInput = {};
+      const [total, categories] = await prisma.$transaction([
+        prisma.category.count(),
+        prisma.category.findMany({
+          skip,
+          take: limit,
+          orderBy: { name: "asc" },
+        }),
+      ]);
 
-      if (hasFilters && filters.length > 0) {
-        where.OR = filters;
-      }
-
-      const categories = await prisma.category.findMany({
-        where,
-        orderBy: { name: "asc" },
-      });
-
-      return categories;
+      return {
+        data: categories,
+        total,
+        page,
+        limit,
+      };
     } catch (error) {
       await HandleError.handlePrismaError(error, "category", "find");
       throw error;

@@ -29,6 +29,13 @@ export const publisherResponseSchema = t.Object({
   name: PublisherPlain.properties.name,
 });
 
+export const paginatedPublisherResponseSchema = t.Object({
+  data: t.Array(publisherResponseSchema),
+  total: t.Number(),
+  page: t.Number(),
+  limit: t.Number(),
+});
+
 export const publisherWithBooksResponseSchema = t.Object({
   id: PublisherPlain.properties.id,
   name: PublisherPlain.properties.name,
@@ -37,10 +44,11 @@ export const publisherWithBooksResponseSchema = t.Object({
 
 export const publisherIndexDto = {
   query: t.Object({
-    id: t.Optional(PublisherPlain.properties.id),
+    page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
+    limit: t.Optional(t.Numeric({ default: 10, minimum: 1 })),
     name: t.Optional(t.String()),
   }),
-  response: { 200: t.Array(publisherResponseSchema) },
+  response: { 200: paginatedPublisherResponseSchema },
   detail: {
     summary: "Yayıncıları Listele",
   },
