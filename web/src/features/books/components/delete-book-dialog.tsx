@@ -13,12 +13,14 @@ interface DeleteBookDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  isLoading: boolean;
 }
 
 export function DeleteBookDialog({
   isOpen,
   onClose,
   onConfirm,
+  isLoading
 }: DeleteBookDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -33,13 +35,11 @@ export function DeleteBookDialog({
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onClose}>İptal</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
+            onClick={onConfirm}
+            disabled={isLoading}
             className="bg-red-500 hover:bg-red-600"
           >
-            Evet, Sil
+            {isLoading ? "Siliniyor..." : "Evet, Sil"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

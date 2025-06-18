@@ -19,6 +19,7 @@ export type Book = {
   id: string;
   title: string;
   isbn: string | null;
+  shelf_location: string | null;
   author: {
     id: string;
     name: string;

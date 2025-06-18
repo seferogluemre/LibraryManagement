@@ -20,8 +20,6 @@ interface TransferHistoryToolbarProps {
     }) => void;
 }
 
-// NOTE: This is a skeleton component.
-// The actual DatePicker and other interactive elements will need state and handlers.
 
 export function TransferHistoryToolbar({ filters, onFilterChange }: TransferHistoryToolbarProps) {
     const [searchTerm, setSearchTerm] = useState(filters.q || "");

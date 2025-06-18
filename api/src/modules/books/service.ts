@@ -25,17 +25,17 @@ export abstract class BookService {
     const {
       title,
       isbn,
-      publishedYear,
-      totalCopies,
-      availableCopies,
-      authorId,
-      categoryId,
-      publisherId,
+      published_year,
+      total_copies,
+      available_copies,
+      author_id,
+      category_id,
+      publisher_id,
     } = payloadRaw;
 
     // Yazarın var olduğunu kontrol et
     const authorExists = await prisma.author.findUnique({
-      where: { id: authorId },
+      where: { id: author_id },
     });
 
     if (!authorExists) {
@@ -43,9 +43,9 @@ export abstract class BookService {
     }
 
     // Kategori varsa kontrol et
-    if (categoryId) {
+    if (category_id) {
       const categoryExists = await prisma.category.findUnique({
-        where: { id: categoryId },
+        where: { id: category_id },
       });
 
       if (!categoryExists) {
@@ -54,9 +54,9 @@ export abstract class BookService {
     }
 
     // Yayınevi varsa kontrol et
-    if (publisherId) {
+    if (publisher_id) {
       const publisherExists = await prisma.publisher.findUnique({
-        where: { id: publisherId },
+        where: { id: publisher_id },
       });
 
       if (!publisherExists) {
@@ -67,20 +67,20 @@ export abstract class BookService {
     return {
       title,
       isbn: isbn || null,
-      publishedYear: publishedYear || null,
-      totalCopies,
-      availableCopies: availableCopies || totalCopies,
+      publishedYear: published_year || null,
+      totalCopies: total_copies,
+      availableCopies: available_copies || total_copies,
       author: {
-        connect: { id: authorId },
+        connect: { id: author_id },
       },
-      ...(categoryId && {
+      ...(category_id && {
         category: {
-          connect: { id: categoryId },
+          connect: { id: category_id },
         },
       }),
-      ...(publisherId && {
+      ...(publisher_id && {
         publisher: {
-          connect: { id: publisherId },
+          connect: { id: publisher_id },
         },
       }),
     };

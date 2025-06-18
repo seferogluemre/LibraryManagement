@@ -8,7 +8,6 @@ export function TransferHistoryStats() {
     const { data, isLoading } = useQuery({
         queryKey: ["transferStats"],
         queryFn: async () => {
-             // @ts-ignore
             const res = await api.reports["transfer-stats"].get();
             if (res.error) throw new Error("İstatistikler alınamadı.");
             return res.data;

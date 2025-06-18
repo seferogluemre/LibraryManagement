@@ -4,10 +4,11 @@ import { AddEditBookModal } from "@/features/books/components/add-edit-book-moda
 import { BooksToolbar } from "@/features/books/components/books-toolbar";
 import { DeleteBookDialog } from "@/features/books/components/delete-book-dialog";
 import { api } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/books")({
   component: BooksPage,
@@ -18,13 +19,31 @@ function BooksPage() {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["books"],
     queryFn: async () => {
       const res = await api.books.get();
       if (res.error) throw new Error("Kitaplar alınamadı.");
-      return res.data as Book[]; // Cast data to Book[]
+      return res.data as Book[]; 
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (bookId: string) => {
+      return api.books({ id: bookId }).delete();
+    },
+    onSuccess: () => {
+      toast.success("Kitap başarıyla silindi.");
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+    },
+    onError: (error) => {
+      toast.error(`Kitap silinirken bir hata oluştu: ${error.message}`);
+    },
+    onSettled: () => {
+      setDeleteDialogOpen(false);
+      setSelectedBook(null);
     },
   });
 
@@ -44,11 +63,9 @@ function BooksPage() {
   };
 
   const handleDeleteConfirm = () => {
-    console.log("Deleting book (Scenario):", selectedBook?.id);
-    // Here you would call the delete mutation
-    // And then invalidate the query to refetch the data
-    setDeleteDialogOpen(false);
-    setSelectedBook(null);
+    if (selectedBook) {
+      deleteMutation.mutate(selectedBook.id);
+    }
   };
 
   const filteredData = useMemo(() => {
@@ -114,6 +131,7 @@ function BooksPage() {
         isOpen={isDeleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );
