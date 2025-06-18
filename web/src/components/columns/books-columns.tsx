@@ -3,12 +3,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -31,7 +31,12 @@ export type Book = {
   availableCopies: number;
 };
 
-export const columns: ColumnDef<Book>[] = [
+interface ColumnsProps {
+    onEdit: (book: Book) => void;
+    onDelete: (book: Book) => void;
+}
+
+export const columns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Book>[] => [
   {
     accessorKey: "title",
     header: "Kitap Adı",
@@ -97,11 +102,14 @@ export const columns: ColumnDef<Book>[] = [
               Detayları Görüntüle
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => console.log("Edit", book.id)}>
+            <DropdownMenuItem onClick={() => onEdit(book)}>
               <Pencil className="mr-2 h-4 w-4" />
               Düzenle
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500 focus:text-red-600">
+            <DropdownMenuItem 
+              className="text-red-500 focus:text-red-600"
+              onClick={() => onDelete(book)}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Sil
             </DropdownMenuItem>

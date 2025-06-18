@@ -1,27 +1,67 @@
-import { columns } from "@/components/columns/books-columns";
+import { type Book, columns } from "@/components/columns/books-columns";
 import { BooksDataTable } from "@/components/data-table/books-data-table";
+import { AddEditBookModal } from "@/features/books/components/add-edit-book-modal";
 import { BooksToolbar } from "@/features/books/components/books-toolbar";
+import { DeleteBookDialog } from "@/features/books/components/delete-book-dialog";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/books")({
   component: BooksPage,
 });
 
 function BooksPage() {
+  const [isAddEditModalOpen, setAddEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["books"],
     queryFn: async () => {
-      // @ts-ignore
       const res = await api.books.get();
-      if (res.error) {
-        throw new Error("Kitaplar alınamadı.");
-      }
-      return res.data;
+      if (res.error) throw new Error("Kitaplar alınamadı.");
+      return res.data as Book[]; // Cast data to Book[]
     },
   });
+
+  const handleOpenAddModal = () => {
+    setSelectedBook(null);
+    setAddEditModalOpen(true);
+  };
+
+  const handleOpenEditModal = (book: Book) => {
+    setSelectedBook(book);
+    setAddEditModalOpen(true);
+  };
+
+  const handleOpenDeleteDialog = (book: Book) => {
+    setSelectedBook(book);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    console.log("Deleting book (Scenario):", selectedBook?.id);
+    // Here you would call the delete mutation
+    // And then invalidate the query to refetch the data
+    setDeleteDialogOpen(false);
+    setSelectedBook(null);
+  };
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    if (!searchQuery) return data;
+
+    return data.filter(
+      (book) =>
+        book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        book.author.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        String(book.id).includes(searchQuery)
+    );
+  }, [data, searchQuery]);
 
   if (isLoading) {
     return (
@@ -55,8 +95,26 @@ function BooksPage() {
           </p>
         </div>
       </div>
-      <BooksToolbar />
-      <BooksDataTable columns={columns} data={data || []} />
+      <BooksToolbar
+        onAdd={handleOpenAddModal}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+      <BooksDataTable
+        columns={columns({ onEdit: handleOpenEditModal, onDelete: handleOpenDeleteDialog })}
+        data={filteredData}
+      />
+
+      <AddEditBookModal
+        isOpen={isAddEditModalOpen}
+        onClose={() => setAddEditModalOpen(false)}
+        book={selectedBook}
+      />
+      <DeleteBookDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }
