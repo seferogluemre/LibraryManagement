@@ -82,10 +82,6 @@ const app = new Elysia()
   .use(reportController)
   .use(notificationController)
   .use(websockets)
-  .post("/transfer-history-test", ({ body }) => {
-    console.log("✅ TEST ROTASI BAŞARIYLA ÇALIŞTI!", body);
-    return { success: true, message: "Test rotası çalıştı!" };
-  })
   .get("/health", () => ({ status: "ok" }), {
     detail: {
       tags: ["System"],

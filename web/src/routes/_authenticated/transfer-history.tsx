@@ -1,7 +1,7 @@
-import type { TransferHistoryRow } from "@/components/columns/transfer-history.columns";
+import type { TransferHistoryRow } from "@/components/columns/transfer-history-columns";
 import {
   columns,
-} from "@/components/columns/transfer-history.columns";
+} from "@/components/columns/transfer-history-columns";
 import { TransferHistoryDataTable } from "@/components/data-table/transfer-history-data-table";
 import { Button } from "@/components/ui/button";
 import { TransferHistoryStats } from "@/features/transfer-history/components/TransferHistoryStats";

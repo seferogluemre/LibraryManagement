@@ -1,19 +1,7 @@
-import { ThemeToggle } from "@/components/theme-toggle";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ModeToggle } from "@/context/theme/theme-toggle";
 import type { OverdueBook, ReportsResponse, TopBook, TopStudent } from "@/features/reports/types";
 import { api } from "@/lib/api";
 import { clearLocalStorageAuthState } from "@/lib/auth";
@@ -22,17 +10,16 @@ import { createFileRoute, useRouteContext, useRouter } from "@tanstack/react-rou
 import {
   AlertTriangle,
   ArrowUpRight,
-  Bell,
   Book,
-  Users,
+  Users
 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  component: DashboardPage,
+  component: Dashboard,
 });
 
-function DashboardPage() {
+function Dashboard() {
   const auth = useRouteContext({ from: "/_authenticated/dashboard" });
   const router = useRouter();
 
@@ -85,37 +72,11 @@ function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-8 py-4">
-      <header className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Kütüphane yönetim sistemi ana sayfası</p>
-        </div>
-        <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Button variant="outline" size="icon">
-                <Bell className="h-5 w-5"/>
-                <span className="sr-only">Bildirimler</span>
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">Çıkış Yap</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Emin misiniz?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Oturumunuzu sonlandırmak istediğinizden emin misiniz?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>İptal</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleLogout}>Evet, Çıkış Yap</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-        </div>
-      </header>
+    <div className="p-4 sm:p-6 md:p-8 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Gösterge Paneli</h1>
+        <ModeToggle />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
           <Card key={stat.title}>

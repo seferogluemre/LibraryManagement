@@ -1,5 +1,5 @@
-import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/context/theme/theme-provider";
 import {
   clearLocalStorageAuthState,
   getAuthState,

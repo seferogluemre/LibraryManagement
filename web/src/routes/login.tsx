@@ -1,8 +1,14 @@
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ModeToggle } from "@/context/theme/theme-toggle";
 import { api } from "@/lib/api";
 import { setAuthState } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -80,14 +86,15 @@ function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="absolute top-4 right-4">
-        <ThemeToggle />
+        <ModeToggle />
       </div>
       <div className="w-full max-w-md">
         <Card className="border-border/50 bg-card/50 backdrop-blur">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-semibold tracking-tight">
-              Giriş
-            </CardTitle>
+          <CardHeader>
+            <CardTitle className="text-2xl">Giriş Yap</CardTitle>
+            <CardDescription>
+              Devam etmek için e-posta ve şifrenizi girin
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

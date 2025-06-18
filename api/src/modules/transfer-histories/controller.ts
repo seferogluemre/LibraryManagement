@@ -127,6 +127,7 @@ export const transferHistoryController = new Elysia({
   .delete(
     "/:id",
     async ({ params: { id } }) => {
+      console.log("id",id)
       await TransferHistoryService.destroy(id);
       return TransferHistoryFormatter.deleteResponse();
     },
