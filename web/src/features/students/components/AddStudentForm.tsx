@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,42 +24,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, Loader2, PlusCircle, XCircle } from "lucide-react";
-import React, { Fragment } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
 export type Classroom = {
   id: string;
   name: string;
 };
 
-const studentFormSchema = z.object({
-  name: z.string().min(2, "İsim en az 2 karakter olmalıdır."),
-  studentNo: z.coerce.number().positive("Öğrenci numarası pozitif bir sayı olmalıdır."),
-  email: z.string().email("Geçerli bir e-posta adresi girin.").optional().or(z.literal("")),
-  classId: z.string({ required_error: "Sınıf seçimi zorunludur." }),
-});
-
-type AddStudentFormValues = z.infer<typeof studentFormSchema>;
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1 },
+export type AddStudentFormData = {
+  name: string;
+  email: string | null;
+  studentNo: string;
+  classId: string;
 };
 
 export function AddStudentForm() {
@@ -69,24 +47,17 @@ export function AddStudentForm() {
 
   const queryClient = useQueryClient();
 
-  const {
-    data: classroomsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+  const { data: classrooms, isLoading: isLoadingClassrooms } = useQuery({
     queryKey: ["classrooms"],
-    queryFn: async ({ pageParam = 1 }) =>
-      (await api.classrooms.get({ query: { page: pageParam, limit: 10 } })).data as any,
-    getNextPageParam: (lastPage: any) => {
-      const morePagesExist = lastPage && lastPage.data.length === lastPage.limit;
-      return morePagesExist ? lastPage.page + 1 : undefined;
+    queryFn: async () => {
+      const res = await api.classrooms.index.get();
+      if (res.error) throw new Error("Sınıflar alınamadı");
+      return res.data;
     },
-    initialPageParam: 1,
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (values: AddStudentFormValues) => {
+    mutationFn: async (values: AddStudentFormData) => {
       const res = await api.students.post({
         ...values,
         studentNo: Number(values.studentNo),
@@ -109,17 +80,11 @@ export function AddStudentForm() {
     },
   });
 
-  const form = useForm<AddStudentFormValues>({
-    resolver: zodResolver(studentFormSchema),
-    defaultValues: {
-      name: "",
-      studentNo: undefined,
-      email: "",
-      classId: "",
-    },
+  const form = useForm<AddStudentFormData>({
+    defaultValues: { name: "", email: "", studentNo: "", classId: "" },
   });
 
-  function onSubmit(values: AddStudentFormValues) {
+  function onSubmit(values: AddStudentFormData) {
     mutate(values);
   }
 
@@ -145,7 +110,7 @@ export function AddStudentForm() {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -191,36 +156,23 @@ export function AddStudentForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Sınıf</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={isLoadingClassrooms}
+                    required
+                  >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Bir sınıf seçin" />
+                        <SelectValue placeholder="Bir sınıf seçin..." />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <motion.div variants={containerVariants} initial="hidden" animate="visible">
-                        {classroomsData?.pages.map((page, i) => (
-                          <Fragment key={i}>
-                            {page?.data?.map((classroom: any) => (
-                              <motion.div key={classroom.id} variants={itemVariants}>
-                                <SelectItem value={classroom.id}>
-                                  {classroom.name}
-                                </SelectItem>
-                              </motion.div>
-                            ))}
-                          </Fragment>
-                        ))}
-                        {hasNextPage && (
-                          <Button
-                            className="w-full mt-2"
-                            variant="ghost"
-                            onClick={() => fetchNextPage()}
-                            disabled={isFetchingNextPage}
-                          >
-                            {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin" /> : "Daha Fazla Yükle"}
-                          </Button>
-                        )}
-                      </motion.div>
+                      {classrooms?.map((classroom: Classroom) => (
+                        <SelectItem key={classroom.id} value={classroom.id}>
+                          {classroom.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

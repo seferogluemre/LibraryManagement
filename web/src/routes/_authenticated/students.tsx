@@ -21,9 +21,8 @@ function StudentManagementPage() {
       return res.data
     },
   })
-
-  const tableData = students.data ?? []
-
+  const tableData = students ?? []
+  
   return (
     <div className="p-4 md:p-6">
       {/* Sayfa Başlığı ve Yeni Öğrenci Ekle Butonu */}

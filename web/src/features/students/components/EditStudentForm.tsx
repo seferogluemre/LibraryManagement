@@ -1,35 +1,32 @@
-"use client";
-
 import { type Student } from "@/components/columns/student-columns";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
-import React, { Fragment } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -47,21 +44,6 @@ interface EditStudentFormProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1 },
-};
-
 export function EditStudentForm({
   student,
   isOpen,
@@ -69,20 +51,13 @@ export function EditStudentForm({
 }: EditStudentFormProps) {
   const queryClient = useQueryClient();
 
-  const {
-    data: classroomsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+  const { data: classrooms, isLoading: isLoadingClassrooms } = useQuery({
     queryKey: ["classrooms"],
-    queryFn: async ({ pageParam = 1 }) =>
-      (await api.classrooms.get({ query: { page: pageParam, limit: 10 } })).data as any,
-    getNextPageParam: (lastPage: any) => {
-      const morePagesExist = lastPage && lastPage.data.length === lastPage.limit;
-      return morePagesExist ? lastPage.page + 1 : undefined;
+    queryFn: async () => {
+      const res = await api.classrooms.index.get();
+      if (res.error) throw new Error("Sınıflar alınamadı");
+      return res.data;
     },
-    initialPageParam: 1,
   });
 
   const { mutate: updateStudent, isPending } = useMutation({
@@ -198,36 +173,24 @@ export function EditStudentForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Sınıf</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    required
+                  >
                     <FormControl>
-                      <SelectTrigger disabled={isFetchingNextPage}>
-                        <SelectValue placeholder="Bir sınıf seçin" />
+                      <SelectTrigger disabled={isLoadingClassrooms}>
+                        <SelectValue placeholder="Bir sınıf seçin..." />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <motion.div variants={containerVariants} initial="hidden" animate="visible">
-                        {classroomsData?.pages.map((page, i) => (
-                          <Fragment key={i}>
-                            {page?.data?.map((classroom: any) => (
-                              <motion.div key={classroom.id} variants={itemVariants}>
-                                <SelectItem value={classroom.id}>
-                                  {classroom.name}
-                                </SelectItem>
-                              </motion.div>
-                            ))}
-                          </Fragment>
-                        ))}
-                        {hasNextPage && (
-                          <Button
-                            className="w-full mt-2"
-                            variant="ghost"
-                            onClick={() => fetchNextPage()}
-                            disabled={isFetchingNextPage}
-                          >
-                            {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin" /> : "Daha Fazla Yükle"}
-                          </Button>
-                        )}
-                      </motion.div>
+                      {classrooms?.map(
+                        (classroom: { id: string; name: string }) => (
+                          <SelectItem key={classroom.id} value={classroom.id}>
+                            {classroom.name}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

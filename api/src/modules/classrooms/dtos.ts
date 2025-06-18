@@ -42,22 +42,15 @@ export const classroomWithStudentsResponseSchema = t.Object({
   ),
 });
 
-export const paginatedClassroomResponseSchema = t.Object({
-  data: t.Array(classroomResponseSchema),
-  total: t.Number(),
-  page: t.Number(),
-  limit: t.Number(),
-});
-
 export const classroomIndexDto = {
   query: t.Object({
-    page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
-    limit: t.Optional(t.Numeric({ default: 10, minimum: 1 })),
+    id: t.Optional(ClassroomPlain.properties.id),
     name: t.Optional(t.String()),
   }),
-  response: { 200: paginatedClassroomResponseSchema },
+  response: { 200: t.Array(classroomWithStudentsResponseSchema) },
   detail: {
     summary: "Sınıfları Listele",
+    description: "Tüm sınıfları ve her sınıfa ait öğrencileri listeler",
   },
 } satisfies ControllerHook;
 

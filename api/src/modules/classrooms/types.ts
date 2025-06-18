@@ -5,7 +5,6 @@ import {
   classroomShowDto,
   classroomUpdateDto,
 } from "./dtos";
-import { Zod } from "zod";
 
 export type ClassroomResponse = Static<(typeof classroomShowDto.response)[200]>;
 
@@ -21,4 +20,4 @@ export type ClassroomShowResponse = Static<
   (typeof classroomShowDto.response)[200]
 >;
 
-export type ClassroomIndexQuery = Zod.infer<typeof classroomIndexDto.query>;
+export type ClassroomIndexQuery = Static<typeof classroomIndexDto.query>;

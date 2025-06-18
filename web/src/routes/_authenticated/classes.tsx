@@ -19,25 +19,26 @@ function ClassesPage() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["classrooms"],
     queryFn: async (): Promise<ClassroomsResponse> => {
-      const res = await api.classrooms.index.get();
+      const res = await api.classrooms.get();
       if (res.error) {
         throw new Error(res.error.value.message);
       }
       return res.data as ClassroomsResponse;
     },
   });
-
   const formattedData: Class[] = useMemo(() => {
     if (!data) return []; 
-    return data.map((classroom) => ({
+    return data?.data?.map((classroom) => ({
       ...classroom,
-      studentCount: classroom.students.length,
+      studentCount: classroom?.students?.length ?? 0,
     }));
   }, [data]);
 
   if (isError) {
     return <div>Error: {error.message}</div>;
   }
+
+
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
@@ -56,7 +57,7 @@ function ClassesPage() {
       <div className="grid gap-4">
         <DataTable
           columns={classColumns}
-          data={formattedData}
+          data={data}
           searchColumn="name"
           searchPlaceholder="Sınıf adı ile ara..."
           isLoading={isLoading}
@@ -72,7 +73,7 @@ function ClassesPage() {
             {isLoading ? (
               <Skeleton className="h-8 w-1/4" />
             ) : (
-              <div className="text-2xl font-bold">{data?.length ?? 0}</div>
+              <div className="text-2xl font-bold">{data?.total ?? 0}</div>
             )}
             <p className="text-xs text-muted-foreground">
               Sistemde kayıtlı toplam sınıf sayısı
