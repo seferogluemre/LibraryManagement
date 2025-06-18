@@ -86,10 +86,16 @@ export const PublisherWhereUnique = t.Recursive(
     t.Intersect(
       [
         t.Partial(
-          t.Object({ id: t.String() }, { additionalProperties: true }),
+          t.Object(
+            { id: t.String(), name: t.String() },
+            { additionalProperties: true },
+          ),
           { additionalProperties: true },
         ),
-        t.Union([t.Object({ id: t.String() })], { additionalProperties: true }),
+        t.Union(
+          [t.Object({ id: t.String() }), t.Object({ name: t.String() })],
+          { additionalProperties: true },
+        ),
         t.Partial(
           t.Object({
             AND: t.Union([Self, t.Array(Self, { additionalProperties: true })]),

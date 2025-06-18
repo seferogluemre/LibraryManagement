@@ -53,7 +53,7 @@ model User {
 
 model Author {
   id    String @id @default(uuid()) @map("author_id")
-  name  String @map("author_name")
+  name  String @unique @map("author_name")
   books Book[]
 
   @@index([name])
@@ -70,7 +70,7 @@ model Category {
 
 model Publisher {
   id    String @id @default(uuid()) @map("publisher_id")
-  name  String @map("publisher_name")
+  name  String @unique @map("publisher_name")
   books Book[]
 
   @@index([name])
