@@ -22,7 +22,7 @@ function App() {
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data) => {
     try {
       console.log("Login attempt:", data);
       // TODO: API call will be here
