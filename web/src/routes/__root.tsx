@@ -5,7 +5,7 @@ import {
   getAuthState,
   setAuthState,
   type AuthState
-} from "@/lib/auth";
+} from "@/services/auth";
 import {
   createRootRouteWithContext,
   Outlet,

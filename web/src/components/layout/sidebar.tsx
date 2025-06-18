@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { navItems } from "@/constants/navigation";
-import { clearLocalStorageAuthState } from "@/lib/auth";
+import { clearLocalStorageAuthState } from "@/services/auth";
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
 import {

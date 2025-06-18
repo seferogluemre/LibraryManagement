@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "@/context/theme/theme-toggle";
 import { api } from "@/lib/api";
-import { setAuthState } from "@/lib/auth";
+import { setAuthState } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createFileRoute,

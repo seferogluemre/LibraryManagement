@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
-import { getLocalUser } from "@/lib/auth";
+import { getLocalUser } from "@/services/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, Loader2, Plus, XCircle } from "lucide-react";
 import React from "react";

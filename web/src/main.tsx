@@ -8,7 +8,7 @@ import "./index.css";
 import { routeTree } from "./routeTree.gen";
 
 // Auth state'i ve tiplerini import et
-import { getAuthState, type AuthState, type User } from "./lib/auth";
+import { getAuthState, type AuthState, type User } from "./services/auth";
 
 export interface RouterContext extends AuthState {
   login: (data: {

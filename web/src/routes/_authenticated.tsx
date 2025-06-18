@@ -1,6 +1,6 @@
 import { MainLayout } from "@/components/layout/main-layout";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { getAuthState, getLoginTimestamp } from "@/lib/auth";
+import { getAuthState, getLoginTimestamp } from "@/services/auth";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

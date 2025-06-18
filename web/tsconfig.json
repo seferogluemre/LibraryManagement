@@ -26,6 +26,7 @@
       "@api/*": ["../api/src/*"],
       "@types/*": ["../types/*"],
       "@stores/*": ["./src/stores/*"],
+      "@services/*": ["./src/services/*"],
       "@lib/*": ["./src/lib/*"],
       "@components/*": ["./src/components/*"],
       "@tanstack/react-router": ["../node_modules/@tanstack/react-router"],

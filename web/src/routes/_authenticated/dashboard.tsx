@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ModeToggle } from "@/context/theme/theme-toggle";
 import type { OverdueBook, ReportsResponse, TopBook, TopStudent } from "@/features/reports/types";
 import { api } from "@/lib/api";
-import { clearLocalStorageAuthState } from "@/lib/auth";
+import { clearLocalStorageAuthState } from "@/services/auth";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouteContext, useRouter } from "@tanstack/react-router";
 import {
