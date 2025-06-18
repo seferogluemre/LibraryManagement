@@ -79,8 +79,6 @@ export const app = new Elysia({
   .delete(
     "/:id",
     async ({ params , body }) => {
-      console.log("body",body)
-      console.log("params",params)
       await ClassroomService.destroy(body.params.id);
       return { message: "Sınıf başarıyla silindi" };
     },

@@ -170,6 +170,11 @@ export abstract class ClassroomService {
           });
         }
 
+        await tx.transferHistory.updateMany({
+          where: { newClassId: id },
+          data: { newClassId: unclassifiedClass.id },
+        });
+
         await tx.student.updateMany({
           where: { classId: id },
           data: { classId: unclassifiedClass.id },
