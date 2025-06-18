@@ -25,7 +25,7 @@ export const app = new Elysia({
     publisherCreateDto
   )
   .get(
-    "/",
+    "",
     async ({ query }) => {
       const publishers = await PublisherService.index(query);
       return publishers.map((publisher) =>

@@ -29,7 +29,6 @@ export function MainLayout({ children }: MainLayoutProps) {
           "lg:ml-0 ml-0 pt-16 lg:pt-0"
         )}
       >
-    
 
         {/* Page Content */}
         <main className="p-4 md:p-6 lg:ml-0">{children}</main>

@@ -32,7 +32,7 @@ export const publisherResponseSchema = t.Object({
 export const publisherWithBooksResponseSchema = t.Object({
   id: PublisherPlain.properties.id,
   name: PublisherPlain.properties.name,
-  books: t.Array(BookPlain.properties.id),
+  books: t.Array(BookPlain),
 });
 
 export const publisherIndexDto = {
@@ -40,7 +40,7 @@ export const publisherIndexDto = {
     id: t.Optional(PublisherPlain.properties.id),
     name: t.Optional(t.String()),
   }),
-  response: { 200: t.Array(publisherWithBooksResponseSchema) },
+  response: { 200: t.Array(publisherResponseSchema) },
   detail: {
     summary: "Yayıncıları Listele",
   },

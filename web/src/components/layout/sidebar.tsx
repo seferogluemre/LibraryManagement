@@ -24,8 +24,6 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { SidebarItem } from "./sidebar-item";
 
-
-
 export function Sidebar() {
     const { user } = useRouteContext({ from: '/_authenticated' });
     const { isOpen, toggle, setIsMobile } = useSidebarStore();
