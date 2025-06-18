@@ -1,12 +1,12 @@
 import Elysia from "elysia";
 import {
-  studentByClassDto,
-  studentByStudentNoDto,
-  studentCreateDto,
-  studentDestroyDto,
-  studentIndexDto,
-  studentShowDto,
-  studentUpdateDto,
+    studentByClassDto,
+    studentByStudentNoDto,
+    studentCreateDto,
+    studentDestroyDto,
+    studentIndexDto,
+    studentShowDto,
+    studentUpdateDto,
 } from "./dtos";
 import { StudentFormatter } from "./formatters";
 import { StudentService } from "./service";
@@ -29,8 +29,8 @@ export const app = new Elysia({
   .get(
     "",
     async ({ query }) => {
-      const students = await StudentService.index(query);
-      return StudentFormatter.listResponse(students);
+      const paginatedStudents = await StudentService.index(query);
+      return paginatedStudents;
     },
     studentIndexDto
   )

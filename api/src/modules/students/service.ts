@@ -2,11 +2,10 @@ import prisma from "@core/prisma";
 import { Prisma, Student } from "@prisma/client";
 import { HandleError } from "@shared/error/handle-error";
 import { NotFoundException } from "@utils/http-errors";
-import { getStudentFilters } from "./dtos";
 import {
-  StudentCreatePayload,
-  StudentIndexQuery,
-  StudentUpdatePayload,
+    StudentCreatePayload,
+    StudentIndexQuery,
+    StudentUpdatePayload,
 } from "./types";
 
 export abstract class StudentService {
@@ -63,30 +62,36 @@ export abstract class StudentService {
 
   static async index(query?: StudentIndexQuery) {
     try {
-      const [hasFilters, filters] = getStudentFilters(query);
+      const { page = 1, limit = 10, name } = query || {};
+      const skip = (page - 1) * limit;
 
       const where: Prisma.StudentWhereInput = {};
-
-      if (hasFilters && filters.length > 0) {
-        where.OR = filters;
+      if (name) {
+        where.name = {
+          contains: name,
+          mode: "insensitive",
+        };
       }
 
-      const students = await prisma.student.findMany({
-        where,
-        include: {
-          class: {
-            select: {
-              id: true,
-              name: true,
-            },
+      const [total, students] = await prisma.$transaction([
+        prisma.student.count({ where }),
+        prisma.student.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { name: "asc" },
+           include: {
+            class: true,
           },
-        },
-        orderBy: {
-          studentNo: "asc",
-        },
-      });
+        }),
+      ]);
 
-      return students;
+      return {
+        data: students,
+        total,
+        page,
+        limit,
+      };
     } catch (error) {
       await HandleError.handlePrismaError(error, "student", "find");
       throw error;

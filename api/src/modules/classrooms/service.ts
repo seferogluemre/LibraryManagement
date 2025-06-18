@@ -2,11 +2,10 @@ import prisma from "@core/prisma";
 import { Classroom, Prisma } from "@prisma/client";
 import { HandleError } from "@shared/error/handle-error";
 import { NotFoundException } from "@utils/http-errors";
-import { getClassroomFilters } from "./dtos";
 import {
-  ClassroomCreatePayload,
-  ClassroomIndexQuery,
-  ClassroomUpdatePayload,
+    ClassroomCreatePayload,
+    ClassroomIndexQuery,
+    ClassroomUpdatePayload,
 } from "./types";
 
 export abstract class ClassroomService {
@@ -36,33 +35,24 @@ export abstract class ClassroomService {
 
   static async index(query?: ClassroomIndexQuery) {
     try {
-      const [hasFilters, filters] = getClassroomFilters(query);
+      const { page = 1, limit = 10 } = query || {};
+      const skip = (page - 1) * limit;
 
-      const where: Prisma.ClassroomWhereInput = {};
+      const [total, classrooms] = await prisma.$transaction([
+        prisma.classroom.count(),
+        prisma.classroom.findMany({
+          skip,
+          take: limit,
+          orderBy: { name: "asc" },
+        }),
+      ]);
 
-      if (hasFilters && filters.length > 0) {
-        where.OR = filters;
-      }
-
-      const classrooms = await prisma.classroom.findMany({
-        where,
-        include: {
-          students: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              studentNo: true,
-            },
-            orderBy: {
-              studentNo: "asc",
-            },
-          },
-        },
-        orderBy: { name: "asc" },
-      });
-
-      return classrooms;
+      return {
+        data: classrooms,
+        total,
+        page,
+        limit,
+      };
     } catch (error) {
       await HandleError.handlePrismaError(error, "classroom", "find");
       throw error;
@@ -169,6 +159,11 @@ export abstract class ClassroomService {
             },
           });
         }
+
+        await tx.transferHistory.updateMany({
+          where: { oldClassId: id },
+          data: { oldClassId: unclassifiedClass.id },
+        });
 
         await tx.transferHistory.updateMany({
           where: { newClassId: id },

@@ -61,15 +61,20 @@ export const studentWithClassResponseSchema = t.Object({
   }),
 });
 
+export const paginatedStudentResponseSchema = t.Object({
+  data: t.Array(studentWithClassResponseSchema),
+  total: t.Number(),
+  page: t.Number(),
+  limit: t.Number(),
+});
+
 export const studentIndexDto = {
   query: t.Object({
-    id: t.Optional(StudentPlain.properties.id),
+    page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
+    limit: t.Optional(t.Numeric({ default: 10, minimum: 1 })),
     name: t.Optional(t.String()),
-    email: t.Optional(t.String()),
-    studentNo: t.Optional(t.Number()),
-    classId: t.Optional(t.String()),
   }),
-  response: { 200: t.Array(studentWithClassResponseSchema) },
+  response: { 200: paginatedStudentResponseSchema },
   detail: {
     summary: "Öğrencileri Listele",
   },

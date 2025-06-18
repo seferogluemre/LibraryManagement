@@ -45,9 +45,6 @@ export abstract class PublisherService {
           skip,
           take: limit,
           orderBy: { name: "asc" },
-           include: {
-            books: true,
-          },
         }),
       ]);
 

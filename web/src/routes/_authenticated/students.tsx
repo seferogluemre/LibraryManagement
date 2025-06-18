@@ -14,7 +14,7 @@ function StudentManagementPage() {
   const { data: students, isLoading } = useQuery({
     queryKey: ['students'],
     queryFn: async () => {
-      const res = await api.students.index.get()
+      const res = await api.students.get();
       if (res.error) {
         throw new Error('Öğrenciler getirilemedi')
       }
@@ -22,7 +22,7 @@ function StudentManagementPage() {
     },
   })
 
-  const tableData = students ?? []
+  const tableData = students.data ?? []
 
   return (
     <div className="p-4 md:p-6">

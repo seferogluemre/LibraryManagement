@@ -1,209 +1,230 @@
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { api } from "@/lib/api"
-import { getAccessToken } from "@/lib/auth"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { CheckCircle, XCircle } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+"use client";
 
-interface TransferRequest {
-  studentId: string
-  oldClassId: string
-  newClassId: string
-  notes?: string
-}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Fragment, useState, useMemo } from "react";
+import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { api } from "@/lib/api";
+import { debounce } from "lodash";
 
-// Define explicit types for query data
-interface Student {
-  id: string
-  name: string
-  class: { id: string; name: string }
-}
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
-interface Classroom {
-  id: string
-  name: string
-}
+const transferFormSchema = z.object({
+  studentId: z.string({ required_error: "Öğrenci seçimi zorunludur." }),
+  newClassId: z.string({ required_error: "Yeni sınıf seçimi zorunludur." }),
+  reason: z.string().min(1, "Transfer sebebi zorunludur."),
+  notes: z.string().optional(),
+});
+
+type TransferFormValues = z.infer<typeof transferFormSchema>;
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
 
 export function TransferForm() {
-  const [selectedStudent, setSelectedStudent] = useState<string>("")
-  const [targetClass, setTargetClass] = useState<string>("")
-  const [notes, setNotes] = useState("")
-  const [currentClass, setCurrentClass] = useState<string>("")
+  const queryClient = useQueryClient();
+  const [studentSearch, setStudentSearch] = useState("");
 
-  const queryClient = useQueryClient()
+  const form = useForm<TransferFormValues>({
+    resolver: zodResolver(transferFormSchema),
+  });
 
-  // Öğrenci listesini getir
-  const { data: students } = useQuery<Student[]>({
-    queryKey: ["students"],
-    queryFn: async () => {
-      const res = await api.students.index.get()
-      if (res.error) throw new Error("Öğrenciler getirilemedi")
-      return res.data as Student[]
-    },
-  })
+  const debouncedSetStudentSearch = useMemo(
+    () => debounce((value: string) => setStudentSearch(value), 300),
+    []
+  );
 
-  const { data: classes } = useQuery<Classroom[]>({
+  const {
+    data: studentsData,
+    fetchNextPage: fetchNextStudents,
+    hasNextPage: hasNextStudents,
+    isFetchingNextPage: isFetchingStudents,
+  } = useInfiniteQuery({
+    queryKey: ["students", studentSearch],
+    queryFn: async ({ pageParam = 1 }) =>
+      (await api.students.get({ query: { page: pageParam, limit: 10, name: studentSearch } })).data as any,
+    getNextPageParam: (lastPage: any) =>
+      lastPage.data.length === lastPage.limit ? lastPage.page + 1 : undefined,
+    initialPageParam: 1,
+  });
+
+  const {
+    data: classroomsData,
+    fetchNextPage: fetchNextClassrooms,
+    hasNextPage: hasNextClassrooms,
+    isFetchingNextPage: isFetchingClassrooms,
+  } = useInfiniteQuery({
     queryKey: ["classrooms"],
-    queryFn: async () => {
-      const classRes = await api.classrooms.index.get()
-      if (classRes.error) throw new Error("Sınıflar getirilemedi")
-      return classRes.data as Classroom[]
-    },
-  })
-  
-  const { mutate: transferStudent, isPending } = useMutation({
-    mutationFn: async (values: TransferRequest) => {
-      const accessToken = getAccessToken();
-      if (!accessToken) {
-        toast.error("Yetkilendirme hatası", { description: "Lütfen tekrar giriş yapın." });
-        throw new Error("Yetkilendirme token'ı bulunamadı");
-      }
-      
-      const res = await api["transfer-history"].post(values, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+    queryFn: async ({ pageParam = 1 }) =>
+      (await api.classrooms.get({ query: { page: pageParam, limit: 10 } })).data as any,
+    getNextPageParam: (lastPage: any) =>
+      lastPage.data.length === lastPage.limit ? lastPage.page + 1 : undefined,
+    initialPageParam: 1,
+  });
 
-      if (res.error) {
-        if (res.error.status === 401 || res.error.status === 403) {
-            toast.error("Yetkilendirme hatası", { description: "Token geçersiz veya süresi dolmuş. Lütfen tekrar giriş yapın." });
-        }
-        throw new Error(res.error.value.message || "Bir hata oluştu");
-      }
-      return res.data;
-    },
+  const transferMutation = useMutation({
+    mutationFn: (values: TransferFormValues) =>
+      api.students.transfer.post(values),
     onSuccess: () => {
-      toast.success("Transfer başarıyla gerçekleştirildi", {
-        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-      })
-      queryClient.invalidateQueries({ queryKey: ["students"] })
-      
-      setSelectedStudent("")
-      setTargetClass("")
-      setNotes("")
-      setCurrentClass("")
+      toast.success("Öğrenci transferi başarıyla tamamlandı.");
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["transfer-history"] });
+      form.reset();
     },
-    onError: (error) => {
-      toast.error("Transfer işlemi başarısız oldu", {
-        description: error.message,
-        icon: <XCircle className="h-5 w-5 text-red-500" />,
-      })
+    onError: (error: any) => {
+      toast.error(`Transfer sırasında bir hata oluştu: ${error.message}`);
     },
-  })
+  });
 
-  const handleStudentChange = (value: string) => {
-    setSelectedStudent(value)
-    const student = students?.find(s => s.id === value)
-    if (student) {
-      setCurrentClass(student.class.name)
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!selectedStudent || !targetClass) {
-      toast.error("Lütfen gerekli alanları doldurun")
-      return
-    }
-
-    const student = students?.find(s => s.id === selectedStudent)
-    
-    if (!student) {
-      toast.error("Öğrenci bilgisi bulunamadı")
-      return
-    }
-
-    const transferData: TransferRequest = {
-      studentId: selectedStudent,
-      oldClassId: student.class.id,
-      newClassId: targetClass,
-      notes: notes.trim() || undefined
-    }
-
-    transferStudent(transferData)
-  }
+  const onSubmit = (data: TransferFormValues) => {
+    transferMutation.mutate(data);
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Transfer Formu</CardTitle>
+        <CardTitle>Öğrenci Sınıf Transferi</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Öğrenci Seçin</label>
-            <Select value={selectedStudent} onValueChange={handleStudentChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Öğrenci seçin..." />
-              </SelectTrigger>
-              <SelectContent>
-                {students?.map((student) => (
-                  <SelectItem key={student.id} value={student.id}>
-                    {student.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedStudent && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Mevcut Sınıf</label>
-              <div className="p-2 bg-muted rounded-md">
-                {currentClass}
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Hedef Sınıf</label>
-            <Select value={targetClass} onValueChange={setTargetClass}>
-              <SelectTrigger>
-                <SelectValue placeholder="Hedef sınıf seçin..." />
-              </SelectTrigger>
-              <SelectContent>
-                {classes?.map((class_) => (
-                  <SelectItem key={class_.id} value={class_.id}>
-                    {class_.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Transfer Notları (Opsiyonel)</label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Transfer sebebi veya ek notlar..."
-              className="min-h-[100px]"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="studentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Öğrenci</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Transfer edilecek öğrenciyi seçin" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <div className="p-2">
+                         <Input
+                           placeholder="Öğrenci adı ile ara..."
+                           onChange={(e) => debouncedSetStudentSearch(e.target.value)}
+                         />
+                      </div>
+                      <motion.div variants={containerVariants} initial="hidden" animate="visible">
+                        {studentsData?.pages.map((page, i) => (
+                          <Fragment key={i}>
+                            {page?.data?.map((student: any) => (
+                              <motion.div key={student.id} variants={itemVariants}>
+                                <SelectItem value={student.id}>{student.name} ({student.studentNo})</SelectItem>
+                              </motion.div>
+                            ))}
+                          </Fragment>
+                        ))}
+                      </motion.div>
+                      {hasNextStudents && (
+                         <Button
+                            className="w-full mt-2"
+                            variant="ghost"
+                            onClick={() => fetchNextStudents()}
+                            disabled={isFetchingStudents}
+                          >
+                           {isFetchingStudents ? <Loader2 className="h-4 w-4 animate-spin" /> : "Daha Fazla Yükle"}
+                        </Button>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Transfer Ediliyor..." : "Transferi Gerçekleştir"}
-          </Button>
-        </form>
+             <FormField
+              control={form.control}
+              name="newClassId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Yeni Sınıf</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Öğrencinin transfer edileceği sınıfı seçin" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <motion.div variants={containerVariants} initial="hidden" animate="visible">
+                        {classroomsData?.pages.map((page, i) => (
+                          <Fragment key={i}>
+                            {page?.data?.map((classroom: any) => (
+                              <motion.div key={classroom.id} variants={itemVariants}>
+                                <SelectItem value={classroom.id}>{classroom.name}</SelectItem>
+                              </motion.div>
+                            ))}
+                          </Fragment>
+                        ))}
+                      </motion.div>
+                       {hasNextClassrooms && (
+                         <Button
+                          className="w-full mt-2"
+                          variant="ghost"
+                          onClick={() => fetchNextClassrooms()}
+                          disabled={isFetchingClassrooms}
+                        >
+                           {isFetchingClassrooms ? <Loader2 className="h-4 w-4 animate-spin" /> : "Daha Fazla Yükle"}
+                        </Button>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="reason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Transfer Sebebi</FormLabel>
+                  <FormControl>
+                    <Input placeholder="örn: Velisinin isteği üzerine" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ek Notlar (Opsiyonel)</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Transfer ile ilgili ek notlar..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={transferMutation.isPending}>
+              {transferMutation.isPending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Transfer Ediliyor...</> : "Transfer Et"}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
-  )
+  );
 }

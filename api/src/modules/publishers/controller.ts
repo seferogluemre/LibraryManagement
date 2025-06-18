@@ -27,10 +27,8 @@ export const app = new Elysia({
   .get(
     "",
     async ({ query }) => {
-      const publishers = await PublisherService.index(query);
-      return publishers.map((publisher) =>
-        PublisherFormatter.responseWithBooks(publisher)
-      );
+      const paginatedPublishers = await PublisherService.index(query);
+      return paginatedPublishers;
     },
     publisherIndexDto
   )
