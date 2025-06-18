@@ -37,7 +37,6 @@ export function Sidebar() {
         router.navigate({ to: "/login" });
     };
 
-    // Responsive design listener
     useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 1024);

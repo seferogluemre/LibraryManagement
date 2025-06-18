@@ -1,7 +1,7 @@
 import { en, Faker, tr } from "@faker-js/faker";
 import { config } from "dotenv";
 
-import prisma from "../src/core/prisma";
+import prisma from "../../src/core/prisma";
 
 const faker = new Faker({
   locale: [tr, en],
