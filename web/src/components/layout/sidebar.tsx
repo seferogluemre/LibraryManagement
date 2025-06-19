@@ -67,18 +67,18 @@ export function Sidebar() {
             {/* Sidebar with responsive classes */}
             <aside 
                 className={`
-                    fixed lg:static 
-                    top-0 left-0 bottom-0 
+                    fixed lg:sticky 
+                    top-0 left-0 bottom-0 h-screen
                     w-64 bg-background border-r 
                     flex flex-col 
                     transform transition-transform duration-300 
                     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                     lg:translate-x-0 
-                    z-40 lg:z-0
+                    z-40
                 `}
             >
                 <div className="p-4 border-b flex justify-between items-center">
-                    <h1 className="text-xl font-bold tracking-wider">Navigasyon</h1>
+                    <h1 className="text-lg font-semibold tracking-tight">Ümmü Mihcen Kütüphane</h1>
                     <Button 
                         variant="ghost" 
                         size="icon" 

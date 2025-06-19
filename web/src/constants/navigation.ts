@@ -12,15 +12,15 @@ import {
 } from "lucide-react";
 
 export const navItems = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/online-users", icon: Users, label: "Online Kullanıcılar" },
-  { href: "/students", icon: Users, label: "Öğrenci Yönetimi" },
-  { href: "/classes", icon: School, label: "Sınıf Yönetimi" },
-  { href: "/transfers", icon: ArrowRightLeft, label: "Öğrenci Transferi" },
-  { href: "/transfer-history", icon: History, label: "Transfer Geçmişi" },
-  { href: "/books", icon: Book, label: "Kitap Yönetimi" },
-  { href: "/authors", icon: PenSquare, label: "Yazar Yönetimi" },
-  { href: "/categories", icon: Tags, label: "Kategori Yönetimi" },
-  { href: "/publishers", icon: Building, label: "Yayınevi Yönetimi" },
-  { href: "/lending", icon: BookCopy, label: "Ödünç İşlemleri" },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", color: "text-sky-500" },
+  { href: "/online-users", icon: Users, label: "Online Kullanıcılar", color: "text-green-500" },
+  { href: "/students", icon: Users, label: "Öğrenci Yönetimi", color: "text-violet-500" },
+  { href: "/classes", icon: School, label: "Sınıf Yönetimi", color: "text-orange-500" },
+  { href: "/transfers", icon: ArrowRightLeft, label: "Öğrenci Transferi", color: "text-yellow-500" },
+  { href: "/transfer-history", icon: History, label: "Transfer Geçmişi", color: "text-red-500" },
+  { href: "/books", icon: Book, label: "Kitap Yönetimi", color: "text-blue-500" },
+  { href: "/authors", icon: PenSquare, label: "Yazar Yönetimi", color: "text-indigo-500" },
+  { href: "/categories", icon: Tags, label: "Kategori Yönetimi", color: "text-pink-500" },
+  { href: "/publishers", icon: Building, label: "Yayınevi Yönetimi", color: "text-emerald-500" },
+  { href: "/lending", icon: BookCopy, label: "Ödünç İşlemleri", color: "text-rose-500" },
 ];
