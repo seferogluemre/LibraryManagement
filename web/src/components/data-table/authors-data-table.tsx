@@ -34,6 +34,7 @@ export function AuthorsDataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+
   return (
     <div>
       <div className="rounded-md border">

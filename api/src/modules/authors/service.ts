@@ -38,7 +38,10 @@ export abstract class AuthorService {
           orderBy: { name: "asc" },
           include: {
             books: true,
-          },  
+            _count: {
+              select: { books: true },
+            },
+          },
         }),
       ]);
 

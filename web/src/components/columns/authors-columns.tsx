@@ -3,15 +3,29 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 export type Author = {
   id: string;
   name: string;
-  bookCount: number;
   avatarUrl?: string;
+  _count: {
+    books: number;
+  };
 };
+
+interface AuthorColumnsProps {
+    onEdit: (author: Author) => void;
+    onDelete: (author: Author) => void;
+}
 
 const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -19,7 +33,7 @@ const getInitials = (name: string) => {
     return initials.length > 2 ? initials.substring(0, 2) : initials;
 }
 
-export const columns: ColumnDef<Author>[] = [
+export const columns = ({ onEdit, onDelete }: AuthorColumnsProps): ColumnDef<Author>[] => [
   {
     accessorKey: "name",
     header: "Yazar",
@@ -39,17 +53,35 @@ export const columns: ColumnDef<Author>[] = [
   {
     accessorKey: "bookCount",
     header: "Kitap Sayısı",
-    cell: ({ row }) => <Badge variant="secondary">{row.original.bookCount} kitap</Badge>,
+    cell: ({ row }) => <Badge variant="secondary">{row.original._count.books} kitap</Badge>,
   },
   {
     id: "actions",
     cell: ({ row }) => {
-       // Actions will be added later
+      const author = row.original;
       return (
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Menüyü aç</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Menüyü aç</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => onEdit(author)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Düzenle
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-500 focus:text-red-600"
+              onClick={() => onDelete(author)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Sil
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },

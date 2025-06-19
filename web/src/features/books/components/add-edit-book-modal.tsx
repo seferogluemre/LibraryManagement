@@ -84,7 +84,7 @@ export function AddEditBookModal({ isOpen, onClose, book }: AddEditBookModalProp
     (await api[endpoint].get({ query: { page: pageParam, limit: 10 } })).data as PaginatedResponse<SelectItemData>;
 
   const { data: authorsData, fetchNextPage: fetchNextAuthors, hasNextPage: hasNextAuthors, isFetchingNextPage: isFetchingAuthors } = useInfiniteQuery({
-    queryKey: ["authors"],
+    queryKey: ["authors", "select-list"],
     queryFn: (context) => fetcher(context, "authors"),
     getNextPageParam: (lastPage) => lastPage && lastPage.data.length === lastPage.limit ? lastPage.page + 1 : undefined,
     initialPageParam: 1,
@@ -96,7 +96,7 @@ export function AddEditBookModal({ isOpen, onClose, book }: AddEditBookModalProp
     hasNextPage: hasNextPublishers,
     isFetchingNextPage: isFetchingPublishers,
   } = useInfiniteQuery({
-    queryKey: ["publishers"],
+    queryKey: ["publishers", "select-list"],
     queryFn: (context) => fetcher(context, "publishers"),
     getNextPageParam: (lastPage) =>
       lastPage && lastPage.data.length === lastPage.limit ? lastPage.page + 1 : undefined,
@@ -109,7 +109,7 @@ export function AddEditBookModal({ isOpen, onClose, book }: AddEditBookModalProp
     hasNextPage: hasNextCategories,
     isFetchingNextPage: isFetchingCategories,
   } = useInfiniteQuery({
-    queryKey: ["categories"],
+    queryKey: ["categories", "select-list"],
     queryFn: (context) => fetcher(context, "categories"),
     getNextPageParam: (lastPage) =>
       lastPage && lastPage.data.length === lastPage.limit ? lastPage.page + 1 : undefined,
