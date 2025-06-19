@@ -32,6 +32,10 @@ export function getAuthorFilters(query?: {
 export const authorResponseSchema = t.Object({
   id: AuthorPlain.properties.id,
   name: AuthorPlain.properties.name,
+  books: t.Array(t.Object({
+    id: BookPlain.properties.id,
+    title: BookPlain.properties.title,
+  })),
 });
 
 export const paginatedAuthorResponseSchema = t.Object({

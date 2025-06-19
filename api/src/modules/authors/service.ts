@@ -36,6 +36,9 @@ export abstract class AuthorService {
           skip,
           take: limit,
           orderBy: { name: "asc" },
+          include: {
+            books: true,
+          },  
         }),
       ]);
 
