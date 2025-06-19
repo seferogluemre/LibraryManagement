@@ -6,16 +6,18 @@ import { Button } from "@/components/ui/button";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
-// Mock data type, will be replaced with actual API response type
 export type Author = {
   id: string;
   name: string;
-  nationality: string;
-  lifespan: string;
-  bio: string;
   bookCount: number;
   avatarUrl?: string;
 };
+
+const getInitials = (name: string) => {
+    const names = name.split(' ');
+    const initials = names.map(n => n[0]).join('');
+    return initials.length > 2 ? initials.substring(0, 2) : initials;
+}
 
 export const columns: ColumnDef<Author>[] = [
   {
@@ -27,23 +29,12 @@ export const columns: ColumnDef<Author>[] = [
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
             <AvatarImage src={author.avatarUrl} alt={author.name} />
-            <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{getInitials(author.name)}</AvatarFallback>
           </Avatar>
-          <div>
-            <div className="font-medium">{author.name}</div>
-            <div className="text-sm text-muted-foreground truncate max-w-xs">{author.bio}</div>
-          </div>
+          <div className="font-medium">{author.name}</div>
         </div>
       );
     },
-  },
-  {
-    accessorKey: "nationality",
-    header: "Uyruk",
-  },
-  {
-    accessorKey: "lifespan",
-    header: "Yaşam Dönemi",
   },
   {
     accessorKey: "bookCount",

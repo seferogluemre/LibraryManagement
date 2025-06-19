@@ -2,10 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 // Mock author type
-type Author = { id: string; name: string; nationality: string; lifespan: string; bio: string; };
+type Author = { id: string; name: string; };
 
 interface AddEditAuthorModalProps {
   isOpen: boolean;
@@ -18,34 +17,23 @@ export function AddEditAuthorModal({ isOpen, onClose, author }: AddEditAuthorMod
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted (Scenario)");
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{isEditMode ? "Yazar Düzenle" : "Yeni Yazar Ekle"}</DialogTitle>
           <DialogDescription>
-            {isEditMode ? "Yazar bilgilerini güncelleyin." : "Yeni bir yazarı sisteme ekleyin."}
+            {isEditMode ? "Yazarın adını güncelleyin." : "Yeni bir yazarı sisteme ekleyin."}
           </DialogDescription>
         </DialogHeader>
         <form id="author-form" onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Yazar Adı</Label>
-            <Input id="name" defaultValue={author?.name} />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="nationality">Uyruk</Label>
-            <Input id="nationality" defaultValue={author?.nationality} />
-          </div>
-           <div className="grid gap-2">
-            <Label htmlFor="lifespan">Yaşam Dönemi</Label>
-            <Input id="lifespan" defaultValue={author?.lifespan} placeholder="örn: 1903 - 1950"/>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="bio">Biyografi (Kısa)</Label>
-            <Textarea id="bio" defaultValue={author?.bio} />
+            <Input id="name" defaultValue={author?.name} placeholder="örn: Fyodor Dostoyevski"/>
           </div>
         </form>
         <DialogFooter>
