@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  type ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
+  type ColumnDef,
+  type PaginationState,
 } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -17,23 +17,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { OnChangeFn } from "@tanstack/react-table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pageCount: number;
+  pagination: PaginationState;
+  onPaginationChange: OnChangeFn<PaginationState>;
 }
 
 export function AuthorsDataTable<TData, TValue>({
   columns,
   data,
+  pageCount,
+  pagination,
+  onPaginationChange,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
+    pageCount: pageCount,
+    state: {
+      pagination,
+    },
+    onPaginationChange,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
   });
-
 
   return (
     <div>

@@ -3,9 +3,9 @@ import { Author, Prisma } from "@prisma/client";
 import { HandleError } from "@shared/error/handle-error";
 import { NotFoundException } from "@utils/http-errors";
 import {
-  AuthorCreatePayload,
-  AuthorIndexQuery,
-  AuthorUpdatePayload,
+    AuthorCreatePayload,
+    AuthorIndexQuery,
+    AuthorUpdatePayload,
 } from "./types";
 
 export abstract class AuthorService {
@@ -27,17 +27,25 @@ export abstract class AuthorService {
 
   static async index(query?: AuthorIndexQuery) {
     try {
-      const { page = 1, limit = 10 } = query || {};
+      const { page = 1, limit = 10, name } = query || {};
       const skip = (page - 1) * limit;
 
+      const where: Prisma.AuthorWhereInput = {};
+      if (name) {
+        where.name = {
+          contains: name,
+          mode: 'insensitive',
+        };
+      }
+
       const [total, authors] = await prisma.$transaction([
-        prisma.author.count(),
+        prisma.author.count({ where }),
         prisma.author.findMany({
+          where,
           skip,
           take: limit,
           orderBy: { name: "asc" },
           include: {
-            books: true,
             _count: {
               select: { books: true },
             },
