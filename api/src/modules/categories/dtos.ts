@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import { AuthorPlain } from "@prismabox/Author";
 import { BookPlain } from "@prismabox/Book";
 import { CategoryPlain } from "@prismabox/Category";
 import { ControllerHook, errorResponseDto } from "@utils/elysia-types";
@@ -76,18 +75,20 @@ export const categoryUpdateDto = {
     id: CategoryPlain.properties.id,
   }),
   body: t.Object({
-    name: t.Optional(AuthorPlain.properties.name),
+    name: t.Optional(CategoryPlain.properties.name),
   }),
   response: {
     200: categoryResponseSchema,
     404: errorResponseDto[404],
-    409: errorResponseDto[409],
     422: errorResponseDto[422],
   },
   detail: {
     summary: "Kategoriyi Güncelle",
   },
 } satisfies ControllerHook;
+
+
+
 
 export const categoryDestroyDto = {
   params: t.Object({

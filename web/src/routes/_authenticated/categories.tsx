@@ -30,7 +30,6 @@ function CategoriesPage() {
   if (isLoading) return <div className="p-8 text-center bg-destructive/10 rounded-md"><h2 className="text-xl font-semibold text-destructive">Bir Hata Oluştu</h2><p className="text-muted-foreground mt-2">Yazarlar yüklenirken bir sorunla karşılaşıldı.</p></div>;
   if (isError) return <div className="p-8 text-center bg-destructive/10 rounded-md"><h2 className="text-xl font-semibold text-destructive">Bir Hata Oluştu</h2><p className="text-muted-foreground mt-2">Yazarlar yüklenirken bir sorunla karşılaşıldı.</p></div>;
 
-  console.log("data",data?.data?.data)
 
 
   return (

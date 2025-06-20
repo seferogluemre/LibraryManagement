@@ -60,13 +60,11 @@ export function AddClassroomForm() {
       const formattedName = formatClassroomName(data.name);
       const accessToken = localStorage.getItem("accessToken");
 
-      // 1. Adım: Token var mı diye kontrol et.
       if (!accessToken) {
         toast.error("Oturum bulunamadı", {
           description: "Bu işlemi yapmak için lütfen giriş yapın.",
           icon: <XCircle className="h-5 w-5 text-red-500" />,
         });
-        // Hata fırlatarak işlemi durdur.
         throw new Error("Access token not found in localStorage.");
       }
 
@@ -110,7 +108,6 @@ export function AddClassroomForm() {
   }
 
   React.useEffect(() => {
-    // Modal kapandığında formu temizle
     if (!isOpen) {
       form.reset();
     }

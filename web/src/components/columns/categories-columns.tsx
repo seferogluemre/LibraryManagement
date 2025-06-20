@@ -15,23 +15,30 @@ export const categoriesColumns: ColumnDef<Category>[] = [
     cell: ({ row }) => (
       <div className="flex flex-col">
         <span className="font-medium">{row?.original.name}</span>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-muted-foreground max-w-60 truncate" >
           {row.original.description}
         </span>
       </div>
     ),
   },
   {
-    accessorKey: "books",
+    accessorKey: "_count.books",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Kitap Sayısı" />
     ),
     cell: ({ row }) => (
-      <Badge variant="outline">{row.original?.books?.length} kitap</Badge>
+      <Badge variant="outline">{row.original?._count?.books} kitap</Badge>
     ),
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    header: () => <div className="">İşlemler</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="text-right">
+          <DataTableRowActions row={row} />
+        </div>
+      );
+    },
   },
 ]; 

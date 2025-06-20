@@ -1,4 +1,4 @@
-import Elysia from "elysia";
+import { Elysia } from "elysia";
 import {
   categoryCreateDto,
   categoryDestroyDto,
@@ -11,10 +11,7 @@ import { CategoryService } from "./service";
 
 export const app = new Elysia({
   prefix: "/categories",
-  name: "Category",
-  detail: {
-    tags: ["Categories"],
-  },
+  tags: ["Categories"],
 })
   .post(
     "",
@@ -43,16 +40,20 @@ export const app = new Elysia({
   .patch(
     "/:id",
     async ({ params: { id }, body }) => {
-      const updatedCategory = await CategoryService.update(id, body);
-      return CategoryFormatter.response(updatedCategory);
+      const category = await CategoryService.update(id, body);
+      return CategoryFormatter.response(category);
     },
     categoryUpdateDto
   )
   .delete(
     "/:id",
-    async ({ params: { id } }) => {
-      await CategoryService.destroy(id);
+    async ({ params , body }) => {
+      await CategoryService.destroy(body.params.id);
       return { message: "Kategori başarıyla silindi" };
     },
-    categoryDestroyDto
+    {
+      ...categoryDestroyDto,
+    }
   );
+
+export default app;
