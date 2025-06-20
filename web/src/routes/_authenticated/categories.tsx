@@ -40,7 +40,7 @@ function CategoriesPage() {
           Kitap kategorilerini yönetin ve düzenleyin
         </p>
       </div>
-      <CategoryStats totalCategories={MOCK_CATEGORIES.length} />
+      <CategoryStats totalCategories={data?.data?.data?.length} />
       <CategoriesDataTable columns={categoriesColumns} data={data?.data?.data} />
     </div>
   );

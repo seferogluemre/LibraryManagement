@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -60,10 +59,10 @@ export function AddEditCategoryModal({
       if (category) {
         return api.categories[":id"].patch({
           params: { id: category.id.toString() },
-          body: { name: data.name },
+          body: data,
         });
       }
-      return api.categories.post({ body: data });
+      return api.categories.post(data);
     },
     onSuccess: () => {
       toast.success(
@@ -112,16 +111,6 @@ export function AddEditCategoryModal({
             </Label>
             <Input id="name" {...register("name", { required: "İsim zorunludur." })} className="col-span-3" />
             {errors.name && <p className="col-span-4 text-red-500 text-xs">{errors.name.message}</p>}
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">
-              Açıklama
-            </Label>
-            <Textarea
-              id="description"
-              {...register("description")}
-              className="col-span-3"
-            />
           </div>
           <DialogFooter>
             <Button type="submit" disabled={mutation.isPending}>
