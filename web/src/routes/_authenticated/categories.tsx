@@ -2,6 +2,8 @@ import { categoriesColumns } from "@/components/columns/categories-columns";
 import { CategoriesDataTable } from "@/components/data-table/categories-data-table";
 import { CategoryStats } from "@/features/categories/components/category-stats";
 import type { Category } from "@/features/categories/types";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/categories")({
@@ -18,6 +20,19 @@ const MOCK_CATEGORIES: Category[] = [
 ];
 
 function CategoriesPage() {
+
+
+  const {data, isLoading, isError} = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => api.categories.get(),
+  });
+
+  if (isLoading) return <div className="p-8 text-center bg-destructive/10 rounded-md"><h2 className="text-xl font-semibold text-destructive">Bir Hata Oluştu</h2><p className="text-muted-foreground mt-2">Yazarlar yüklenirken bir sorunla karşılaşıldı.</p></div>;
+  if (isError) return <div className="p-8 text-center bg-destructive/10 rounded-md"><h2 className="text-xl font-semibold text-destructive">Bir Hata Oluştu</h2><p className="text-muted-foreground mt-2">Yazarlar yüklenirken bir sorunla karşılaşıldı.</p></div>;
+
+  console.log("data",data?.data?.data)
+
+
   return (
     <div className="p-4 md:p-8 lg:p-12 space-y-4">
       <div className="space-y-2">
@@ -27,7 +42,7 @@ function CategoriesPage() {
         </p>
       </div>
       <CategoryStats totalCategories={MOCK_CATEGORIES.length} />
-      <CategoriesDataTable columns={categoriesColumns} data={MOCK_CATEGORIES} />
+      <CategoriesDataTable columns={categoriesColumns} data={data?.data?.data} />
     </div>
   );
 } 
