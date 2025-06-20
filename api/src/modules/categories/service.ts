@@ -2,7 +2,6 @@ import prisma from "@core/prisma";
 import { Category, Prisma } from "@prisma/client";
 import { HandleError } from "@shared/error/handle-error";
 import { NotFoundException } from "@utils/http-errors";
-import { getCategoryFilters } from "./dtos";
 import {
   CategoryCreatePayload,
   CategoryIndexQuery,
@@ -37,6 +36,9 @@ export abstract class CategoryService {
           skip,
           take: limit,
           orderBy: { name: "asc" },
+          include: {
+            books: true,
+          },
         }),
       ]);
 

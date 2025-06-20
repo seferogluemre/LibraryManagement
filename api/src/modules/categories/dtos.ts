@@ -27,6 +27,10 @@ export function getCategoryFilters(query?: { id?: string; name?: string }) {
 export const categoryResponseSchema = t.Object({
   id: CategoryPlain.properties.id,
   name: CategoryPlain.properties.name,
+  books: t.Array(t.Object({
+    id: BookPlain.properties.id,
+    title: BookPlain.properties.title,
+  })),
 });
 
 export const paginatedCategoryResponseSchema = t.Object({

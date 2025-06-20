@@ -18,6 +18,7 @@ import { Route as AuthenticatedStudentsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedOnlineUsersRouteImport } from './routes/_authenticated/online-users'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedClassesRouteImport } from './routes/_authenticated/classes'
+import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedBooksRouteImport } from './routes/_authenticated/books'
 import { Route as AuthenticatedAuthorsRouteImport } from './routes/_authenticated/authors'
 
@@ -67,6 +68,11 @@ const AuthenticatedClassesRoute = AuthenticatedClassesRouteImport.update({
   path: '/classes',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedBooksRoute = AuthenticatedBooksRouteImport.update({
   id: '/books',
   path: '/books',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/authors': typeof AuthenticatedAuthorsRoute
   '/books': typeof AuthenticatedBooksRoute
+  '/categories': typeof AuthenticatedCategoriesRoute
   '/classes': typeof AuthenticatedClassesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/authors': typeof AuthenticatedAuthorsRoute
   '/books': typeof AuthenticatedBooksRoute
+  '/categories': typeof AuthenticatedCategoriesRoute
   '/classes': typeof AuthenticatedClassesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/authors': typeof AuthenticatedAuthorsRoute
   '/_authenticated/books': typeof AuthenticatedBooksRoute
+  '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/classes': typeof AuthenticatedClassesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/online-users': typeof AuthenticatedOnlineUsersRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/authors'
     | '/books'
+    | '/categories'
     | '/classes'
     | '/dashboard'
     | '/online-users'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/authors'
     | '/books'
+    | '/categories'
     | '/classes'
     | '/dashboard'
     | '/online-users'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/authors'
     | '/_authenticated/books'
+    | '/_authenticated/categories'
     | '/_authenticated/classes'
     | '/_authenticated/dashboard'
     | '/_authenticated/online-users'
@@ -227,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClassesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/categories': {
+      id: '/_authenticated/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof AuthenticatedCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/books': {
       id: '/_authenticated/books'
       path: '/books'
@@ -247,6 +266,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAuthorsRoute: typeof AuthenticatedAuthorsRoute
   AuthenticatedBooksRoute: typeof AuthenticatedBooksRoute
+  AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedClassesRoute: typeof AuthenticatedClassesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnlineUsersRoute: typeof AuthenticatedOnlineUsersRoute
@@ -258,6 +278,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAuthorsRoute: AuthenticatedAuthorsRoute,
   AuthenticatedBooksRoute: AuthenticatedBooksRoute,
+  AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedClassesRoute: AuthenticatedClassesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnlineUsersRoute: AuthenticatedOnlineUsersRoute,
