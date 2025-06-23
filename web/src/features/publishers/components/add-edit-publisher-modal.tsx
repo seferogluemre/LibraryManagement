@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,28 +18,35 @@ interface AddEditPublisherModalProps {
   isOpen: boolean;
   onClose: () => void;
   publisher?: Publisher | null;
+  onSave: (values: { name: string }) => Promise<void>;
+  isSaving: boolean;
 }
 
 export function AddEditPublisherModal({
   isOpen,
   onClose,
   publisher,
+  onSave,
+  isSaving,
 }: AddEditPublisherModalProps) {
   const [name, setName] = useState("");
   const isEditMode = publisher != null;
 
   useEffect(() => {
-    if (isEditMode) {
-      setName(publisher.name);
-    } else {
-      setName("");
+    if (isOpen) {
+      if (isEditMode && publisher) {
+        setName(publisher.name);
+      } else {
+        setName("");
+      }
     }
-  }, [publisher, isEditMode]);
+  }, [isOpen, publisher, isEditMode]);
 
-  const handleSave = () => {
-    // API call will be here later
-    console.log("Saving publisher:", { id: publisher?.id, name });
-    onClose();
+  const handleSave = async () => {
+    if (!name.trim()) {
+      return;
+    }
+    await onSave({ name });
   };
 
   return (
@@ -65,15 +72,16 @@ export function AddEditPublisherModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="col-span-3"
+              disabled={isSaving}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={isSaving}>
             İptal
           </Button>
-          <Button type="submit" onClick={handleSave}>
-            Kaydet
+          <Button type="submit" onClick={handleSave} disabled={isSaving}>
+            {isSaving ? "Kaydediliyor..." : "Kaydet"}
           </Button>
         </DialogFooter>
       </DialogContent>

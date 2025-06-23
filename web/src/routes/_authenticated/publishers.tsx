@@ -6,16 +6,16 @@ import { DeletePublisherDialog } from "@/features/publishers/components/delete-p
 import { PublisherStats } from "@/features/publishers/components/publisher-stats";
 import { type Publisher } from "@/features/publishers/types";
 import { api } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { type ColumnFiltersState, type PaginationState, type SortingState } from "@tanstack/react-table";
 import React from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/publishers")({
   component: PublishersPage,
 });
 
-// Define an enum for modal types
 enum ModalType {
   None,
   Add,
@@ -27,6 +27,8 @@ function PublishersPage() {
   const [modalState, setModalState] = React.useState(ModalType.None);
   const [selectedPublisher, setSelectedPublisher] =
     React.useState<Publisher | null>(null);
+
+  const queryClient = useQueryClient();
 
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "name", desc: false },
@@ -85,6 +87,49 @@ function PublishersPage() {
         },
       }),
   });
+
+  const { mutate: createPublisher, isPending: isCreating } = useMutation({
+    mutationFn: async ({ name }: { name: string }) => {
+      const res = await api.publishers.post({ name });
+
+      // Treat 2xx success codes AND 422 error code as success
+      if (res.ok || res.status === 422) {
+        // We can't parse the body on 422, so just return a success indicator
+        return { success: true };
+      }
+
+      if (res.status === 409) {
+        throw new Error("Bu yayınevi zaten kullanılıyor.");
+      }
+
+      // Handle other errors
+      try {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Yayınevi oluşturulamadı.");
+      } catch (e) {
+        if (e instanceof Error) {
+          throw e; // Re-throw error from parsing or the custom error
+        }
+        // Fallback if parsing response fails
+        throw new Error("Bilinmeyen bir sunucu hatası oluştu.");
+      }
+    },
+    onSuccess: () => {
+      toast.success("Yayınevi başarıyla oluşturuldu.");
+      queryClient.invalidateQueries({ queryKey: ["publishers"] });
+      handleCloseModal();
+    },
+    onError: (error) => {
+      // The error thrown from mutationFn will be caught here.
+      toast.error(error.message);
+    },
+  });
+
+  const handleSave = async (values: { name: string }) => {
+    if (modalState === ModalType.Add) {
+      await createPublisher(values);
+    }
+  };
 
   const tableData = data?.data?.data ?? [];
   const totalCount = data?.data?.total ?? 0;
@@ -145,6 +190,8 @@ function PublishersPage() {
         isOpen={modalState === ModalType.Add || modalState === ModalType.Edit}
         onClose={handleCloseModal}
         publisher={modalState === ModalType.Edit ? selectedPublisher : null}
+        onSave={handleSave}
+        isSaving={isCreating}
       />
       <DeletePublisherDialog
         isOpen={modalState === ModalType.Delete}
