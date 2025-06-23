@@ -16,20 +16,18 @@ interface DeletePublisherDialogProps {
   isOpen: boolean;
   onClose: () => void;
   publisher?: Publisher | null;
+  onDelete: () => void;
+  isDeleting: boolean;
 }
 
 export function DeletePublisherDialog({
   isOpen,
   onClose,
   publisher,
+  onDelete,
+  isDeleting,
 }: DeletePublisherDialogProps) {
   if (!publisher) return null;
-
-  const handleDelete = () => {
-    // API call will be here later
-    console.log("Deleting publisher:", publisher.id);
-    onClose();
-  };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -42,8 +40,12 @@ export function DeletePublisherDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>İptal</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>Evet, Sil</AlertDialogAction>
+          <AlertDialogCancel onClick={onClose} disabled={isDeleting}>
+            İptal
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={onDelete} disabled={isDeleting}>
+            {isDeleting ? "Siliniyor..." : "Evet, Sil"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

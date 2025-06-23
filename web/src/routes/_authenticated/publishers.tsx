@@ -102,15 +102,13 @@ function PublishersPage() {
         throw new Error("Bu yayınevi zaten kullanılıyor.");
       }
 
-      // Handle other errors
       try {
         const errorData = await res.json();
         throw new Error(errorData.message || "Yayınevi oluşturulamadı.");
       } catch (e) {
         if (e instanceof Error) {
-          throw e; // Re-throw error from parsing or the custom error
+          throw e;
         }
-        // Fallback if parsing response fails
         throw new Error("Bilinmeyen bir sunucu hatası oluştu.");
       }
     },
@@ -125,9 +123,32 @@ function PublishersPage() {
     },
   });
 
+  const { mutate: deletePublisher, isPending: isDeleting } = useMutation({
+    mutationFn: async (id: string) => {
+      // The eden client will automatically throw an error for non-2xx responses.
+      // We can rely on react-query's onError to catch it.
+      await api.publishers({ id }).delete();
+    },
+    onSuccess: () => {
+      toast.success("Yayınevi başarıyla silindi.");
+      queryClient.invalidateQueries({ queryKey: ["publishers"] });
+      handleCloseModal();
+    },
+    onError: (error: Error) => {
+      // Any error thrown from mutationFn will be caught here.
+      toast.error(error.message || "Yayınevi silinemedi. Lütfen tekrar deneyin.");
+    },
+  });
+
   const handleSave = async (values: { name: string }) => {
     if (modalState === ModalType.Add) {
       await createPublisher(values);
+    }
+  };
+
+  const handleDelete = () => {
+    if (selectedPublisher) {
+      deletePublisher(selectedPublisher.id);
     }
   };
 
@@ -197,6 +218,8 @@ function PublishersPage() {
         isOpen={modalState === ModalType.Delete}
         onClose={handleCloseModal}
         publisher={selectedPublisher}
+        onDelete={handleDelete}
+        isDeleting={isDeleting}
       />
     </>
   );
