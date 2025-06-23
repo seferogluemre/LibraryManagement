@@ -95,7 +95,6 @@ class Cache {
         .map((user) => {
           const dbUser = usersMap[user.userId];
           if (!dbUser) {
-            // Eğer kullanıcı veritabanında bulunamazsa, bu kaydı atla
             return null;
           }
           return {
@@ -104,7 +103,7 @@ class Cache {
             role: dbUser.role,
           };
         })
-        .filter(Boolean); // null olan kayıtları filtrele
+        .filter(Boolean); 
 
       return {
         count: combinedUsers.length,

@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated/transfers'
 import { Route as AuthenticatedTransferHistoryRouteImport } from './routes/_authenticated/transfer-history'
 import { Route as AuthenticatedStudentsRouteImport } from './routes/_authenticated/students'
+import { Route as AuthenticatedPublishersRouteImport } from './routes/_authenticated/publishers'
 import { Route as AuthenticatedOnlineUsersRouteImport } from './routes/_authenticated/online-users'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedClassesRouteImport } from './routes/_authenticated/classes'
@@ -50,6 +51,11 @@ const AuthenticatedTransferHistoryRoute =
 const AuthenticatedStudentsRoute = AuthenticatedStudentsRouteImport.update({
   id: '/students',
   path: '/students',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPublishersRoute = AuthenticatedPublishersRouteImport.update({
+  id: '/publishers',
+  path: '/publishers',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedOnlineUsersRoute =
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/classes': typeof AuthenticatedClassesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
+  '/publishers': typeof AuthenticatedPublishersRoute
   '/students': typeof AuthenticatedStudentsRoute
   '/transfer-history': typeof AuthenticatedTransferHistoryRoute
   '/transfers': typeof AuthenticatedTransfersRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/classes': typeof AuthenticatedClassesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
+  '/publishers': typeof AuthenticatedPublishersRoute
   '/students': typeof AuthenticatedStudentsRoute
   '/transfer-history': typeof AuthenticatedTransferHistoryRoute
   '/transfers': typeof AuthenticatedTransfersRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_authenticated/classes': typeof AuthenticatedClassesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/online-users': typeof AuthenticatedOnlineUsersRoute
+  '/_authenticated/publishers': typeof AuthenticatedPublishersRoute
   '/_authenticated/students': typeof AuthenticatedStudentsRoute
   '/_authenticated/transfer-history': typeof AuthenticatedTransferHistoryRoute
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/classes'
     | '/dashboard'
     | '/online-users'
+    | '/publishers'
     | '/students'
     | '/transfer-history'
     | '/transfers'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/classes'
     | '/dashboard'
     | '/online-users'
+    | '/publishers'
     | '/students'
     | '/transfer-history'
     | '/transfers'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/classes'
     | '/_authenticated/dashboard'
     | '/_authenticated/online-users'
+    | '/_authenticated/publishers'
     | '/_authenticated/students'
     | '/_authenticated/transfer-history'
     | '/_authenticated/transfers'
@@ -218,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/publishers': {
+      id: '/_authenticated/publishers'
+      path: '/publishers'
+      fullPath: '/publishers'
+      preLoaderRoute: typeof AuthenticatedPublishersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/online-users': {
       id: '/_authenticated/online-users'
       path: '/online-users'
@@ -270,6 +289,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedClassesRoute: typeof AuthenticatedClassesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnlineUsersRoute: typeof AuthenticatedOnlineUsersRoute
+  AuthenticatedPublishersRoute: typeof AuthenticatedPublishersRoute
   AuthenticatedStudentsRoute: typeof AuthenticatedStudentsRoute
   AuthenticatedTransferHistoryRoute: typeof AuthenticatedTransferHistoryRoute
   AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
@@ -282,6 +302,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClassesRoute: AuthenticatedClassesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnlineUsersRoute: AuthenticatedOnlineUsersRoute,
+  AuthenticatedPublishersRoute: AuthenticatedPublishersRoute,
   AuthenticatedStudentsRoute: AuthenticatedStudentsRoute,
   AuthenticatedTransferHistoryRoute: AuthenticatedTransferHistoryRoute,
   AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
