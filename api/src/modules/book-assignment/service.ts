@@ -74,9 +74,34 @@ export abstract class BookAssignmentService {
     try {
       const [hasFilters, filters] = getBookAssignmentsFilters(query);
 
-      const where: Prisma.BookAssignmentWhereInput = hasFilters
+      let where: Prisma.BookAssignmentWhereInput = hasFilters
         ? { AND: filters }
         : {};
+
+      if (query?.search) {
+        const searchQuery = query.search;
+        where = {
+          ...where,
+          OR: [
+            {
+              book: {
+                title: {
+                  contains: searchQuery,
+                  mode: "insensitive",
+                },
+              },
+            },
+            {
+              student: {
+                name: {
+                  contains: searchQuery,
+                  mode: "insensitive",
+                },
+              },
+            },
+          ],
+        };
+      }
 
       return await prisma.bookAssignment.findMany({
         where,

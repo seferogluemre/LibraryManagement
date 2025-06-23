@@ -89,6 +89,7 @@ export const bookAssignmentIndexDto = {
     bookId: t.Optional(BookAssignmentPlain.properties.bookId),
     assignedById: t.Optional(BookAssignmentPlain.properties.assignedById),
     returned: t.Optional(BookAssignmentPlain.properties.returned),
+    search: t.Optional(t.String()),
   }),
   response: { 200: t.Array(bookAssignmentWithRelationsResponseSchema) },
   detail: {

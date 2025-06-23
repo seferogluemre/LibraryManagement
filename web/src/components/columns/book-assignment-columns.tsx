@@ -42,15 +42,20 @@ export const columns: ColumnDef<BookAssignment>[] = [
     header: "Durum",
     cell: ({ row }) => {
       const status = row.getValue("status") as string
-      const variant =
-        status === "Gecikmiş"
-          ? "destructive"
-          : status === "İade Edildi"
-            ? "default"
-            : "secondary"
+      let variant: "default" | "destructive" | "secondary" | "outline" | null | undefined = "secondary";
+      
+      if (status === "Gecikmiş") {
+        variant = "destructive"
+      } else if (status === "İade Edildi") {
+        variant = "default"
+      }
 
       if (status === "İade Edildi") {
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge className="bg-green-600 text-white">{status}</Badge>
+      }
+
+      if (status === "Ödünç Verildi") {
+        return <Badge className="bg-orange-500 text-white">{status}</Badge>
       }
 
       return <Badge variant={variant}>{status}</Badge>
