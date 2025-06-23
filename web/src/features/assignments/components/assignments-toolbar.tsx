@@ -10,11 +10,15 @@ import React from "react"
 interface AssignmentsToolbarProps {
   search: string
   setSearch: React.Dispatch<React.SetStateAction<string>>
+  showOverdueOnly: boolean
+  setShowOverdueOnly: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function AssignmentsToolbar({
   search,
   setSearch,
+  showOverdueOnly,
+  setShowOverdueOnly,
 }: AssignmentsToolbarProps) {
   return (
     <div className="flex items-center justify-between">
@@ -29,7 +33,11 @@ export function AssignmentsToolbar({
           />
         </div>
         <div className="flex items-center space-x-2">
-          <Checkbox id="show-overdue" />
+          <Checkbox
+            id="show-overdue"
+            checked={showOverdueOnly}
+            onCheckedChange={(checked) => setShowOverdueOnly(Boolean(checked))}
+          />
           <Label htmlFor="show-overdue" className="whitespace-nowrap">
             Sadece Gecikenleri Göster
           </Label>

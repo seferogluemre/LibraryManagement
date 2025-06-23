@@ -36,16 +36,32 @@ export const Route = createFileRoute("/_authenticated/assignments")({
 
 function AssignmentsPage() {
   const [search, setSearch] = useState("");
+  const [showOverdueOnly, setShowOverdueOnly] = useState(false);
   const [debouncedSearch] = useDebounce(search, 500);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["assignments", debouncedSearch],
+    queryKey: ["assignments", debouncedSearch, showOverdueOnly],
     queryFn: async () => {
       const res = await api["book-assignments"].get({
-        query: { search: debouncedSearch },
+        query: {
+          search: debouncedSearch,
+          overdueOnly: showOverdueOnly,
+        },
       });
       if (res.error) {
         throw new Error("Veri çekilemedi");
+      }
+      return res.data;
+    },
+  });
+
+  const { data: statsData } = useQuery({
+    queryKey: ["assignments-stats"],
+    queryFn: async () => {
+      const res = await api["book-assignments"].get();
+      if (res.error) {
+        console.error("İstatistik verisi çekilemedi:", res.error);
+        return [];
       }
       return res.data;
     },
@@ -77,6 +93,30 @@ function AssignmentsPage() {
     });
   }, [data]);
 
+  const stats = useMemo(() => {
+    if (!statsData) {
+      return { active: 0, overdue: 0, returnedThisMonth: 0 };
+    }
+
+    const active = statsData.filter((item: AssignmentApiResponse) => !item.returned).length;
+
+    const overdue = statsData.filter(
+      (item: AssignmentApiResponse) => !item.returned && new Date(item.returnDue) < new Date()
+    ).length;
+
+    const returnedThisMonth = statsData.filter((item: AssignmentApiResponse) => {
+      if (!item.returnedAt) return false;
+      const returnDate = new Date(item.returnedAt);
+      const today = new Date();
+      return (
+        returnDate.getMonth() === today.getMonth() &&
+        returnDate.getFullYear() === today.getFullYear()
+      );
+    }).length;
+
+    return { active, overdue, returnedThisMonth };
+  }, [statsData]);
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
@@ -90,13 +130,22 @@ function AssignmentsPage() {
         </div>
       </div>
       <div className="space-y-6">
-        <AssignmentsToolbar search={search} setSearch={setSearch} />
+        <AssignmentsToolbar
+          search={search}
+          setSearch={setSearch}
+          showOverdueOnly={showOverdueOnly}
+          setShowOverdueOnly={setShowOverdueOnly}
+        />
         <BookAssignmentDataTable
           columns={columns}
           data={formattedData}
           isLoading={isLoading}
         />
-        <AssignmentStats data={formattedData} />
+        <AssignmentStats
+          active={stats.active}
+          overdue={stats.overdue}
+          returnedThisMonth={stats.returnedThisMonth}
+        />
       </div>
     </div>
   );

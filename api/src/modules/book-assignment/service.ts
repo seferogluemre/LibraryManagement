@@ -103,6 +103,13 @@ export abstract class BookAssignmentService {
         };
       }
 
+      if (query?.overdueOnly) {
+        where.returned = false;
+        where.returnDue = {
+          lt: new Date(),
+        };
+      }
+
       return await prisma.bookAssignment.findMany({
         where,
         include: {
