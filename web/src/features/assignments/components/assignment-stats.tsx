@@ -1,13 +1,25 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { type BookAssignment } from "@/features/assignments/types"
 
-export function AssignmentStats() {
-  // Mock data for stats
+interface AssignmentStatsProps {
+  data: BookAssignment[]
+}
+
+export function AssignmentStats({ data }: AssignmentStatsProps) {
   const stats = {
-    active: 2,
-    overdue: 1,
-    returnedThisMonth: 1,
+    active: data.filter((item) => item.status === "Ödünç Verildi").length,
+    overdue: data.filter((item) => item.status === "Gecikmiş").length,
+    returnedThisMonth: data.filter((item) => {
+      if (item.status !== "İade Edildi" || !item.returnDate) return false
+      const returnDate = new Date(item.returnDate)
+      const today = new Date()
+      return (
+        returnDate.getMonth() === today.getMonth() &&
+        returnDate.getFullYear() === today.getFullYear()
+      )
+    }).length,
   }
 
   return (
