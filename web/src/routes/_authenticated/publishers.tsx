@@ -1,9 +1,12 @@
-import { columns } from "@/components/columns/publishers-columns";
+import { getColumns } from "@/components/columns/publishers-columns";
 import { PublishersDataTable } from "@/components/data-table/publishers-data-table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AddEditPublisherModal } from "@/features/publishers/components/add-edit-publisher-modal";
+import { DeletePublisherDialog } from "@/features/publishers/components/delete-publisher-dialog";
 import { PublisherStats } from "@/features/publishers/components/publisher-stats";
+import { type Publisher } from "@/features/publishers/types";
 import { api } from "@/lib/api";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { type ColumnFiltersState, type PaginationState, type SortingState } from "@tanstack/react-table";
 import React from "react";
@@ -12,8 +15,19 @@ export const Route = createFileRoute("/_authenticated/publishers")({
   component: PublishersPage,
 });
 
+// Define an enum for modal types
+enum ModalType {
+  None,
+  Add,
+  Edit,
+  Delete,
+}
+
 function PublishersPage() {
-  const queryClient = useQueryClient();
+  const [modalState, setModalState] = React.useState(ModalType.None);
+  const [selectedPublisher, setSelectedPublisher] =
+    React.useState<Publisher | null>(null);
+
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "name", desc: false },
   ]);
@@ -28,6 +42,25 @@ function PublishersPage() {
   const nameFilter = columnFilters.find((f) => f.id === "name")?.value as
     | string
     | undefined;
+
+  const handleOpenAdd = () => setModalState(ModalType.Add);
+  const handleOpenEdit = (publisher: Publisher) => {
+    setSelectedPublisher(publisher);
+    setModalState(ModalType.Edit);
+  };
+  const handleOpenDelete = (publisher: Publisher) => {
+    setSelectedPublisher(publisher);
+    setModalState(ModalType.Delete);
+  };
+  const handleCloseModal = () => {
+    setModalState(ModalType.None);
+    setSelectedPublisher(null);
+  };
+
+  const columns = React.useMemo(
+    () => getColumns({ onEdit: handleOpenEdit, onDelete: handleOpenDelete }),
+    []
+  );
 
   React.useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
@@ -82,28 +115,42 @@ function PublishersPage() {
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Yayınevleri</h1>
-          <p className="text-muted-foreground">
-            Kütüphanedeki kitapların yayınevlerini yönetin
-          </p>
+    <>
+      <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Yayınevleri</h1>
+            <p className="text-muted-foreground">
+              Kütüphanedeki kitapların yayınevlerini yönetin
+            </p>
+          </div>
         </div>
+        <PublishersDataTable
+          columns={columns}
+          data={tableData}
+          pageCount={pageCount}
+          pagination={pagination}
+          setPagination={setPagination}
+          sorting={sorting}
+          setSorting={setSorting}
+          columnFilters={columnFilters}
+          setColumnFilters={setColumnFilters}
+          onSearch={handleSearch}
+          onAdd={handleOpenAdd}
+        />
+        <PublisherStats totalPublishers={totalCount} />
       </div>
-      <PublishersDataTable
-        columns={columns}
-        data={tableData}
-        pageCount={pageCount}
-        pagination={pagination}
-        setPagination={setPagination}
-        sorting={sorting}
-        setSorting={setSorting}
-        columnFilters={columnFilters}
-        setColumnFilters={setColumnFilters}
-        onSearch={handleSearch}
+
+      <AddEditPublisherModal
+        isOpen={modalState === ModalType.Add || modalState === ModalType.Edit}
+        onClose={handleCloseModal}
+        publisher={modalState === ModalType.Edit ? selectedPublisher : null}
       />
-      <PublisherStats totalPublishers={totalCount} />
-    </div>
+      <DeletePublisherDialog
+        isOpen={modalState === ModalType.Delete}
+        onClose={handleCloseModal}
+        publisher={selectedPublisher}
+      />
+    </>
   );
 }

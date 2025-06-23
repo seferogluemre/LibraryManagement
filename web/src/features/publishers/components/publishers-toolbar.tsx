@@ -8,11 +8,13 @@ import React from "react";
 interface PublishersToolbarProps<TData> {
   table: Table<TData>;
   onSearch: (value: string) => void;
+  onAdd: () => void;
 }
 
 export function PublishersToolbar<TData>({
   table,
   onSearch,
+  onAdd,
 }: PublishersToolbarProps<TData>) {
   const [searchValue, setSearchValue] = React.useState("");
   return (
@@ -28,7 +30,7 @@ export function PublishersToolbar<TData>({
           Ara
         </Button>
       </div>
-      <Button size="sm">
+      <Button size="sm" onClick={onAdd}>
         Yeni Yayınevi Ekle
       </Button>
     </div>

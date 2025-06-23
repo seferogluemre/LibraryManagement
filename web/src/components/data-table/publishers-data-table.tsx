@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   columnFilters: ColumnFiltersState;
   setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
   onSearch: (value: string) => void;
+  onAdd: () => void;
 }
 
 export function PublishersDataTable<TData, TValue>({
@@ -51,6 +52,7 @@ export function PublishersDataTable<TData, TValue>({
   columnFilters,
   setColumnFilters,
   onSearch,
+  onAdd,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -85,7 +87,7 @@ export function PublishersDataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <PublishersToolbar table={table} onSearch={onSearch} />
+      <PublishersToolbar table={table} onSearch={onSearch} onAdd={onAdd} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

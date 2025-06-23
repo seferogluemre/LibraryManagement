@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { type Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -14,10 +14,14 @@ import { type Publisher } from "../types";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
+  onEdit: (publisher: Publisher) => void;
+  onDelete: (publisher: Publisher) => void;
 }
 
 export function DataTableRowActions<TData>({
   row,
+  onEdit,
+  onDelete,
 }: DataTableRowActionsProps<TData>) {
   const publisher = row.original as Publisher;
 
@@ -33,9 +37,13 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Düzenle</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onEdit(publisher)}>
+          Düzenle
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Sil</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDelete(publisher)}>
+          Sil
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

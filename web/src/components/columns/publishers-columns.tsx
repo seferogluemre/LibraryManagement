@@ -7,7 +7,15 @@ import { type Publisher } from "@/features/publishers/types";
 import { type ColumnDef } from "@tanstack/react-table";
 import { Building2 } from "lucide-react";
 
-export const columns: ColumnDef<Publisher>[] = [
+type GetColumnsOptions = {
+  onEdit: (publisher: Publisher) => void;
+  onDelete: (publisher: Publisher) => void;
+};
+
+export const getColumns = ({
+  onEdit,
+  onDelete,
+}: GetColumnsOptions): ColumnDef<Publisher>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -29,12 +37,18 @@ export const columns: ColumnDef<Publisher>[] = [
       const bookCount = row.original.books.length;
       return <Badge variant="outline">{bookCount} kitap</Badge>;
     },
-    sortingFn: (rowA, rowB, columnId) => {
+    sortingFn: (rowA, rowB) => {
       return rowA.original.books.length - rowB.original.books.length;
-    }
+    },
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => (
+      <DataTableRowActions
+        row={row}
+        onEdit={() => onEdit(row.original)}
+        onDelete={() => onDelete(row.original)}
+      />
+    ),
   },
 ]; 
