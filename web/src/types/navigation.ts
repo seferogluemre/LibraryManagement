@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 export interface NavigationItem {
+  label: Key | null | undefined;
   id: string;
   title: string;
   icon: LucideIcon;

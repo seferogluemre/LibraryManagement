@@ -22,6 +22,7 @@ import { Route as AuthenticatedClassesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedBooksRouteImport } from './routes/_authenticated/books'
 import { Route as AuthenticatedAuthorsRouteImport } from './routes/_authenticated/authors'
+import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -89,10 +90,17 @@ const AuthenticatedAuthorsRoute = AuthenticatedAuthorsRouteImport.update({
   path: '/authors',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAssignmentsRoute =
+  AuthenticatedAssignmentsRouteImport.update({
+    id: '/assignments',
+    path: '/assignments',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/assignments': typeof AuthenticatedAssignmentsRoute
   '/authors': typeof AuthenticatedAuthorsRoute
   '/books': typeof AuthenticatedBooksRoute
   '/categories': typeof AuthenticatedCategoriesRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/assignments': typeof AuthenticatedAssignmentsRoute
   '/authors': typeof AuthenticatedAuthorsRoute
   '/books': typeof AuthenticatedBooksRoute
   '/categories': typeof AuthenticatedCategoriesRoute
@@ -123,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/authors': typeof AuthenticatedAuthorsRoute
   '/_authenticated/books': typeof AuthenticatedBooksRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/assignments'
     | '/authors'
     | '/books'
     | '/categories'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/assignments'
     | '/authors'
     | '/books'
     | '/categories'
@@ -168,6 +180,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/assignments'
     | '/_authenticated/authors'
     | '/_authenticated/books'
     | '/_authenticated/categories'
@@ -279,10 +292,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAuthorsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/assignments': {
+      id: '/_authenticated/assignments'
+      path: '/assignments'
+      fullPath: '/assignments'
+      preLoaderRoute: typeof AuthenticatedAssignmentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedAuthorsRoute: typeof AuthenticatedAuthorsRoute
   AuthenticatedBooksRoute: typeof AuthenticatedBooksRoute
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
@@ -296,6 +317,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedAuthorsRoute: AuthenticatedAuthorsRoute,
   AuthenticatedBooksRoute: AuthenticatedBooksRoute,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
