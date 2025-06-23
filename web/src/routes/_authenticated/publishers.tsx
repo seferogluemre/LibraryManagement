@@ -3,7 +3,7 @@ import { PublishersDataTable } from "@/components/data-table/publishers-data-tab
 import { Skeleton } from "@/components/ui/skeleton";
 import { PublisherStats } from "@/features/publishers/components/publisher-stats";
 import { api } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { type ColumnFiltersState, type PaginationState, type SortingState } from "@tanstack/react-table";
 import React from "react";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/_authenticated/publishers")({
 });
 
 function PublishersPage() {
+  const queryClient = useQueryClient();
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "name", desc: false },
   ]);
@@ -23,18 +24,14 @@ function PublishersPage() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [nameFilter, setNameFilter] = React.useState("");
 
-  const debouncedNameFilter = useDebounce(nameFilter, 300);
-
-  React.useEffect(() => {
-    setColumnFilters([{ id: "name", value: debouncedNameFilter }]);
-  }, [debouncedNameFilter]);
+  const nameFilter = columnFilters.find((f) => f.id === "name")?.value as
+    | string
+    | undefined;
 
   React.useEffect(() => {
-    // Reset to first page when filter changes
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-  }, [debouncedNameFilter]);
+  }, [nameFilter]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -42,7 +39,7 @@ function PublishersPage() {
       pagination.pageIndex,
       pagination.pageSize,
       sorting,
-      debouncedNameFilter,
+      nameFilter,
     ],
     queryFn: () =>
       api.publishers.get({
@@ -51,7 +48,7 @@ function PublishersPage() {
           limit: pagination.pageSize.toString(),
           sort: sorting[0]?.id,
           order: sorting[0]?.desc ? "desc" : "asc",
-          search: debouncedNameFilter,
+          search: nameFilter,
         },
       }),
   });
@@ -80,6 +77,10 @@ function PublishersPage() {
     return <div>An error occurred: {error.message}</div>;
   }
 
+  const handleSearch = (searchValue: string) => {
+    setColumnFilters([{ id: "name", value: searchValue }]);
+  };
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -100,24 +101,9 @@ function PublishersPage() {
         setSorting={setSorting}
         columnFilters={columnFilters}
         setColumnFilters={setColumnFilters}
-        nameFilter={nameFilter}
-        setNameFilter={setNameFilter}
+        onSearch={handleSearch}
       />
       <PublisherStats totalPublishers={totalCount} />
     </div>
   );
-}
-
-function useDebounce<T>(value: T, delay?: number): T {
-  const [debouncedValue, setDebouncedValue] = React.useState<T>(value);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay || 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
 }
