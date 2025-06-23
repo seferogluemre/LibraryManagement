@@ -6,17 +6,44 @@ import { type BookAssignment } from "@/features/assignments/types";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useDebounce } from "use-debounce";
+
+type Student = {
+  id: string;
+  name: string;
+  classroom?: { name: string };
+};
+
+type Book = {
+  id: string;
+  title: string;
+};
+
+type AssignmentApiResponse = {
+  id: string;
+  returned: boolean;
+  returnDue: string;
+  returnedAt: string | null;
+  createdAt: string;
+  student: Student;
+  book: Book;
+};
 
 export const Route = createFileRoute("/_authenticated/assignments")({
   component: AssignmentsPage,
 });
 
 function AssignmentsPage() {
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 500);
+
   const { data, isLoading } = useQuery({
-    queryKey: ["assignments"],
+    queryKey: ["assignments", debouncedSearch],
     queryFn: async () => {
-      const res = await api["book-assignments"].get();
+      const res = await api["book-assignments"].get({
+        query: { search: debouncedSearch },
+      });
       if (res.error) {
         throw new Error("Veri çekilemedi");
       }
@@ -26,7 +53,7 @@ function AssignmentsPage() {
 
   const formattedData: BookAssignment[] = useMemo(() => {
     if (!data) return [];
-    return data.map((item: any) => {
+    return data.map((item: AssignmentApiResponse) => {
       const isOverdue = !item.returned && new Date(item.returnDue) < new Date();
       let status: "Ödünç Verildi" | "Gecikmiş" | "İade Edildi" = "Ödünç Verildi";
       if (item.returned) {
@@ -63,7 +90,7 @@ function AssignmentsPage() {
         </div>
       </div>
       <div className="space-y-6">
-        <AssignmentsToolbar />
+        <AssignmentsToolbar search={search} setSearch={setSearch} />
         <BookAssignmentDataTable
           columns={columns}
           data={formattedData}
