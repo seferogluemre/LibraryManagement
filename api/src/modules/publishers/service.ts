@@ -42,6 +42,9 @@ export abstract class PublisherService {
       const [total, publishers] = await prisma.$transaction([
         prisma.publisher.count(),
         prisma.publisher.findMany({
+          include: {
+            books: true,
+          },
           skip,
           take: limit,
           orderBy: { name: "asc" },

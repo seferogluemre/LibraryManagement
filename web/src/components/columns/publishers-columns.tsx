@@ -21,23 +21,17 @@ export const columns: ColumnDef<Publisher>[] = [
     ),
   },
   {
-    accessorKey: "_count.books",
+    accessorKey: "books",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Kitap Sayısı" />
     ),
     cell: ({ row }) => {
-      const bookCount = row.original._count.books;
+      const bookCount = row.original.books.length;
       return <Badge variant="outline">{bookCount} kitap</Badge>;
     },
-  },
-  {
-    accessorKey: "establishmentYear",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Kuruluş Yılı" />
-    ),
-    cell: ({ row }) => {
-      return <div>{row.getValue("establishmentYear")}</div>;
-    },
+    sortingFn: (rowA, rowB, columnId) => {
+      return rowA.original.books.length - rowB.original.books.length;
+    }
   },
   {
     id: "actions",

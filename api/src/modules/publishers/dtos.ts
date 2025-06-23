@@ -27,6 +27,7 @@ export function getPublisherFilters(query?: { id?: string; name?: string }) {
 export const publisherResponseSchema = t.Object({
   id: PublisherPlain.properties.id,
   name: PublisherPlain.properties.name,
+  books: t.Array(BookPlain),
 });
 
 export const paginatedPublisherResponseSchema = t.Object({

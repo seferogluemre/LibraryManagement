@@ -1,18 +1,18 @@
 "use client";
 
 import {
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type PaginationState,
+  type SortingState,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
 
@@ -24,42 +24,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PublishersToolbar } from "@/features/publishers/components/publishers-toolbar";
 import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  pageCount: number;
+  pagination: PaginationState;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
+  sorting: SortingState;
+  setSorting: React.Dispatch<React.SetStateAction<SortingState>>;
+  columnFilters: ColumnFiltersState;
+  setColumnFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>;
+  nameFilter: string;
+  setNameFilter: (value: string) => void;
 }
 
 export function PublishersDataTable<TData, TValue>({
   columns,
   data,
+  pageCount,
+  pagination,
+  setPagination,
+  sorting,
+  setSorting,
+  columnFilters,
+  setColumnFilters,
+  nameFilter,
+  setNameFilter,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
     data,
     columns,
+    pageCount: pageCount ?? -1,
     state: {
+      pagination,
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
     },
     enableRowSelection: true,
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -67,6 +87,11 @@ export function PublishersDataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
+      <PublishersToolbar
+        table={table}
+        filterValue={nameFilter}
+        setFilterValue={setNameFilter}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
