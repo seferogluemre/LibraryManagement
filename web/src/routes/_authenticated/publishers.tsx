@@ -8,7 +8,11 @@ import { type Publisher } from "@/features/publishers/types";
 import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { type ColumnFiltersState, type PaginationState, type SortingState } from "@tanstack/react-table";
+import {
+  type ColumnFiltersState,
+  type PaginationState,
+  type SortingState,
+} from "@tanstack/react-table";
 import React from "react";
 import { toast } from "sonner";
 
@@ -123,6 +127,24 @@ function PublishersPage() {
     },
   });
 
+  const { mutate: updatePublisher, isPending: isUpdating } = useMutation({
+    mutationFn: async (variables: { id: string; name: string }) => {
+      const { id, name } = variables;
+      // The eden client will throw an error on non-2xx responses.
+      // We let react-query's onError handle it.
+      await api.publishers({ id }).put({ name });
+    },
+    onSuccess: () => {
+      toast.success("Yayınevi başarıyla güncellendi.");
+      queryClient.invalidateQueries({ queryKey: ["publishers"] });
+      handleCloseModal();
+    },
+    onError: (error: Error) => {
+      // e.g., for 409 conflict
+      toast.error(error.message || "Yayınevi güncellenemedi.");
+    },
+  });
+
   const { mutate: deletePublisher, isPending: isDeleting } = useMutation({
     mutationFn: async (id: string) => {
       // The eden client will automatically throw an error for non-2xx responses.
@@ -136,13 +158,17 @@ function PublishersPage() {
     },
     onError: (error: Error) => {
       // Any error thrown from mutationFn will be caught here.
-      toast.error(error.message || "Yayınevi silinemedi. Lütfen tekrar deneyin.");
+      toast.error(
+        error.message || "Yayınevi silinemedi. Lütfen tekrar deneyin."
+      );
     },
   });
 
   const handleSave = async (values: { name: string }) => {
     if (modalState === ModalType.Add) {
       await createPublisher(values);
+    } else if (modalState === ModalType.Edit && selectedPublisher) {
+      await updatePublisher({ id: selectedPublisher.id, ...values });
     }
   };
 
@@ -212,7 +238,7 @@ function PublishersPage() {
         onClose={handleCloseModal}
         publisher={modalState === ModalType.Edit ? selectedPublisher : null}
         onSave={handleSave}
-        isSaving={isCreating}
+        isSaving={isCreating || isUpdating}
       />
       <DeletePublisherDialog
         isOpen={modalState === ModalType.Delete}

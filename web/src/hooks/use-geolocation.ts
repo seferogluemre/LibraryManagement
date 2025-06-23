@@ -8,7 +8,6 @@ export function useGeolocation() {
   const { setLoading, setLocation, setError } = useLocationActions();
 
   useEffect(() => {
-    // Eğer konum bilgisi zaten store'da varsa veya API anahtarı yoksa, işlemi başlatma
     if (city || !API_KEY) {
       if (!API_KEY) {
         // Bu hatayı sadece geliştirme ortamında göster
@@ -66,6 +65,5 @@ export function useGeolocation() {
     };
 
     getLocation();
-    // district store'dan kaldırıldı, bu yüzden bağımlılıklardan da çıkarıldı.
   }, [city, setLoading, setLocation, setError]);
 }
