@@ -57,6 +57,7 @@ export abstract class BookAssignmentFormatter {
       returnDue: assignment.returnDue,
       returned: assignment.returned,
       returnedAt: assignment.returnedAt,
+      assignedAt: assignment.assignedAt,
       student: {
         id: assignment.student.id,
         name: assignment.student.name,
@@ -69,6 +70,12 @@ export abstract class BookAssignmentFormatter {
         id: assignment.assignedBy.id,
         name: assignment.assignedBy.name,
       },
+      class: assignment.student.class
+        ? {
+            id: assignment.student.class.id,
+            name: assignment.student.class.name,
+          }
+        : null,
       publisher: assignment.book.publisher
         ? {
             id: assignment.book.publisher.id,

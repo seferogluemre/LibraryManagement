@@ -16,7 +16,22 @@ export function PublishersToolbar<TData>({
   onSearch,
   onAdd,
 }: PublishersToolbarProps<TData>) {
-  const [searchValue, setSearchValue] = React.useState("");
+  const [searchValue, setSearchValue] = React.useState(
+    (table.getColumn("name")?.getFilterValue() as string) ?? ""
+  );
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      onSearch(searchValue);
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [searchValue, onSearch]);
+
+  React.useEffect(() => {
+    setSearchValue((table.getColumn("name")?.getFilterValue() as string) ?? "");
+  }, [table.getColumn("name")?.getFilterValue()]);
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -26,9 +41,6 @@ export function PublishersToolbar<TData>({
           onChange={(event) => setSearchValue(event.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        <Button size="sm" onClick={() => onSearch(searchValue)}>
-          Ara
-        </Button>
       </div>
       <Button size="sm" onClick={onAdd}>
         Yeni Yayınevi Ekle

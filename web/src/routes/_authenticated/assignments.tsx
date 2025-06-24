@@ -12,7 +12,6 @@ import { useDebounce } from "use-debounce";
 type Student = {
   id: string;
   name: string;
-  classroom?: { name: string };
 };
 
 type Book = {
@@ -25,9 +24,10 @@ type AssignmentApiResponse = {
   returned: boolean;
   returnDue: string;
   returnedAt: string | null;
-  createdAt: string;
+  assignedAt: string;
   student: Student;
   book: Book;
+  class: { name: string } | null;
 };
 
 export const Route = createFileRoute("/_authenticated/assignments")({
@@ -82,8 +82,8 @@ function AssignmentsPage() {
         id: item.id,
         bookName: item.book.title,
         studentName: item.student.name,
-        className: item.student.classroom?.name || "N/A",
-        assignedDate: new Date(item.createdAt).toLocaleDateString(),
+        className: item.class?.name || "N/A",
+        assignedDate: new Date(item.assignedAt).toLocaleDateString(),
         dueDate: new Date(item.returnDue).toLocaleDateString(),
         returnDate: item.returnedAt
           ? new Date(item.returnedAt).toLocaleDateString()

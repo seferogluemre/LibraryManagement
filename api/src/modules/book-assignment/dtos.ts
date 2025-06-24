@@ -61,6 +61,7 @@ export const bookAssignmentWithRelationsResponseSchema = t.Object({
   returnDue: BookAssignmentPlain.properties.returnDue,
   returned: BookAssignmentPlain.properties.returned,
   returnedAt: BookAssignmentPlain.properties.returnedAt,
+  assignedAt: BookAssignmentPlain.properties.assignedAt,
   student: t.Object({
     id: t.String(),
     name: t.String(),
@@ -74,6 +75,13 @@ export const bookAssignmentWithRelationsResponseSchema = t.Object({
     name: t.String(),
   }),
   publisher: t.Union([
+    t.Object({
+      id: t.String(),
+      name: t.String(),
+    }),
+    t.Null(),
+  ]),
+  class: t.Union([
     t.Object({
       id: t.String(),
       name: t.String(),
