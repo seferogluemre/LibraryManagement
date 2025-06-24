@@ -90,7 +90,7 @@ export const studentShowDto = {
 
 export const studentUpdateDto = {
   params: t.Object({
-    id: t.String(),
+    id: StudentPlain.properties.id,
   }),
   body: t.Object({
     name: t.Optional(t.Union([t.String(), t.Null()])),

@@ -26,6 +26,14 @@ export const app = new Elysia({
     },
     studentCreateDto
   )
+  .patch(
+    "/:id",
+    async ({ body, params }) => {
+      const updatedStudent = await StudentService.update(params.id, body);
+      return StudentFormatter.response(updatedStudent);
+    },
+    studentUpdateDto
+  )
   .get(
     "",
     async ({ query }) => {
@@ -41,14 +49,6 @@ export const app = new Elysia({
       return StudentFormatter.response(targetStudent);
     },
     studentShowDto
-  )
-  .patch(
-    "/:id",
-    async ({  body , params}) => {
-      const updatedStudent = await StudentService.update(params.id, body);
-      return StudentFormatter.response(updatedStudent);
-    },
-    studentUpdateDto
   )
   .delete(
     "/:id",

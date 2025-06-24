@@ -62,14 +62,9 @@ export function EditStudentForm({
 
   const { mutate: updateStudent, isPending } = useMutation({
     mutationFn: async (values: EditStudentFormData) => {
-      const res = await api.students[":id"].patch({
-        params: {
-          id: student.id,
-        },
-        body: {
-          ...values,
-          studentNo: values.studentNo ? Number(values.studentNo) : undefined,
-        },
+      const res = await api.students[student.id].patch({
+        ...values,
+        studentNo: values.studentNo ? Number(values.studentNo) : undefined,
       });
       if (res.error) throw new Error(res.error.value.message);
       return res.data;
