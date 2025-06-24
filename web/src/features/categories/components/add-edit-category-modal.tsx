@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,10 +57,7 @@ export function AddEditCategoryModal({
   const mutation = useMutation({
     mutationFn: (data: FormData) => {
       if (category) {
-        return api.categories[":id"].patch({
-          params: { id: category.id.toString() },
-          body: data,
-        });
+        return api.categories[category.id].patch(data);
       }
       return api.categories.post(data);
     },
