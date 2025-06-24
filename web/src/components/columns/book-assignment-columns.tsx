@@ -3,8 +3,12 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { type BookAssignment } from "@/features/assignments/types"
+import { api } from "@/lib/api"
+import { handleServerError } from "@/utils/handle-server-error"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { type ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
+import { toast } from "sonner"
 
 export const columns: ColumnDef<BookAssignment>[] = [
   {
@@ -64,17 +68,43 @@ export const columns: ColumnDef<BookAssignment>[] = [
   {
     id: "actions",
     header: "İşlemler",
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const assignment = row.original
-      const isReturned = assignment.status === 'İade Edildi'
+      const isReturned = assignment.status === "İade Edildi"
+      const queryClient = useQueryClient()
+
+      const returnBookMutation = useMutation({
+        mutationFn: async (assignmentId: string) => {
+          const res = await api["book-assignments"][assignmentId].return.patch(
+            {}
+          )
+          if (res.error) {
+            throw res.error
+          }
+          return res.data
+        },
+        onSuccess: () => {
+          toast.success("Kitap başarıyla iade alındı.")
+          queryClient.invalidateQueries({ queryKey: ["assignments"] })
+          queryClient.invalidateQueries({ queryKey: ["assignments-stats"] })
+        },
+        onError: (error) => {
+          handleServerError(error)
+        },
+      })
 
       if (isReturned) {
-        return null;
+        return null
       }
 
       return (
-        <Button variant="outline" size="sm">
-          İade Al
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => returnBookMutation.mutate(assignment.id)}
+          disabled={returnBookMutation.isPending}
+        >
+          {returnBookMutation.isPending ? "İade ediliyor..." : "İade Al"}
         </Button>
       )
     },
