@@ -249,7 +249,7 @@ export function AddBookAssignmentForm({ onSuccess }: AddBookAssignmentFormProps)
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>İade Tarihi</FormLabel>
-              <Popover>
+              <Popover modal={false}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
