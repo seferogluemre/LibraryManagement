@@ -1,11 +1,11 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Search } from "lucide-react"
+import { Search } from "lucide-react"
 import React from "react"
+import { AddBookAssignmentModal } from "./add-book-assignment-modal"
 
 interface AssignmentsToolbarProps {
   search: string
@@ -43,10 +43,7 @@ export function AssignmentsToolbar({
           </Label>
         </div>
       </div>
-      <Button>
-        <Plus className="mr-2 h-4 w-4" />
-        Yeni Kitap Ödünç Ver
-      </Button>
+      <AddBookAssignmentModal />
     </div>
   )
 } 
