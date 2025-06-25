@@ -129,9 +129,9 @@ export function AddStudentForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-posta (İsteğe Bağlı)</FormLabel>
+                  <FormLabel>E-posta</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="ornek@okul.edu.tr" {...field} />
+                    <Input type="email" placeholder="ornek@okul.edu.tr" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

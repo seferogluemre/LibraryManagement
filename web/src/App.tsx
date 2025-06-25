@@ -2,13 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { loginSchema, type LoginFormData } from "@/services/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import 'normalize.css';
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 function App() {
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -22,12 +26,12 @@ function App() {
     },
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      console.log("Login attempt:", data);
-      // TODO: API call will be here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      alert("Giriş başarılı!");
+      await login(data);
+      router.invalidate().finally(() => {
+        alert("Giriş başarılı!");
+      });
     } catch (error) {
       console.error("Login error:", error);
     }
