@@ -4,11 +4,7 @@ import { NotificationQueue } from "../queues/notification.queue";
 import { NotificationService } from "../service";
 import { TeacherNotificationData } from "../types";
 
-// Her dakika çalışacak (test için)
-const cronSchedule = "* * * * *";
-
-// Normale döndürmek için:
-// const cronSchedule = "0 9,16 * * *";
+const cronSchedule = "0 9 * * *";
 
 export function startOverdueBooksCron() {
   schedule(cronSchedule, async () => {

@@ -1,4 +1,5 @@
- //import "#modules/notifications/queues/notification.worker";
+import { startOverdueBooksCron } from "#modules/notifications/cron-jobs/overdue-books.cron";
+import "#modules/notifications/queues/notification.worker";
 import { transferHistoryController } from "#modules/transfer-histories";
 import { handleElysiaError } from "@config/error-handler";
 import { prepareSwaggerConfig } from "@config/swagger-config";
@@ -113,7 +114,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(swagger(swaggerConfig));
 }
 
-// startOverdueBooksCron();
+startOverdueBooksCron();
 
 console.log(
   `🦊 Elysia çalışıyor kardeş ${app.server?.hostname}:${app.server?.port}`
