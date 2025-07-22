@@ -1,3 +1,15 @@
+import { api } from "@/lib/api";
+import { z } from "zod";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+export const loginSchema = z.object({
+  email: z.string().email({ message: "Geçerli bir e-posta adresi giriniz." }),
+  password: z.string().min(1, { message: "Şifre boş bırakılamaz." }),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;
+
 export type User = {
   id: string;
   name: string;
@@ -10,54 +22,89 @@ export type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
   user: User | null;
+  loginTimestamp: number | null;
+  login: (data: LoginFormData) => Promise<void>;
+  setAuthData: (data: { user: User; accessToken: string; refreshToken: string }) => void;
+  logout: () => void;
 };
 
 type UserLoginResponse = AuthState;
 
-const USER_STORAGE_KEY = "user";
-const ACCESS_STORAGE_KEY = "accessToken";
-const REFRESH_STORAGE_KEY = "refreshToken";
-const LOGIN_TIMESTAMP_KEY = "loginTimestamp";
+const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      accessToken: null,
+      refreshToken: null,
+      user: null,
+      loginTimestamp: null,
+      login: async (data) => {
+        const response = await api.auth.login.post({ json: data });
+        if (!response.ok) {
+          throw new Error("Giriş başarısız");
+        }
+        const { user, accessToken, refreshToken } = await response.json();
+        console.log(user, accessToken, refreshToken);
+        set({ user, accessToken, refreshToken, loginTimestamp: Date.now() });
+      },
+      setAuthData: (data) => {
+        set({ user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken, loginTimestamp: Date.now() });
+      },
+      logout: () => {
+        set({ user: null, accessToken: null, refreshToken: null, loginTimestamp: null });
+      },
+    }),
+    {
+      name: "auth-storage",
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        user: state.user,
+        loginTimestamp: state.loginTimestamp,
+      }),
+    }
+  )
+);
+
+export const useAuth = useAuthStore;
 
 export function getAuthState(): AuthState {
-  const user = localStorage.getItem(USER_STORAGE_KEY);
+  const state = useAuthStore.getState();
   return {
-    accessToken: localStorage.getItem(ACCESS_STORAGE_KEY),
-    refreshToken: localStorage.getItem(REFRESH_STORAGE_KEY),
-    user: user ? JSON.parse(user) : null,
+    accessToken: state.accessToken,
+    refreshToken: state.refreshToken,
+    user: state.user,
+    loginTimestamp: state.loginTimestamp,
+    login: () => Promise.resolve(),
+    logout: () => {},
+    setAuthData: () => {},
   };
 }
 
 export function setAuthState(data: UserLoginResponse) {
-  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(data.user));
-  localStorage.setItem(ACCESS_STORAGE_KEY, String(data.accessToken));
-  localStorage.setItem(REFRESH_STORAGE_KEY, String(data.refreshToken));
-  localStorage.setItem(LOGIN_TIMESTAMP_KEY, String(new Date().getTime()));
+  // Bu fonksiyon artık deprecated, setAuthData kullanın
+  useAuthStore.getState().setAuthData({
+    user: data.user!,
+    accessToken: data.accessToken!,
+    refreshToken: data.refreshToken!,
+  });
 }
 
 export function clearLocalStorageAuthState() {
-  localStorage.removeItem(USER_STORAGE_KEY);
-  localStorage.removeItem(ACCESS_STORAGE_KEY);
-  localStorage.removeItem(REFRESH_STORAGE_KEY);
-  localStorage.removeItem(LOGIN_TIMESTAMP_KEY);
+  useAuthStore.getState().logout();
 }
 
 export const getAccessToken = () => {
-  const accessToken = localStorage.getItem(ACCESS_STORAGE_KEY);
-  return accessToken;
+  return useAuthStore.getState().accessToken;
 };
 
 export const getLoginTimestamp = () => {
-  const timestamp = localStorage.getItem(LOGIN_TIMESTAMP_KEY);
-  return timestamp ? Number(timestamp) : null;
+  return useAuthStore.getState().loginTimestamp;
 };
 
 export const getRefreshToken = () => {
-  const refreshToken = localStorage.getItem(REFRESH_STORAGE_KEY);
-  return refreshToken;
+  return useAuthStore.getState().refreshToken;
 };
 
 export const getLocalUser = () => {
-  const user = localStorage.getItem(USER_STORAGE_KEY);
-  return user ? JSON.parse(user) : null;
+  return useAuthStore.getState().user;
 };

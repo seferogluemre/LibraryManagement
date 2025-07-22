@@ -7,13 +7,13 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context, location }) => {
-    if (!context.accessToken) {
+    // @ts-expect-error - context type is not properly inferred
+    if (!context.auth.accessToken) {
       throw redirect({
         to: "/login",
         search: {
           redirect: location.href,
         },
-        replace: true,
       });
     }
   },

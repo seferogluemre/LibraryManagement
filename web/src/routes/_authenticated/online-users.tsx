@@ -1,8 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardContent
+    Card,
+    CardContent
 } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { useLocationStore } from "@/stores/location-store";
@@ -24,11 +24,6 @@ const onlineUserSchema = z.object({
   lastSeen: z.string(),
   name: z.string(),
   role: z.string(),
-});
-
-const onlineUserApiResponseSchema = z.object({
-  count: z.number(),
-  users: z.array(onlineUserSchema),
 });
 
 type OnlineUser = z.infer<typeof onlineUserSchema>;
@@ -118,7 +113,7 @@ function OnlineUsersPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {onlineUsers?.users.map((user) => {
+        {onlineUsers?.users.map((user: any) => {
           const mockStatus = userStatuses[user.name] ?? {
             status: "Çevrimiçi",
             location: "Bilinmeyen Konum",

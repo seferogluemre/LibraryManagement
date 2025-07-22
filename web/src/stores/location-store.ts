@@ -8,9 +8,14 @@ type LocationState = {
   isLoading: boolean;
   actions: {
     setLocation: (city: string, district: string) => void;
-    setError: (error: string) => void;
-    setLoading: (isLoading: boolean) => void;
+    setError: (error: string | null) => void;
+    setLoading: (loading: boolean) => void;
   };
+};
+
+type PersistedState = {
+  city: string | null;
+  district: string | null;
 };
 
 export const useLocationStore = create(
@@ -28,10 +33,12 @@ export const useLocationStore = create(
       },
     }),
     {
-      name: "location-storage", // local storage'daki anahtar
-      storage: createJSONStorage(() => localStorage),
-      // Sadece bu alanları local storage'a kaydet, actions'ı kaydetme
-      partialize: (state) => ({ city: state.city, district: state.district }),
+      name: "location-storage", // local storage'daki key
+      storage: createJSONStorage(() => localStorage), // (opsiyonel) varsayılan olarak localStorage kullanılır
+      partialize: (state): PersistedState => ({
+        city: state.city,
+        district: state.district,
+      }),
     }
   )
 );

@@ -167,6 +167,8 @@ function PublishersPage() {
   const handleSave = async (values: { name: string }) => {
     if (modalState === ModalType.Add) {
       await createPublisher(values);
+      queryClient.invalidateQueries({ queryKey: ["publishers"] });
+      toast.success("Yayınevi başarıyla oluşturuldu.");
     } else if (modalState === ModalType.Edit && selectedPublisher) {
       await updatePublisher({ id: selectedPublisher.id, ...values });
     }

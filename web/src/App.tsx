@@ -1,24 +1,27 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { loginSchema, type LoginFormData } from "@/services/auth";
+import { loginSchema, useAuth, type LoginFormData } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
-import 'normalize.css';
+import "normalize.css";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 function App() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -30,76 +33,82 @@ function App() {
     try {
       await login(data);
       router.invalidate().finally(() => {
-        alert("Giriş başarılı!");
+        router.navigate({ to: "/dashboard" });
       });
     } catch (error) {
+      // Burada handleServerError(error) gibi bir şey olmalı
       console.error("Login error:", error);
+      alert("Giriş başarısız oldu.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <Card className="border-border/50 bg-card/50 backdrop-blur">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-semibold tracking-tight">
-              Giriş
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Kütüphane Takip Sistemine Hoş Geldiniz
+          </h1>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Lütfen devam etmek için giriş yapınız.
+          </p>
+        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-posta Adresi</FormLabel>
+                  <FormControl>
                 <Input
-                  id="email"
                   type="email"
                   placeholder="ornek@okul.edu.tr"
-                  className="bg-background/50"
-                  {...register("email")}
+                      {...field}
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">
-                    {errors.email.message}
-                  </p>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
                 )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Şifre</Label>
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Şifre</FormLabel>
+                  <FormControl>
                 <div className="relative">
                   <Input
-                    id="password"
                     type={showPassword ? "text" : "password"}
-                    className="bg-background/50 pr-10"
-                    {...register("password")}
+                        placeholder="Şifreniz"
+                        {...field}
                   />
-                  <Button
+                      <button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                     onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
+                        {showPassword ? <EyeOff /> : <Eye />}
+                      </button>
                 </div>
-                {errors.password && (
-                  <p className="text-sm text-destructive">
-                    {errors.password.message}
-                  </p>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
                 )}
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Giriş yapılıyor..." : "Giriş Yap"}
+            />
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting
+                ? "Giriş Yapılıyor..."
+                : "Giriş Yap"}
               </Button>
             </form>
-          </CardContent>
-        </Card>
+        </Form>
       </div>
     </div>
   );

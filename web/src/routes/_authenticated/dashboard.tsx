@@ -4,25 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ModeToggle } from "@/context/theme/theme-toggle";
 import type { OverdueBook, ReportsResponse, TopBook, TopStudent } from "@/features/reports/types";
 import { api } from "@/lib/api";
-import { clearLocalStorageAuthState } from "@/services/auth";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useRouteContext, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
-    AlertTriangle,
-    ArrowUpRight,
-    Book,
-    Users
+  AlertTriangle,
+  ArrowUpRight,
+  Book,
+  Users
 } from "lucide-react";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 
 function Dashboard() {
-  const auth = useRouteContext({ from: "/_authenticated/dashboard" });
-  const router = useRouter();
-
   const {
     data: reports,
     isLoading,
@@ -40,6 +35,7 @@ function Dashboard() {
       return response.data;
     },
   });
+  const router = useRouter();
 
   if (isLoading) {
     return <div className="p-4">Raporlar yükleniyor...</div>;
@@ -52,17 +48,6 @@ function Dashboard() {
   if (!reports) {
     return <div className="p-4">Rapor verisi bulunamadı.</div>;
   }
-
-  const handleLogout = () => {
-    if (auth.logout) {
-      auth.logout();
-      clearLocalStorageAuthState();
-      toast.info("Oturumunuz başarıyla kapatıldı.");
-      if(router.history.location.pathname !== "/login") {
-        router.navigate({ to: "/login" });
-      }
-    }
-  };  
 
   const stats = [
     { title: "Toplam Kitap", value: String(reports.systemStats[0].totalBooks ?? 'N/A'), icon: Book },

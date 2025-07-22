@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "@/context/theme/theme-toggle";
 import { api } from "@/lib/api";
-import { setAuthState } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createFileRoute,
@@ -35,7 +34,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export const Route = createFileRoute("/login")({
   beforeLoad: ({ context }) => {
-    if (context.accessToken) {
+    console.log("context",context)
+    if (context.auth.accessToken) {
       throw redirect({
         to: "/dashboard",
         replace: true,
@@ -67,8 +67,7 @@ function LoginPage() {
       });
 
       if (response.data && 'accessToken' in response.data) {
-        auth.login(response.data);
-        setAuthState(response.data);
+        auth.auth.setAuthData(response.data);
         toast.success("Giriş başarılı! Yönlendiriliyorsunuz...");
         router.navigate({ to: "/dashboard", replace: true });
       } else {

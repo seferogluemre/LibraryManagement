@@ -1,48 +1,24 @@
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/context/theme/theme-provider";
+import { useAuth } from "@/services/auth";
 import {
-  clearLocalStorageAuthState,
-  getAuthState,
-  setAuthState,
-  type AuthState
-} from "@/services/auth";
-import {
-  createRootRouteWithContext,
-  Outlet,
-  useRouter,
+    createRootRouteWithContext,
+    Outlet,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import React from "react";
-import type { RouterContext } from "../main"; // main.tsx'den arayüzü import et
 
-export const Route = createRootRouteWithContext<RouterContext>()({
+interface MyRouterContext {
+  auth: ReturnType<typeof useAuth>;
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootComponent,
 });
 
 function RootComponent() {
-  const router = useRouter();
-  const [auth, setAuth] = React.useState<AuthState>(getAuthState());
-
-  React.useEffect(() => {
-    const context: RouterContext = {
-      ...auth,
-      login: (data) => {
-        setAuthState(data);
-        setAuth(data);
-      },
-      logout: () => {
-        clearLocalStorageAuthState();
-        setAuth({ accessToken: null, refreshToken: null, user: null });
-      },
-    };
-    router.update({ context });
-  }, [auth, router]);
-
+  const auth = useAuth();
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <>
       <Outlet />
-      <Toaster />
       <TanStackRouterDevtools />
-    </ThemeProvider>
+    </>
   );
 }
