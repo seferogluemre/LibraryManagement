@@ -16,12 +16,9 @@ export function StudentDetailPage({ studentId }: StudentDetailPageProps) {
   const router = useRouter();
 
   const { data: student, isLoading, error } = useQuery({
-    queryKey: ['student', studentId],
+    queryKey: ['studentId', studentId],
     queryFn: async () => {
       const res = await api.students({ id: studentId }).get();
-      if (res.error) {
-        throw new Error('Öğrenci bilgileri getirilemedi');
-      }
       return res.data;
     },
   });

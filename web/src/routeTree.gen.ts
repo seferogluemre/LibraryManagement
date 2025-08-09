@@ -24,7 +24,7 @@ import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedBooksRouteImport } from './routes/_authenticated/books'
 import { Route as AuthenticatedAuthorsRouteImport } from './routes/_authenticated/authors'
 import { Route as AuthenticatedAssignmentsRouteImport } from './routes/_authenticated/assignments'
-import { Route as AuthenticatedStudentsStudentIdRouteImport } from './routes/_authenticated/students/$studentId'
+import { Route as AuthenticatedStudentIdRouteImport } from './routes/_authenticated/$studentId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -103,17 +103,17 @@ const AuthenticatedAssignmentsRoute =
     path: '/assignments',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedStudentsStudentIdRoute =
-  AuthenticatedStudentsStudentIdRouteImport.update({
-    id: '/$studentId',
-    path: '/$studentId',
-    getParentRoute: () => AuthenticatedStudentsRoute,
-  } as any)
+const AuthenticatedStudentIdRoute = AuthenticatedStudentIdRouteImport.update({
+  id: '/$studentId',
+  path: '/$studentId',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/$studentId': typeof AuthenticatedStudentIdRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/authors': typeof AuthenticatedAuthorsRoute
   '/books': typeof AuthenticatedBooksRoute
@@ -122,15 +122,15 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
   '/publishers': typeof AuthenticatedPublishersRoute
-  '/students': typeof AuthenticatedStudentsRouteWithChildren
+  '/students': typeof AuthenticatedStudentsRoute
   '/transfer-history': typeof AuthenticatedTransferHistoryRoute
   '/transfers': typeof AuthenticatedTransfersRoute
-  '/students/$studentId': typeof AuthenticatedStudentsStudentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/$studentId': typeof AuthenticatedStudentIdRoute
   '/assignments': typeof AuthenticatedAssignmentsRoute
   '/authors': typeof AuthenticatedAuthorsRoute
   '/books': typeof AuthenticatedBooksRoute
@@ -139,10 +139,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/online-users': typeof AuthenticatedOnlineUsersRoute
   '/publishers': typeof AuthenticatedPublishersRoute
-  '/students': typeof AuthenticatedStudentsRouteWithChildren
+  '/students': typeof AuthenticatedStudentsRoute
   '/transfer-history': typeof AuthenticatedTransferHistoryRoute
   '/transfers': typeof AuthenticatedTransfersRoute
-  '/students/$studentId': typeof AuthenticatedStudentsStudentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_authenticated/$studentId': typeof AuthenticatedStudentIdRoute
   '/_authenticated/assignments': typeof AuthenticatedAssignmentsRoute
   '/_authenticated/authors': typeof AuthenticatedAuthorsRoute
   '/_authenticated/books': typeof AuthenticatedBooksRoute
@@ -158,10 +158,9 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/online-users': typeof AuthenticatedOnlineUsersRoute
   '/_authenticated/publishers': typeof AuthenticatedPublishersRoute
-  '/_authenticated/students': typeof AuthenticatedStudentsRouteWithChildren
+  '/_authenticated/students': typeof AuthenticatedStudentsRoute
   '/_authenticated/transfer-history': typeof AuthenticatedTransferHistoryRoute
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
-  '/_authenticated/students/$studentId': typeof AuthenticatedStudentsStudentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/$studentId'
     | '/assignments'
     | '/authors'
     | '/books'
@@ -180,12 +180,12 @@ export interface FileRouteTypes {
     | '/students'
     | '/transfer-history'
     | '/transfers'
-    | '/students/$studentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/register'
+    | '/$studentId'
     | '/assignments'
     | '/authors'
     | '/books'
@@ -197,13 +197,13 @@ export interface FileRouteTypes {
     | '/students'
     | '/transfer-history'
     | '/transfers'
-    | '/students/$studentId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/register'
+    | '/_authenticated/$studentId'
     | '/_authenticated/assignments'
     | '/_authenticated/authors'
     | '/_authenticated/books'
@@ -215,7 +215,6 @@ export interface FileRouteTypes {
     | '/_authenticated/students'
     | '/_authenticated/transfer-history'
     | '/_authenticated/transfers'
-    | '/_authenticated/students/$studentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -332,30 +331,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAssignmentsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/students/$studentId': {
-      id: '/_authenticated/students/$studentId'
+    '/_authenticated/$studentId': {
+      id: '/_authenticated/$studentId'
       path: '/$studentId'
-      fullPath: '/students/$studentId'
-      preLoaderRoute: typeof AuthenticatedStudentsStudentIdRouteImport
-      parentRoute: typeof AuthenticatedStudentsRoute
+      fullPath: '/$studentId'
+      preLoaderRoute: typeof AuthenticatedStudentIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
-interface AuthenticatedStudentsRouteChildren {
-  AuthenticatedStudentsStudentIdRoute: typeof AuthenticatedStudentsStudentIdRoute
-}
-
-const AuthenticatedStudentsRouteChildren: AuthenticatedStudentsRouteChildren = {
-  AuthenticatedStudentsStudentIdRoute: AuthenticatedStudentsStudentIdRoute,
-}
-
-const AuthenticatedStudentsRouteWithChildren =
-  AuthenticatedStudentsRoute._addFileChildren(
-    AuthenticatedStudentsRouteChildren,
-  )
-
 interface AuthenticatedRouteChildren {
+  AuthenticatedStudentIdRoute: typeof AuthenticatedStudentIdRoute
   AuthenticatedAssignmentsRoute: typeof AuthenticatedAssignmentsRoute
   AuthenticatedAuthorsRoute: typeof AuthenticatedAuthorsRoute
   AuthenticatedBooksRoute: typeof AuthenticatedBooksRoute
@@ -364,12 +351,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnlineUsersRoute: typeof AuthenticatedOnlineUsersRoute
   AuthenticatedPublishersRoute: typeof AuthenticatedPublishersRoute
-  AuthenticatedStudentsRoute: typeof AuthenticatedStudentsRouteWithChildren
+  AuthenticatedStudentsRoute: typeof AuthenticatedStudentsRoute
   AuthenticatedTransferHistoryRoute: typeof AuthenticatedTransferHistoryRoute
   AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedStudentIdRoute: AuthenticatedStudentIdRoute,
   AuthenticatedAssignmentsRoute: AuthenticatedAssignmentsRoute,
   AuthenticatedAuthorsRoute: AuthenticatedAuthorsRoute,
   AuthenticatedBooksRoute: AuthenticatedBooksRoute,
@@ -378,7 +366,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnlineUsersRoute: AuthenticatedOnlineUsersRoute,
   AuthenticatedPublishersRoute: AuthenticatedPublishersRoute,
-  AuthenticatedStudentsRoute: AuthenticatedStudentsRouteWithChildren,
+  AuthenticatedStudentsRoute: AuthenticatedStudentsRoute,
   AuthenticatedTransferHistoryRoute: AuthenticatedTransferHistoryRoute,
   AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
 }

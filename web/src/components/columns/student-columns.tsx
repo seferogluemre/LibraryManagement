@@ -91,7 +91,7 @@ export const columns: ColumnDef<Student>[] = [
       });
 
       const handleViewDetails = () => {
-        router.navigate({ to: `/students/$studentId`, params: { studentId: student.id } });
+        router.navigate({ to: `/${student.id}` });
       };
 
       return (
