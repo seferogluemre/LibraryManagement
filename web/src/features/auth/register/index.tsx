@@ -1,0 +1,1 @@
+export {RegisterForm as Register} from './components/RegisterForm'
