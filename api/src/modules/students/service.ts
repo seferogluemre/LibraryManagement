@@ -104,6 +104,47 @@ export abstract class StudentService {
               name: true,
             },
           },
+          assignments:{
+            select:{
+              id: true,
+              assignedBy: true,
+              book:{
+                select:{
+                  id:true,
+                  title:true,
+                  category:true,
+                  isbn:true,
+                }
+              } 
+            }
+          },
+          transferHistories:{
+            select:{
+              id: true,
+              newClass: {
+                select: {
+                  id: true,
+                  name: true,
+                }
+              },
+              oldClass: {
+                select: {
+                  id: true,
+                  name: true,
+                }
+              },
+              notes:true,
+              transferDate: true,
+              createdAt: true,
+              student:{
+                select:{
+                  name:true,
+                  studentNo:true, 
+                  id:true                  
+                }
+              }
+            }
+          }
         },
       });
 
@@ -145,8 +186,6 @@ export abstract class StudentService {
     payload: StudentUpdatePayload
   ): Promise<Student & { class: { id: string; name: string } }> {
     try {
-      console.log("gelen id service", id);
-      console.log("gelen payload service", payload);
       const updateData = await this.prepareStudentPayloadForUpdate(payload);
 
       if (Object.keys(updateData).length === 0) {

@@ -117,7 +117,7 @@ if (process.env.NODE_ENV === "development") {
 startOverdueBooksCron();
 
 console.log(
-  `🦊 Elysia çalışıyor kardeş ${app.server?.hostname}:${app.server?.port}`
+  `🦊 Elysia çalışıyor... ${app.server?.hostname}:${app.server?.port}`
 );
 
 export type App = typeof app;

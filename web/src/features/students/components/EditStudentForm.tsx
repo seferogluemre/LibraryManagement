@@ -66,8 +66,7 @@ export function EditStudentForm({
         ...values,
         studentNo: values.studentNo ? Number(values.studentNo) : undefined,
       });
-      if (res.error) throw new Error(res.error.value.message);
-      return res.data;
+      return res.data!;
     },
     onSuccess: () => {
       toast.success("Öğrenci bilgileri başarıyla güncellendi.", {

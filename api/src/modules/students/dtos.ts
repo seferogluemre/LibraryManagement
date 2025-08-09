@@ -59,6 +59,49 @@ export const studentWithClassResponseSchema = t.Object({
     id: t.String(),
     name: t.String(),
   }),
+  assignments: t.Optional(
+    t.Union([
+      t.Array(
+        t.Object({
+          id: t.String(),
+          assignedBy: t.Union([t.String(), t.Null()]),
+          book: t.Object({
+            id: t.String(),
+            title: t.String(),
+            category: t.Union([t.String(), t.Null()]),
+            isbn: t.Union([t.String(), t.Null()]),
+          }),
+        })
+      ),
+      t.Null()
+    ])
+  ),
+  transferHistories: t.Optional(
+    t.Union([
+      t.Array(
+        t.Object({
+          id: t.String(),
+          newClass: t.Object({
+            id: t.String(),
+            name: t.String(),
+          }),
+          oldClass: t.Object({
+            id: t.String(),
+            name: t.String(),
+          }),
+          notes: t.Union([t.String(), t.Null()]),
+          transferDate: t.Union([t.String({ format: "date-time" }), t.Null()]),
+          createdAt: t.String({ format: "date-time" }),
+          student: t.Object({
+            name: t.String(),
+            studentNo: t.String(),
+            id: t.String(),
+          }),
+        })
+      ),
+      t.Null()
+    ])
+  )
 });
 
 export const studentIndexDto = {
