@@ -3,6 +3,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -148,6 +149,15 @@ function LoginPage() {
               </Button>
             </form>
           </CardContent>
+          <CardFooter className="flex justify-between ">
+              <Button
+                variant="link"  
+                onClick={() => router.navigate({ to: "/register" })}
+              >
+                Hesabınız yok mu? Kayıt Olun
+              </Button>
+          </CardFooter >
+
         </Card>
       </div>
     </div>
