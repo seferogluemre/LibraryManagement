@@ -79,7 +79,6 @@ export function AddBookAssignmentForm({ onSuccess }: AddBookAssignmentFormProps)
         student_id: values.studentId,
         return_due: values.returnDue.toISOString(),
       })
-      if (res.error) throw res.error
       return res.data
     },
     onSuccess: () => {
@@ -123,8 +122,7 @@ export function AddBookAssignmentForm({ onSuccess }: AddBookAssignmentFormProps)
                       )}
                     >
                       {field.value
-                        ? books?.find((book: Book) => book.id === field.value)
-                            ?.title
+                        ? books?.find((book: Book) => String(book.id) === field.value)?.title
                         : "Kitap seçin"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -147,16 +145,17 @@ export function AddBookAssignmentForm({ onSuccess }: AddBookAssignmentFormProps)
                             value={book.title}
                             key={book.id}
                             onSelect={() => {
-                              form.setValue("bookId", book.id)
+                              form.setValue("bookId", String(book.id), {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                              })
                               setIsBookPopoverOpen(false)
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                book.id === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
+                                String(book.id) === field.value ? "opacity-100" : "opacity-0"
                               )}
                             />
                             {book.title}
@@ -194,9 +193,7 @@ export function AddBookAssignmentForm({ onSuccess }: AddBookAssignmentFormProps)
                       )}
                     >
                       {field.value
-                        ? students?.find(
-                            (student: Student) => student.id === field.value
-                          )?.name
+                        ? students?.find((student: Student) => String(student.id) === field.value)?.name
                         : "Öğrenci seçin"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -219,7 +216,10 @@ export function AddBookAssignmentForm({ onSuccess }: AddBookAssignmentFormProps)
                             value={student.name}
                             key={student.id}
                             onSelect={() => {
-                              form.setValue("studentId", student.id)
+                              form.setValue("studentId", String(student.id), {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                              })
                               setIsStudentPopoverOpen(false)
                             }}
                           >
@@ -272,9 +272,13 @@ export function AddBookAssignmentForm({ onSuccess }: AddBookAssignmentFormProps)
                   <Calendar
                     mode="single"
                     selected={field.value}
-                    onSelect={field.onChange}
+                    onSelect={(date) => {
+                      if (date) {
+                        field.onChange(date)
+                      }
+                    }}
                     disabled={(date) => date < new Date()}
-                    initialFocus
+
                   />
                 </PopoverContent>
               </Popover>
