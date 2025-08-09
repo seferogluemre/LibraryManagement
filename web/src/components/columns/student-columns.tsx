@@ -22,8 +22,10 @@ import {
 import { EditStudentForm } from "@/features/students/components/EditStudentForm";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
 import { type ColumnDef } from "@tanstack/react-table";
 import {
+  Eye,
   MoreHorizontal,
   Trash
 } from "lucide-react";
@@ -69,6 +71,7 @@ export const columns: ColumnDef<Student>[] = [
     header: "İşlemler",
     cell: function Cell({ row }) {
       const student = row.original;
+      const router = useRouter();
       const queryClient = useQueryClient();
       const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
       const [showEditDialog, setShowEditDialog] = React.useState(false);
@@ -87,6 +90,10 @@ export const columns: ColumnDef<Student>[] = [
         onSettled: () => setShowDeleteDialog(false),
       });
 
+      const handleViewDetails = () => {
+        router.navigate({ to: `/students/$studentId`, params: { studentId: student.id } });
+      };
+
       return (
         <>
           <DropdownMenu>
@@ -98,7 +105,10 @@ export const columns: ColumnDef<Student>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
-              <DropdownMenuItem>Detayları Görüntüle</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleViewDetails}>
+                <Eye className="mr-2 h-4 w-4" />
+                Detayları Görüntüle
+              </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
                 Düzenle
               </DropdownMenuItem>
