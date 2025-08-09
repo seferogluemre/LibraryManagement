@@ -1,5 +1,12 @@
 import type { User, UserRole } from "@prisma/client";
 
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  role?: UserRole;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

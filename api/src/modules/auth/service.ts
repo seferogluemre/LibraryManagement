@@ -11,6 +11,65 @@ import type {
 } from "./types";
 
 export abstract class AuthService {
+  
+  static async register(payload:RegisterRequest): Promise<{
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    const { name, email, password,role } = payload;
+
+    // Email'in benzersiz olduğunu kontrol et
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+    if (existingUser) {
+      throw new UnauthorizedException("Bu email zaten kayıtlı");
+    }
+
+    // Şifreyi hashle
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Yeni kullanıcı oluştur
+    const user = await prisma.user.create({
+      data: {
+        name:name.trim(),
+        email: email.toLowerCase(),
+        hashedPassword,
+        role:role ? role : "TEACHER", 
+      },
+    });
+
+    const accessToken = await JWTHelpers.generateAccessToken(
+      user.id,
+      user.email,
+      user.role
+    );
+    const refreshToken = await JWTHelpers.generateRefreshToken(
+      user.id,
+      user.email,
+      user.role
+    );
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); 
+
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        accessToken,
+        refreshToken,
+        expiresAt,
+      },
+    });
+
+    return {
+      user,
+      accessToken,
+      refreshToken,
+    };
+  }
+  
   /**
    * Email ve şifre ile kullanıcı girişi
    * Mevcut session varsa günceller, yoksa yeni oluşturur

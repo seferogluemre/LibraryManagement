@@ -11,6 +11,45 @@ export const authUserResponseSchema = t.Object({
   createdAt: UserPlain.properties.createdAt,
 });
 
+export const registerDto = {
+  body: t.Object({
+    email: t.String({
+      format: "email",
+      minLength: 3,
+      maxLength: 255,
+      description: "Kullanıcı email adresi",
+    }),
+    password: t.String({
+      minLength: 6,
+      maxLength: 100,
+      description: "Kullanıcı şifresi",
+    }),
+    name: t.String({
+      minLength: 1,
+      maxLength: 100,
+      description: "Kullanıcı adı",
+    }),
+    role: t.Optional(
+      t.String({
+        enum: ["USER", "ADMIN"],
+        description: "Kullanıcı rolü, varsayılan 'USER'",
+      })
+    ),
+  }),
+  response: {
+    200: t.Object({
+      user: authUserResponseSchema,
+      accessToken: t.String(),
+      refreshToken: t.String(),
+    }),
+    422: errorResponseDto[422],
+  },
+  detail: {
+    summary: "Kullanıcı Kaydı",
+    description: "Yeni kullanıcı kaydı yapar, JWT token döner",
+  },
+} satisfies ControllerHook;
+
 export const loginResponseSchema = t.Object({
   user: authUserResponseSchema,
   accessToken: t.String(),

@@ -2,6 +2,7 @@ import type { User } from "@prisma/client";
 import type { LoginResponse, RefreshTokenResponse, UserProfile } from "./types";
 
 export class AuthFormatter {
+
   /**
    * User entity'sini UserProfile formatına çevirir
    */

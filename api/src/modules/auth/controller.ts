@@ -1,7 +1,7 @@
 import { authGuard } from "@utils/auth-middleware";
 import { error } from "console";
 import { Elysia } from "elysia";
-import { loginDto, logoutDto, meDto, refreshTokenDto } from "./dtos";
+import { loginDto, logoutDto, meDto, refreshTokenDto, registerDto } from "./dtos";
 import { AuthFormatter } from "./formatters";
 import { AuthService } from "./service";
 
@@ -11,6 +11,15 @@ export const app = new Elysia({
     tags: ["Authentication"],
   },
 })
+  .post(
+    "/register",
+    async ({ body }) => {
+      const { user, accessToken, refreshToken } =
+        await AuthService.register(body);
+      return AuthFormatter.loginResponse(user, accessToken, refreshToken);
+    },
+    registerDto
+  )
   .post(
     "/login",
     async ({ body }) => {
