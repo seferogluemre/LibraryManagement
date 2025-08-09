@@ -1,7 +1,7 @@
 import { useAuth } from "@/services/auth";
 import {
-    createRootRouteWithContext,
-    Outlet,
+  createRootRouteWithContext,
+  Outlet,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
@@ -14,11 +14,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootComponent() {
-  const auth = useAuth();
   return (
     <>
       <Outlet />
-      <TanStackRouterDevtools />
     </>
   );
 }

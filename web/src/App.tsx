@@ -15,6 +15,7 @@ import { Eye, EyeOff } from "lucide-react";
 import "normalize.css";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { handleServerError } from "./utils/handle-server-error";
 
 function App() {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +37,7 @@ function App() {
         router.navigate({ to: "/dashboard" });
       });
     } catch (error) {
-      // Burada handleServerError(error) gibi bir şey olmalı
+      handleServerError(error) 
       console.error("Login error:", error);
       alert("Giriş başarısız oldu.");
     }

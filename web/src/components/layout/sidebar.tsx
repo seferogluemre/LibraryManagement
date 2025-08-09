@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { navItems } from "@/constants/navigation";
-import { clearLocalStorageAuthState } from "@/services/auth";
+import { clearLocalStorageAuthState, useAuth } from "@/services/auth";
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { useRouteContext, useRouter } from "@tanstack/react-router";
 import {
@@ -51,6 +51,9 @@ export function Sidebar() {
             window.removeEventListener('resize', checkMobile);
         };
     }, [setIsMobile]);
+
+    const auth = useAuth();
+
 
     return (
         <>
@@ -96,12 +99,12 @@ export function Sidebar() {
                 <div className="p-4 border-t mt-auto">
                     <div className="flex items-center gap-3 mb-4">
                         <Avatar className="w-10 h-10">
-                            <AvatarImage src={user?.avatarUrl} alt={user?.name} />
-                            <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                            <AvatarImage src={auth.user?.avatarUrl} alt={auth.user?.name} />
+                            <AvatarFallback>{auth.user?.name?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <p className="text-sm font-semibold">{user?.name || 'Kullanıcı'}</p>
-                            <p className="text-xs text-muted-foreground">{user?.role || 'user'}</p>
+                            <p className="text-sm font-semibold">{auth.user?.name || 'Kullanıcı'}</p>
+                            <p className="text-xs text-muted-foreground">{auth.user?.role == "admin" ? "Admin" : "Ögretmen"}</p>
                         </div>
                     </div>
                     <AlertDialog>
