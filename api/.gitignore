@@ -7,8 +7,6 @@ backup.dump
 .env
 .env.*
 
-# Scripts data
-prisma/scripts/*.csv
 
 # dependencies
 /node_modules
