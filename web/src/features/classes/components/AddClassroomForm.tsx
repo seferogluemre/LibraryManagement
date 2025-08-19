@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
-import { getLocalUser } from "@/services/auth";
+import { getLocalUser, useAuth } from "@/services/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, Loader2, Plus, XCircle } from "lucide-react";
 import React from "react";
@@ -30,10 +30,7 @@ type AddClassroomFormData = {
   name: string;
 };
 
-/**
- * Girilen sınıf adını standart bir formata dönüştürür.
- * Örnek: "11h" -> "11-H", "9 a" -> "9-A", "hazırlık" -> "Hazırlık"
- */
+
 function formatClassroomName(rawName: string): string {
   const trimmedName = rawName.trim();
   const match = trimmedName.match(/^(\d+)\s*([a-zA-Z])$/);
@@ -51,6 +48,9 @@ export function AddClassroomForm() {
   const [isOpen, setIsOpen] = React.useState(false);
   const queryClient = useQueryClient();
 
+  const auth=useAuth();
+  const accessToken = auth?.accessToken || localStorage.getItem("accessToken");
+
   const form = useForm<AddClassroomFormData>({
     defaultValues: { name: "" },
   });
@@ -58,7 +58,7 @@ export function AddClassroomForm() {
   const { mutate: createClassroom, isPending } = useMutation({
     mutationFn: async (data: AddClassroomFormData) => {
       const formattedName = formatClassroomName(data.name);
-      const accessToken = localStorage.getItem("accessToken");
+     
 
       if (!accessToken) {
         toast.error("Oturum bulunamadı", {
